@@ -39,7 +39,7 @@ wire            cen16;
 wire            write = !cs_n && !wr_n;
 
 // Timers
-wire            flag_A, flag_B;
+wire            flag_A, flag_B, flagen_A, flagen_B;
 wire    [7:0]   value_A;
 wire    [7:0]   value_B;
 wire            load_A, load_B;
@@ -47,7 +47,7 @@ wire            clr_flag_A, clr_flag_B;
 wire            overflow_A;
 wire            zero; // Single-clock pulse at the begginig of s1_enters
 
-assign          dout = { ~irq_n, flag_A, flag_B, 5'b0 };
+assign          dout = { ~irq_n, flag_A, flag_B, 5'd6 };
 assign          snd  = 16'd0;
 
 jtopl_mmr u_mmr(
@@ -64,6 +64,8 @@ jtopl_mmr u_mmr(
     .value_B    ( value_B       ),
     .load_A     ( load_A        ),
     .load_B     ( load_B        ),
+    .flagen_A   ( flagen_A      ),
+    .flagen_B   ( flagen_B      ),
     .clr_flag_A ( clr_flag_A    ),
     .clr_flag_B ( clr_flag_B    ),
     .flag_A     ( flag_A        ),
@@ -79,6 +81,8 @@ jtopl_timers u_timers(
     .value_B    ( value_B       ),
     .load_A     ( load_A        ),
     .load_B     ( load_B        ),
+    .flagen_A   ( flagen_A      ),
+    .flagen_B   ( flagen_B      ),
     .clr_flag_A ( clr_flag_A    ),
     .clr_flag_B ( clr_flag_B    ),
     .flag_A     ( flag_A        ),

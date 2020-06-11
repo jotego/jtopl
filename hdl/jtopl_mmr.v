@@ -32,6 +32,8 @@ module jtopl_mmr(
     output  reg [7:0]   value_B,
     output  reg         load_A,
     output  reg         load_B,
+    output  reg         flagen_A,
+    output  reg         flagen_B,
     output  reg         clr_flag_A,
     output  reg         clr_flag_B,
     input               flag_A,
@@ -65,6 +67,8 @@ always @(posedge clk) begin
         // timers
         { value_A, value_B } <= 16'd0;
         { clr_flag_B, clr_flag_A, load_B, load_A } <= 4'd0;
+        flagen_A   <= 1;
+        flagen_B   <= 1;
         din_copy   <= 8'd0;
     end else begin
         // WRITE IN REGISTERS
@@ -80,10 +84,10 @@ always @(posedge clk) begin
                     REG_CLKA: value_A <= din;
                     REG_CLKB: value_B <= din;
                     REG_TIMER: begin
-                        if( din[7] ) begin
-                            clr_flag_A <= din[6];
-                            clr_flag_B <= din[5];
-                        end
+                        clr_flag_A <= din[7];
+                        clr_flag_B <= din[7];
+                        flagen_A   <= ~din[6];
+                        flagen_B   <= ~din[5];
                         { load_B, load_A   } <= din[1:0];
                         end
                     default:;
