@@ -29,8 +29,7 @@ module jtopl_div(
 
 localparam DIVIDER = 4;
 localparam OPCOUNT = 18;
-localparam CNTMAX  = DIVIDER*OPCOUNT-1;
-localparam W       = 7;
+localparam W       = 2;
 
 reg  [W-1:0] cnt;
 reg  [4:0] zcnt;
@@ -40,11 +39,11 @@ initial cnt={W{1'b0}};
 `endif
 
 always @(posedge clk) if(cen) begin
-    cnt <= cnt==CNTMAX ? {W{1'b0}} : cnt+1'd1;
+    cnt <= cnt+1'd1;
 end
 
 always @(posedge clk) begin
-    cenop <= cen && (cnt==CNTMAX);
+    cenop <= cen && (&cnt);
 end
 
 always @(posedge clk, posedge rst) begin

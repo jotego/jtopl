@@ -132,7 +132,7 @@ int JTTParser::parse() {
                 int aux;
                 sscanf( txt_arg, "%d", &aux );
                 wait = aux;
-                wait *= 32*clk_period;
+                wait *= 128*clk_period;
                 // cerr << "Wait for " << wait << '\n';
                 return cmd_wait;
             }
