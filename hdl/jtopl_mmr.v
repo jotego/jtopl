@@ -22,7 +22,7 @@ module jtopl_mmr(
     input               rst,
     input               clk,
     input               cen,
-    output              cen16,
+    output              cenop,
     input       [7:0]   din,
     input               write,
     input               addr,
@@ -44,7 +44,7 @@ jtopl_div u_div (
     .rst            ( rst             ),
     .clk            ( clk             ),
     .cen            ( cen             ),
-    .cen16          ( cen16           ),
+    .cenop          ( cenop           ),
     .zero           ( zero            )
 );
 
@@ -94,7 +94,7 @@ always @(posedge clk) begin
                 endcase
             end
         end
-        else if(cen16) begin /* clear once-only bits */
+        else if(cenop) begin /* clear once-only bits */
             { clr_flag_B, clr_flag_A } <= 2'd0;
         end
     end

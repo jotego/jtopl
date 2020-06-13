@@ -22,7 +22,7 @@
 module jtopl_timers(
   input         clk,
   input         rst,
-  input         cen16,
+  input         cenop,
   input         zero,
   input [7:0]   value_A,
   input [7:0]   value_B,
@@ -45,10 +45,11 @@ assign flag_B = pre_B & flagen_B;
 
 assign irq_n = ~( flag_A | flag_B );
 
-jtopl_timer timer_A(
+// 1 count per 288 master clock ticks
+jtopl_timer #(.MW(2)) timer_A (
     .clk        ( clk       ), 
     .rst        ( rst       ),
-    .cen16      ( cen16     ),
+    .cenop      ( cenop     ),
     .zero       ( zero      ),
     .start_value( value_A   ),
     .load       ( load_A    ),
@@ -57,10 +58,11 @@ jtopl_timer timer_A(
     .overflow   ( overflow_A)
 );
 
-jtopl_timer #(.MW(2)) timer_B(
+// 1 count per 288*4 master clock ticks
+jtopl_timer #(.MW(4)) timer_B(
     .clk        ( clk       ), 
     .rst        ( rst       ),
-    .cen16      ( cen16     ),
+    .cenop      ( cenop     ),
     .zero       ( zero      ),
     .start_value( value_B   ),
     .load       ( load_B    ),
@@ -71,10 +73,10 @@ jtopl_timer #(.MW(2)) timer_B(
 
 endmodule
 
-module jtopl_timer #(parameter MW=0) (
+module jtopl_timer #(parameter MW=2) (
     input      clk, 
     input      rst,
-    input      cen16,
+    input      cenop,
     input      zero,
     input      [7:0] start_value,
     input      load,
@@ -101,7 +103,7 @@ always @(posedge clk)
     if( ~load || rst) begin
       cnt  <= { start_value, {MW{1'b0}} };
     end
-    else if( cen16 && zero )
+    else if( cenop && zero )
       cnt <= overflow ? init : next;
 
 endmodule

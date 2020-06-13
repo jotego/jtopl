@@ -30,11 +30,11 @@ module jtopl(
     output          [ 7:0] dout,
     output                 irq_n,
     // combined output
-    output  signed  [15:0] snd,
+    output  signed  [15:0] sound,
     output                 sample
 );
 
-wire            cen16;
+wire            cenop;
 
 wire            write = !cs_n && !wr_n;
 
@@ -48,13 +48,13 @@ wire            overflow_A;
 wire            zero; // Single-clock pulse at the begginig of s1_enters
 
 assign          dout = { ~irq_n, flag_A, flag_B, 5'd6 };
-assign          snd  = 16'd0;
+assign          sound= 16'd0;
 
 jtopl_mmr u_mmr(
     .rst        ( rst           ),
     .clk        ( clk           ),
     .cen        ( cen           ),  // external clock enable
-    .cen16      ( cen16         ),  // internal clock enable
+    .cenop      ( cenop         ),  // internal clock enable
     .din        ( din           ),
     .write      ( write         ),
     .addr       ( addr          ),
@@ -75,7 +75,7 @@ jtopl_mmr u_mmr(
 jtopl_timers u_timers(
     .rst        ( rst           ),
     .clk        ( clk           ),
-    .cen16      ( cen16         ),
+    .cenop      ( cenop         ),
     .zero       ( zero          ),
     .value_A    ( value_A       ),
     .value_B    ( value_B       ),

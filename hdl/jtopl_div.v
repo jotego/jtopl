@@ -23,34 +23,38 @@ module jtopl_div(
     input       rst,
     input       clk,
     input       cen,
-    output reg  cen16,
-    output reg  zero
+    output reg  cenop,  // clock enable at operator rate
+    output reg  zero    // Marks first slot
 );
 
-reg  [3:0] cnt;
+localparam DIVIDER = 4;
+localparam OPCOUNT = 18;
+localparam CNTMAX  = DIVIDER*OPCOUNT-1;
+localparam W       = 7;
+
+reg  [W-1:0] cnt;
 reg  [4:0] zcnt;
 
 `ifdef SIMULATION
-initial cnt=4'd0;
+initial cnt={W{1'b0}};
 `endif
 
 always @(posedge clk) if(cen) begin
-    cnt <= cnt+4'd1;
+    cnt <= cnt==CNTMAX ? {W{1'b0}} : cnt+1'd1;
 end
 
 always @(posedge clk) begin
-    cen16 <= cen && &cnt;
+    cenop <= cen && (cnt==CNTMAX);
 end
 
 always @(posedge clk, posedge rst) begin
     if( rst ) begin
         zcnt <= 5'd0;
         zero <= 0;
-    end else if(cen16) begin
-        zcnt <= zcnt==5'd18 ? 5'd0 : zcnt+5'd1;
-        zero <= zcnt==5'd18;
+    end else if(cenop) begin
+        zcnt <= zcnt==OPCOUNT-1 ? 5'd0 : zcnt+5'd1;
+        zero <= zcnt==OPCOUNT-1;
     end
 end
-
 
 endmodule
