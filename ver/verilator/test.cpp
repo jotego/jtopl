@@ -76,7 +76,7 @@ double sc_time_stamp () {      // Called by $time in Verilog
 }
 
 class CmdWritter {
-    int addr, cmd, val;
+    int addr, cmd, val, waitcnt;
     Vjtopl *top;
     bool done;
     int last_clk;
@@ -440,11 +440,12 @@ void CmdWritter::Write( int _addr, int _cmd, int _val ) {
             _val = k.filter(_val);
         }
     }
-    addr = _addr;
-    cmd  = _cmd;
-    val  = _val;
-    done = false;
+    addr  = _addr;
+    cmd   = _cmd;
+    val   = _val;
+    done  = false;
     state = 0;
+    waitcnt = 72;
     if( addr == watch_addr && cmd>=(char)0x30 && (cmd&0x3)==watch_ch )
         cerr << addr << '-' << watch_ch << " CMD = " << hex << (cmd&0xff) << " VAL = " << (val&0xff) << '\n';
     for( auto& k : features )
@@ -472,20 +473,28 @@ void CmdWritter::Eval() {
                 state = 20; // wait for one cycle
                 break;
             case 20:
+                if( waitcnt )
+                    waitcnt--;
+                else
+                    state = 30;
+                break;
+            case 30:
                 top->addr = 1;
                 top->din  = val;
                 top->wr_n = 0;
-                state = 30;
-                break;
-            case 30:
-                top->wr_n = 1;
-                state     = 40;
-                top->addr = 0; // read busy signal
+                state=40;
                 break;
             case 40:
-                if( (((int)top->dout) &0x80 ) == 0 ) {
-                    done = true;
-                    state=50;
+                top->wr_n = 1;
+                state     = 50;
+                waitcnt   = 72;
+                break;
+            case 50:
+                if( waitcnt )
+                    waitcnt--;
+                else {
+                    state = 60;
+                    done  = 1;
                 }
                 break;
             default: break;
