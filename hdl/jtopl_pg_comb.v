@@ -36,8 +36,8 @@ module jtopl_pg_comb(
     // input signed [7:0]   pm_in,
     input       [16:0]  phinc_in,
 
-    output  [19:0]  phase_out,
-    output  [ 9:0]  phase_op
+    output      [19:0]  phase_out,
+    output      [ 9:0]  phase_op
 );
 
 wire signed [8:0] pm_offset;
