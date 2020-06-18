@@ -44,7 +44,7 @@ always @(*) begin : pre_rate_calc
 end
 
 always @(*)
-    rate = pre_rate[6] ? 6'd63 : pre_rate[5:0];
+    rate = pre_rate>=7'b1111_00 ? 6'b1111_00 : pre_rate[5:0];
 
 reg [2:0] cnt;
 

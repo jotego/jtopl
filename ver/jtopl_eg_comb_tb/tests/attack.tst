@@ -1,5 +1,5 @@
 reset
-arate=10
+arate=3
 drate=6
 sl=6
 
