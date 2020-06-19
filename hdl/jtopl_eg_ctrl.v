@@ -43,13 +43,7 @@ localparam  ATTACK = 3'b001,
 
 // wire is_decaying = state_in[1] | state_in[2];
 
-reg     [4:0]   sustain;
-
-always @(*) 
-    if( sl == 4'd15 )
-        sustain = 5'h1f; // 93dB
-    else
-        sustain = {1'b0, sl};
+wire [4:0] sustain = { &sl, sl}; //93dB if sl==4'hF
 
 always @(*) begin
     pg_rst = keyon_now;

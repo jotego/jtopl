@@ -32,10 +32,10 @@ class Stim {
 public:
 	// inputs
 	int keyon_now, keyoff_now, state_in, eg_in, arate, drate, rate2, rrate, sl,
-		keycode, eg_cnt, cnt_in, ks, en_sus,
+		keycode, eg_cnt, cnt_in, ks, en_sus, sum_up_in,
 		lfo_mod, amsen, ams, tl;
 	// outputs
-	int state_next, pg_rst, cnt_lsb, pure_eg_out, eg_out;
+	int state_next, pg_rst, cnt_lsb, pure_eg_out, eg_out, sum_up_out;
 	void reset();
 	void apply(Vtest* dut);
 	void get(Vtest* dut);
@@ -97,6 +97,7 @@ void Stim::reset() {
 	rrate=0, sl=0, en_sus=0,
 	keycode=0, eg_cnt=0, cnt_in=0, ks=0,
 	lfo_mod=0, amsen=0, ams=0, tl=0;
+	sum_up_in = 0;
 	wait_count=0;
 }
 
@@ -104,6 +105,7 @@ void Stim::apply(Vtest* dut) {
 	dut->keyon_now	= keyon_now;
 	dut->keyoff_now	= keyoff_now;
 	dut->state_in	= state_in;
+	dut->sum_up_in  = sum_up_in;
 	dut->eg_in		= eg_in;
 	dut->arate		= arate;
 	dut->drate		= drate;
@@ -128,17 +130,19 @@ void Stim::get(Vtest* dut) {
 	cnt_lsb		= dut->cnt_lsb;
 	pure_eg_out	= dut->pure_eg_out;
 	eg_out		= dut->eg_out;
+	sum_up_out  = dut->sum_up_out;
 }
 
 void Stim::next(Vtest* dut) {
 	read_line();
 	apply(dut);
 	dut->eval();
-	main_time+=22*3;
+	main_time+=20000; // zero period=20us = 4*18*1/3.6MHz
 	get(dut);
-	state_in = state_next;
-	eg_in = pure_eg_out;
-	cnt_in = cnt_lsb;
+	state_in  = state_next;
+	eg_in     = pure_eg_out;
+	cnt_in    = cnt_lsb;
+	sum_up_in = sum_up_out;
 	eg_cnt++;
 	lfo_mod++;
 	if( wait_count>0 ) wait_count--;

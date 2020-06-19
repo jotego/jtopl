@@ -28,7 +28,7 @@ module jtopl_reg(
     output reg      zero,
     
     input   [1:0]   sel_group,     // group to update
-    input   [3:0]   sel_sub,       // subslot to update
+    input   [2:0]   sel_sub,       // subslot to update
     
     //input           csm,
     //input           flag_A,
@@ -36,39 +36,39 @@ module jtopl_reg(
 
     input           up_fbcon,
     input           up_fnum,
-    //input           up_pms,
-    //input           up_tl,
-    //input           up_ks_ar,
-    //input           up_sr,        
-    //input           up_sl_rr,
+    input           up_mult,
+    input           up_ksl_tl,
+    input           up_ar_dr,
+    input           up_sl_rr,
     
-       
     // PG
     input       [ 4:0]  latch_fnum,
     output      [ 9:0]  fnum_I,
-    output      [ 2:0]  block_I
+    output      [ 2:0]  block_I,
     // channel configuration
     // output reg  [2:0]   fb_II,
     // output      [2:0]   alg_I,
-    // Operator multiplying
-    // output      [ 3:0]  mul_II,
     
+    output      [ 3:0]  mul_II, // frequency multiplier
+    output      [ 1:0]  ksl_I,  // key shift level
+    output              am_I,
+    output              vib_I,    
     // EG
-    // output      [3:0]   ar_I,     // attack  rate
-    // output      [3:0]   rr_I,     // release rate
-    // output      [3:0]   sl_I,     // sustain level
-    // output      [1:0]   ks_II,    // key scale
-    // output      [5:0]   tl_IV,
-
-    // envelope operation
-    // output          keyon_I
+    output      [5:0]   tl_IV,
+    output              en_sus_I,// enable sustain
+    output      [3:0]   arate_I, // attack  rate
+    output      [3:0]   drate_I, // decay   rate
+    output      [3:0]   rrate_I, // release rate
+    output      [3:0]   sl_I,    // sustain level
+    output              ks_II    // key scale
 );
 
 localparam CH=9;
 
 // Each group contains three channels
+// and each subslot contains six operators
 reg  [1:0] group;
-reg  [3:0] subslot;
+reg  [2:0] subslot;
 
 `ifdef SIMULATION
 // These signals need to operate during rst
@@ -77,13 +77,13 @@ reg  [3:0] subslot;
 // This does not work with NCVERILOG
 initial begin
     group   = 2'd0;
-    subslot = 4'd0;
+    subslot = 3'd0;
     zero    = 1'b1;
 end
 `endif
 
-wire [3:0] next_sub   = subslot==4'd5 ? 4'd0 : (subslot+4'd1);
-wire [1:0] next_group = subslot==4'd5 ? (group==2'b10 ? 2'b00 : group+2'b1) : group;
+wire [2:0] next_sub   = subslot==3'd5 ? 3'd0 : (subslot+3'd1);
+wire [1:0] next_group = subslot==3'd5 ? (group==2'b10 ? 2'b00 : group+2'b1) : group;
 
 wire [2:0] fb_I;
 wire       con_I;
@@ -97,23 +97,23 @@ reg        match;
 //wire    [3:0]   keyon_op = din[7:4];
 //wire    [2:0]   keyon_ch = din[2:0];
 // channel data
-wire    [2:0]   fb_in   = din[3:1];
-wire            con_in  = din[0];
-wire    [7:0]   fnlo_in = din;
+wire [2:0] fb_in   = din[3:1];
+wire       con_in  = din[0];
+wire [7:0] fnlo_in = din;
 
-wire            up_fnum_ch  = up_fnum  & match, 
-                up_fbcon_ch = up_fbcon & match;
-
-// wire up_alg_ch  = up_alg    & update_ch_I;
-// wire up_fnum_ch=up_fnum & update_ch_I;
-// wire up_pms_ch  = up_pms    & update_ch_I;
-// wire up_ams_ch  = up_pms    & update_ch_IV;
+wire       up_fnum_ch  = up_fnum  & match, 
+           up_fbcon_ch = up_fbcon & match,
+           update_op_I = sel_group == group && sel_sub == subslot;
+reg        update_op_II, update_op_III, update_op_IV;
 
 always @(posedge clk) begin : up_counter
     if( cen ) begin
         { group, subslot }  <= { next_group, next_sub };
         match               <= { next_group, next_sub } == { sel_group, sel_sub};
-        zero                <= { next_group, next_sub }==6'd0;
+        zero                <= { next_group, next_sub }==5'd0;
+        update_op_II        <= update_op_I;
+        update_op_III       <= update_op_II;
+        update_op_IV        <= update_op_III;
     end
 end
 
@@ -147,32 +147,31 @@ end
 //     .yuse_prev1     ( yuse_prev1      ),
 //     .yuse_prev2     ( yuse_prev2      )
 // );
-/*
-wire [43:0] shift_out;
 
-jtopl_csr #(.LEN(CH*2)) u_csr(
+localparam OPCFGW = 4*8;
+
+wire [OPCFGW-1:0] shift_out;
+
+jtopl_csr #(.LEN(CH*2),.W(OPCFGW)) u_csr(
     .rst            ( rst           ),
     .clk            ( clk           ),
     .cen            ( cen           ),
     .din            ( din           ),
-    .shift_in       ( shift_out     ),
     .shift_out      ( shift_out     ),
-    .up_tl          ( up_tl         ),     
-    .up_dt1         ( up_dt1        ),    
-    .up_ks_ar       ( up_ks_ar      ),  
-    .up_amen_dr     ( up_amen_dr    ),
-    .up_sr          ( up_sr         ),     
-    .up_sl_rr       ( up_sl_rr      ),  
-    .up_ssgeg       ( up_ssgeg      ),  
+    .up_mult        ( up_mult       ),
+    .up_ksl_tl      ( up_ksl_tl     ),
+    .up_ar_dr       ( up_ar_dr      ),
+    .up_sl_rr       ( up_sl_rr      ), 
     .update_op_I    ( update_op_I   ),
     .update_op_II   ( update_op_II  ),
     .update_op_IV   ( update_op_IV  )
 );
 
-assign { tl_IV,   dt1_I,    mul_II,    ks_II, 
-         ar_I,    amsen_IV, d1r_I,     d2r_I, 
-         sl_I,    rr_I,     ssg_en_I,  ssg_eg_I } = shift_out;
-*/
+assign { am_I, vib_I, en_sus_I, ks_II, mul_II,
+         ksl_I, tl_IV,
+         arate_I, drate_I, 
+         sl_I, rrate_I  } = shift_out;
+
 
 // memory for CH registers
 // Block/fnum data is latched until fnum low byte is written to

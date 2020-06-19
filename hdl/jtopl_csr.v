@@ -20,30 +20,28 @@
 
 */
 
-module jtopl_csr( // Circular Shift Register + input mux
+module jtopl_csr #(
+    parameter LEN=18, W=32
+) ( // Circular Shift Register + input mux
     input           rst,
     input           clk,
     input           cen,
     input   [ 7:0]  din,
-    input   [43:0]  shift_in,
-    output  [43:0]  shift_out,
+    output [W-1:0]  shift_out,
 
-    input           up_tl,
-    input           up_ks_ar,  
-    input           up_sr,     
-    input           up_sl_rr,  
+    input           up_mult,
+    input           up_ksl_tl,
+    input           up_ar_dr,
+    input           up_sl_rr,
     input           update_op_I,
     input           update_op_II,
     input           update_op_IV
 );
 
-parameter LEN=18;
 
-localparam regop_width=44;
+reg [W-1:0] regop_in;
 
-reg [regop_width-1:0] regop_in;
-
-jtopl_sh_rst #(.width(regop_width),.stages(LEN)) u_regch(
+jtopl_sh_rst #(.width(W),.stages(LEN)) u_regch(
     .clk    ( clk          ),
     .cen    ( cen          ),
     .rst    ( rst          ),
@@ -51,25 +49,23 @@ jtopl_sh_rst #(.width(regop_width),.stages(LEN)) u_regch(
     .drop   ( shift_out    )
 );
 
-wire up_tl_op   = up_tl     & update_op_IV;
-wire up_mul_op  = up_dt1    & update_op_II;
-wire up_ks_op   = up_ks_ar  & update_op_II;
-wire up_ar_op   = up_ks_ar  & update_op_I;
-wire up_amen_op = up_amen_dr& update_op_IV;
-wire up_sr_op   = up_sr     & update_op_I;
-wire up_sl_op   = up_sl_rr  & update_op_I;
-wire up_rr_op   = up_sl_rr  & update_op_I;
+wire up_mult_I    = up_mult   & update_op_I;
+wire up_mult_II   = up_mult   & update_op_II;
+wire up_ksl_tl_II = up_ksl_tl & update_op_II;
+wire up_ksl_tl_IV = up_ksl_tl & update_op_IV;
+wire up_ar_dr_op  = up_ar_dr  & update_op_I;
+wire up_sl_rr_op  = up_sl_rr  & update_op_I;
 
-always @(*)
-    regop_in = {
-        up_tl_op    ? din[6:0]    : shift_in[43:37],      // 7 
-        up_mul_op   ? din[3:0]    : shift_in[33:30],      // 4 
-        up_ks_op    ? din[7:6]    : shift_in[29:28],      // 2 
-        up_ar_op    ? din[4:0]    : shift_in[27:23],      // 5 
-        up_amen_op  ? din[7]      : shift_in[   22],      // 1 
-        up_sr_op    ? din[4:0]    : shift_in[16:12],      // 5 
-        up_sl_op    ? din[7:4]    : shift_in[11: 8],      // 4 
-        up_rr_op    ? din[3:0]    : shift_in[ 7: 4],      // 4 
+assign regop_in = { // 4 bytes:
+        up_mult_I   ? din[7:5]    : shift_out[31:29],
+        up_mult_II  ? din[4:0]    : shift_out[28:24], // KSR + Mult
+
+        up_ksl_tl_II? din[7:6]    : shift_out[23:22], // KSL
+        up_ksl_tl_IV? din[5:0]    : shift_out[21:16], // TL
+
+        up_ar_dr_op ? din         : shift_out[15: 8],
+
+        up_sl_rr_op ? din         : shift_out[ 7: 0]
     };
 
 endmodule // jtopl_reg

@@ -40,7 +40,14 @@ module jtopl_mmr(
     input               overflow_A,
     // Phase Generator
     output      [ 9:0]  fnum_I,
-    output      [ 2:0]  block_I
+    output      [ 2:0]  block_I,
+    // Envelope Generator
+    output              en_sus_I, // enable sustain
+    output      [3:0]   arate_I, // attack  rate
+    output      [3:0]   drate_I, // decay   rate
+    output      [3:0]   rrate_I, // release rate
+    output      [3:0]   sl_I,   // sustain level
+    output              ks_II      // key scale
 );
 
 jtopl_div u_div (
@@ -60,8 +67,9 @@ reg  [ 7:0] din_copy;
 reg  [ 4:0] latch_fnum;
 reg         csm, effect;
 reg  [ 1:0] sel_group;     // group to update
-reg  [ 3:0] sel_sub;       // subslot to update
-reg         up_fnum, up_fbcon;
+reg  [ 2:0] sel_sub;       // subslot to update
+reg         up_fnum, up_fbcon, 
+            up_mult, up_ksl_tl, up_ar_dr, up_sl_rr;
 
 // this runs at clk speed, no clock gating here
 // if I try to make this an async rst it fails to map it
@@ -70,10 +78,14 @@ always @(posedge clk) begin
     if( rst ) begin
         selreg    <= 8'h0;
         sel_group <= 2'd0;
-        sel_sub   <= 4'd0;
+        sel_sub   <= 3'd0;
         // Updaters
         up_fbcon  <= 0;
         up_fnum   <= 0;
+        up_mult   <= 0;
+        up_ksl_tl <= 0;
+        up_ar_dr  <= 0;
+        up_sl_rr  <= 0;
         // timers
         { value_A, value_B } <= 16'd0;
         { clr_flag_B, clr_flag_A, load_B, load_A } <= 4'd0;
@@ -87,10 +99,13 @@ always @(posedge clk) begin
                 selreg <= din;  
             end else begin
                 // Global registers
-                din_copy <= din;
-                up_fnum  <= 0;
-                up_fbcon <= 0;
-
+                din_copy  <= din;
+                up_fnum   <= 0;
+                up_fbcon  <= 0;
+                up_mult   <= 0;
+                up_ksl_tl <= 0;
+                up_ar_dr  <= 0;
+                up_sl_rr  <= 0;
                 // General control (<0x20 registers)
                 casez( selreg )
                     REG_CLKA: value_A <= din;
@@ -104,19 +119,19 @@ always @(posedge clk) begin
                         end
                     default:;
                 endcase
-                /*
                 // Operator registers
                 if( selreg >= 8'h20 && selreg < 8'hA0 &&
                     selreg[2:0]<=3'd5 && selreg[4:3]!=2'b11) begin
                     sel_group <= selreg[4:3];
                     sel_sub   <= selreg[2:0];
                     case( selreg[7:5] )
-                        2'b001: {}
-                        2'b010: 
-                        2'b
+                        3'b001: up_mult   <= 1;
+                        3'b010: up_ksl_tl <= 1;
+                        3'b011: up_ar_dr  <= 1;
+                        3'b100: up_sl_rr  <= 1;
+                        default:;
                     endcase
                 end                
-                */
                 // Channel registers
                 case( selreg[7:4] )
                     4'hA: if( selreg[3:0]<=4'd8) up_fnum <= 1;
@@ -128,8 +143,7 @@ always @(posedge clk) begin
                     sel_group <= selreg[3:0] < 4'd3 ? 2'd0 :
                         ( selreg[3:0] < 4'd6 ? 2'd1 : 
                         ( selreg[3:0] < 4'd9 ? 2'd2 : 2'd3) );
-                    sel_sub[3]   <= 0;
-                    sel_sub[2:0] <= selreg[3:0] < 4'd6 ? selreg[2:0] :
+                    sel_sub <= selreg[3:0] < 4'd6 ? selreg[2:0] :
                         { 1'b0, ~&selreg[2:1], selreg[0] };
                 end
             end
@@ -157,16 +171,29 @@ jtopl_reg u_reg(
 
     .up_fbcon   ( up_fbcon      ),
     .up_fnum    ( up_fnum       ),
-    //input           up_pms,
-    //input           up_tl,
-    //input           up_ks_ar,
-    //input           up_sr,        
-    //input           up_sl_rr,
-       
+
+    .up_mult    ( up_mult       ),
+    .up_ksl_tl  ( up_ksl_tl     ),
+    .up_ar_dr   ( up_ar_dr      ),
+    .up_sl_rr   ( up_sl_rr      ),
+
     // PG
     .latch_fnum ( latch_fnum    ),
     .fnum_I     ( fnum_I        ),
-    .block_I    ( block_I       )
+    .block_I    ( block_I       ),
+    // EG
+    .en_sus_I   ( en_sus_I      ),
+    .arate_I    ( arate_I       ),
+    .drate_I    ( drate_I       ),
+    .rrate_I    ( rrate_I       ),
+    .sl_I       ( sl_I          ),
+    .ks_II      ( ks_II         ),
+    // Other
+    .mul_II     (               ),
+    .ksl_I      (               ),
+    .am_I       (               ),
+    .vib_I      (               ),
+    .tl_IV      (               )
 );
 
 endmodule

@@ -34,13 +34,13 @@ module jtopl_pg(
     // phase operation
     input               pg_rst_II,
     
-    output  reg [ 4:0]  keycode_II,
+    output  reg [ 3:0]  keycode_II,
     output      [ 9:0]  phase_VIII
 );
 
 parameter CH=9;
 
-wire [ 4:0] keycode_I;
+wire [ 3:0] keycode_I;
 wire [16:0] phinc_I;
 reg  [16:0] phinc_II;
 wire [19:0] phase_drop, phase_in;

@@ -26,7 +26,7 @@ module jtopl_pg_comb(
     input       [ 4:0]  lfo_mod,
     input       [ 2:0]  pms,
 
-    output      [ 4:0]  keycode,
+    output      [ 3:0]  keycode,
     // Phase increment  
     output      [16:0]  phinc_out,
     // Phase add

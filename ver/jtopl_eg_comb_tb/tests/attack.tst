@@ -1,15 +1,17 @@
 reset
-arate=3
-drate=6
+arate=A
+drate=7
+rrate=A
 sl=6
+keycode=0
+ks=1
 
 keyon=1
 wait=1
 keyon=0
 
-wait=1000
+wait=2000
 
-rrate=f
 keyoff=1
 wait=1
 keyoff=0

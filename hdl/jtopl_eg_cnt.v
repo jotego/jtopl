@@ -27,21 +27,16 @@ module jtopl_eg_cnt(
 	output reg [14:0] eg_cnt
 );
 
-reg	[1:0] eg_cnt_base;
-
 always @(posedge clk, posedge rst) begin : envelope_counter
 	if( rst ) begin
-		eg_cnt_base	<= 2'd0;
 		eg_cnt		<=15'd0;
 	end
 	else begin
 		if( zero && cen ) begin
-			// envelope counter increases every 3 output samples,
-			if( eg_cnt_base == 2'd2 ) begin
-				eg_cnt 		<= eg_cnt + 1'b1;
-				eg_cnt_base	<= 2'd0;
-			end
-			else eg_cnt_base <= eg_cnt_base + 1'b1;
+			// envelope counter increases at each zero input
+			// This is different from OPN/M where it increased
+			// once every three zero inputs
+			eg_cnt <= eg_cnt + 1'b1;
 		end
 	end
 end

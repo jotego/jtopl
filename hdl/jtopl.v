@@ -54,8 +54,27 @@ wire    [ 3:0]  mul_II;
 wire    [ 9:0]  phase_VIII;
 wire            pg_rst_II;
 
-assign          dout = { ~irq_n, flag_A, flag_B, 5'd6 };
-assign          sound= 16'd0;
+// envelope configuration
+wire            en_sus_I; // enable sustain
+wire    [ 3:0]  keycode_II;
+wire    [ 3:0]  arate_I; // attack  rate
+wire    [ 3:0]  drate_I; // decay   rate
+wire    [ 3:0]  rrate_I; // release rate
+wire    [ 3:0]  sl_I;   // sustain level
+wire            ks_II;     // key scale
+// envelope operation
+wire            keyon_I;
+wire            eg_stop;
+// envelope number
+wire    [ 6:0]  lfo_mod;
+wire            amsen_IV;
+wire            ams_IV;
+wire    [ 6:0]  tl_IV;
+wire    [ 9:0]  eg_V;
+
+assign          dout    = { ~irq_n, flag_A, flag_B, 5'd6 };
+assign          sound   = 16'd0;
+assign          eg_stop = 0;
 
 jtopl_mmr u_mmr(
     .rst        ( rst           ),
@@ -79,7 +98,14 @@ jtopl_mmr u_mmr(
     .overflow_A ( overflow_A    ),
     // Phase Generator
     .fnum_I     ( fnum_I        ),
-    .block_I    ( block_I       )
+    .block_I    ( block_I       ),
+    // Envelope Generator
+    .en_sus_I   ( en_sus_I      ),
+    .arate_I    ( arate_I       ),
+    .drate_I    ( drate_I       ),
+    .rrate_I    ( rrate_I       ),
+    .sl_I       ( sl_I          ),
+    .ks_II      ( ks_II         )
 );
 
 jtopl_timers u_timers(
@@ -116,8 +142,33 @@ jtopl_pg u_pg(
     // phase operation
     .pg_rst_II  ( pg_rst_II     ),
     
-    .keycode_II (               ),
+    .keycode_II ( keycode_II    ),
     .phase_VIII ( phase_VIII    )
+);
+
+jtopl_eg u_eg(
+    .rst        ( rst           ),
+    .clk        ( clk           ),
+    .cenop      ( cenop         ),
+    .zero       ( zero          ),
+    .eg_stop    ( eg_stop       ),
+    // envelope configuration
+    .en_sus_I   ( en_sus_I      ), // enable sustain
+    .keycode_II ( keycode_II    ),
+    .arate_I    ( arate_I       ), // attack  rate
+    .drate_I    ( drate_I       ), // decay   rate
+    .rrate_I    ( rrate_I       ), // release rate
+    .sl_I       ( sl_I          ), // sustain level
+    .ks_II      ( ks_II         ), // key scale
+    // envelope operation
+    .keyon_I    ( keyon_I       ),
+    // envelope number
+    .lfo_mod    ( lfo_mod       ),
+    .amsen_IV   ( amsen_IV      ),
+    .ams_IV     ( ams_IV        ),
+    .tl_IV      ( tl_IV         ),
+    .eg_V       ( eg_V          ),
+    .pg_rst_II  ( pg_rst_II     )
 );
 
 endmodule

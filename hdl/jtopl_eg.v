@@ -22,11 +22,11 @@
 module jtopl_eg (
     input               rst,
     input               clk,
-    input               cen,
+    input               cenop,
     input               zero,
     input               eg_stop,
     // envelope configuration
-    input               en_sus, // enable sustain
+    input               en_sus_I, // enable sustain
     input       [3:0]   keycode_II,
     input       [3:0]   arate_I, // attack  rate
     input       [3:0]   drate_I, // decay   rate
@@ -38,21 +38,21 @@ module jtopl_eg (
     // envelope number
     input       [6:0]   lfo_mod,
     input               amsen_IV,
-    input       [1:0]   ams_IV,
+    input               ams_IV,
     input       [6:0]   tl_IV,
 
     output  reg [9:0]   eg_V,
     output  reg         pg_rst_II
 );
 
-parameter CH=9;
+parameter SLOTS=18;
 
 wire [14:0] eg_cnt;
 
 jtopl_eg_cnt u_egcnt(
     .rst    ( rst   ),
     .clk    ( clk   ),
-    .cen    ( cen & ~eg_stop ),
+    .cen    ( cenop & ~eg_stop ),
     .zero   ( zero  ),
     .eg_cnt ( eg_cnt)
 );
@@ -63,8 +63,6 @@ wire keyoff_now_I = keyon_last_I && !keyon_I;
 
 wire cnt_in_II, cnt_lsb_II, step_II, pg_rst_I;
 
-wire ssg_inv_in_I, ssg_inv_out_I;
-reg  ssg_inv_II, ssg_inv_III, ssg_inv_IV;
 wire [2:0] state_in_I, state_next_I;
 
 reg attack_II, attack_III;
@@ -72,7 +70,7 @@ wire [4:0] base_rate_I;
 reg  [4:0] base_rate_II;
 wire  [5:0] rate_out_II;
 reg  [5:1] rate_in_III;
-reg step_III, ssg_en_II, ssg_en_III;
+reg step_III;
 wire sum_out_II;
 reg sum_in_III;
 
@@ -88,7 +86,8 @@ jtopl_eg_comb u_comb(
     .keyoff_now     ( keyoff_now_I  ),
     .state_in       ( state_in_I    ),
     .eg_in          ( eg_in_I       ),
-    // envelope configuration   
+    // envelope configuration
+    .en_sus         ( en_sus_I      ),
     .arate          ( arate_I       ), // attack  rate
     .drate          ( drate_I       ), // decay   rate
     .rrate          ( rrate_I       ),
@@ -114,7 +113,6 @@ jtopl_eg_comb u_comb(
     .pure_attack    ( attack_III        ),
     .pure_step      ( step_III          ),
     .pure_rate      ( rate_in_III[5:1]  ),
-    .pure_ssg_en    ( ssg_en_III        ), 
     .pure_eg_in     ( eg_in_III         ),
     .pure_eg_out    ( pure_eg_out_III   ),
     .sum_up_in      ( sum_in_III        ),
@@ -124,68 +122,54 @@ jtopl_eg_comb u_comb(
     .amsen          ( amsen_IV      ),
     .ams            ( ams_IV        ),
     .tl             ( tl_IV         ),
-    .final_ssg_inv  ( ssg_inv_IV    ), 
     .final_eg_in    ( eg_in_IV      ),
     .final_eg_out   ( eg_out_IV     )
 );
 
-always @(posedge clk) if(cen) begin
+always @(posedge clk) if(cenop) begin
     eg_in_II    <= eg_in_I;
     attack_II   <= state_next_I[0];
     base_rate_II<= base_rate_I;
-    ssg_en_II   <= ssg_en_I;
-    ssg_inv_II  <= ssg_inv_out_I;
     pg_rst_II   <= pg_rst_I;
 
     eg_in_III   <= eg_in_II;
     attack_III  <= attack_II;
     rate_in_III <= rate_out_II[5:1];
-    ssg_en_III  <= ssg_en_II;
-    ssg_inv_III <= ssg_inv_II;
     step_III    <= step_II;
     sum_in_III  <= sum_out_II;
 
-    ssg_inv_IV  <= ssg_inv_III;
     eg_in_IV    <= pure_eg_out_III;
     eg_V        <= eg_out_IV;
 end
 
-jtopl_sh #( .width(1), .stages(4*CH) ) u_cntsh(
+jtopl_sh #( .width(1), .stages(SLOTS) ) u_cntsh(
     .clk    ( clk       ),
-    .cen ( cen    ),
+    .cen    ( cenop     ),
     .din    ( cnt_lsb_II),
     .drop   ( cnt_in_II )
 );
 
-jtopl_sh_rst #( .width(10), .stages(4*CH-3), .rstval(1'b1) ) u_egsh(
+jtopl_sh_rst #( .width(10), .stages(SLOTS-3), .rstval(1'b1) ) u_egsh(
     .clk    ( clk       ),
-    .cen ( cen    ),
+    .cen    ( cenop     ),
     .rst    ( rst       ),
     .din    ( eg_in_IV  ),
     .drop   ( eg_in_I   )
 );
 
-jtopl_sh_rst #( .width(3), .stages(4*CH), .rstval(1'b1) ) u_egstate(
-    .clk    ( clk       ),
-    .cen ( cen    ),
-    .rst    ( rst       ),
+jtopl_sh_rst #( .width(3), .stages(SLOTS), .rstval(1'b1) ) u_egstate(
+    .clk    ( clk           ),
+    .cen    ( cenop         ),
+    .rst    ( rst           ),
     .din    ( state_next_I  ),
     .drop   ( state_in_I    )
 );
 
-jtopl_sh_rst #( .width(1), .stages(4*CH-3), .rstval(1'b0) ) u_ssg_inv(
+jtopl_sh_rst #( .width(1), .stages(SLOTS), .rstval(1'b0) ) u_konsh(
     .clk    ( clk           ),
-    .cen ( cen        ),
-    .rst    ( rst           ),
-    .din    ( ssg_inv_IV    ),
-    .drop   ( ssg_inv_in_I  )
-);
-
-jtopl_sh_rst #( .width(1), .stages(4*CH), .rstval(1'b0) ) u_konsh(
-    .clk    ( clk       ),
-    .cen ( cen    ),
-    .rst    ( rst       ),  
-    .din    ( keyon_I   ),
+    .cen    ( cenop         ),
+    .rst    ( rst           ),  
+    .din    ( keyon_I       ),
     .drop   ( keyon_last_I  )
 );
 

@@ -38,13 +38,13 @@ always @(*) begin : pre_rate_calc
     if( base_rate == 5'd0 )
         pre_rate = 7'd0;
     else
-        pre_rate = { base_rate, 2'b0 } + (ks ?
+        pre_rate = { 1'b0, base_rate, 1'b0 } + (ks ?
                 { 3'b0, keycode      }:
                 { 5'b0, keycode[3:2] });
 end
 
 always @(*)
-    rate = pre_rate>=7'b1111_00 ? 6'b1111_00 : pre_rate[5:0];
+    rate = pre_rate>=7'b1111_00 ? 6'b1111_11 : pre_rate[5:0];
 
 reg [2:0] cnt;
 
