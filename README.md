@@ -32,6 +32,19 @@ YM3526  | hdl/jtopl.v    | jt26.qip
 
 There are several simulation test benches in the **ver** folder. The most important one is in the **ver/verilator** folder. The simulation script is called with the shell script **go** in the same folder. The script will compile the file **test.cpp** together with other files and the design and will simulate the tune specificied with the -f command. It can read **vgm** tunes and generate .wav output of them.
 
+### Tested Features
+
+Each feature is tested with a given .jtt file in the **ver/verilator/tests** folder.
+
+Feature       | JTT
+--------------|--------
+ TL           | TL
+ EG rates     | rates
+ fnum         | fnum
+ FB           | fb
+ connection   | mod
+ EG type      | perc
+
 ## Related Projects
 
 Other sound chips from the same author

@@ -71,7 +71,7 @@ jtopl_pg_comb u_comb(
     .phase_op   ( phase_II      )
 );
 
-jtopl_sh_rst #( .width(20), .stages(4*CH) ) u_phsh(
+jtopl_sh_rst #( .width(20), .stages(2*CH) ) u_phsh(
     .clk    ( clk       ),
     .cen    ( cenop     ),
     .rst    ( rst       ),

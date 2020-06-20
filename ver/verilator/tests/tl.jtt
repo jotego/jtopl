@@ -10,12 +10,28 @@ $C0,1
 # Issue a key-on
 $A0,F0
 $B0,2F
-wait 2000
+wait 200
 
-# Reduce by 3dB
+# Reduce volume in 3dB steps
 $40,4
-wait 1000
-
-# Reduce by further 3dB
+wait 200
 $40,8
-wait 1000
+wait 200
+$40,C
+wait 200
+$40,10
+wait 200
+$40,14
+wait 200
+$40,18
+wait 200
+$40,1C
+wait 200
+$40,20
+wait 200
+$40,24
+wait 200
+$40,28
+wait 200
+$40,2C
+wait 200
