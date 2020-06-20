@@ -328,7 +328,7 @@ int main(int argc, char** argv, char** env) {
             // int dout = top->dout;
             if( sim_time.get_time() > next_sample ) {
                 int16_t snd;
-                snd = top->sound;
+                snd = top->snd;
                 // skip initial set of zero's
                 if( !skip_zeros || snd!=0 ) {
                     skip_zeros=false;
