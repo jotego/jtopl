@@ -30,7 +30,7 @@ module jtopl(
     output          [ 7:0] dout,
     output                 irq_n,
     // combined output
-    output  signed  [15:0] sound,
+    output  signed  [15:0] snd,
     output                 sample
 );
 
@@ -213,7 +213,7 @@ jtopl_acc u_acc(
     .op_result  ( op_result     ),
     .op         ( op_out        ),
     .con        ( con_out       ),
-    .snd        ( sound         )
+    .snd        ( snd           )
 );
 
 endmodule

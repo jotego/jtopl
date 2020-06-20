@@ -132,7 +132,7 @@ WaveOutputs::~WaveOutputs() {
 
 void WaveOutputs::write( class Vjtopl *top ) {
     int16_t snd[2]; // 0=left, 1=right
-    snd[0] = top->sound;
+    snd[0] = top->snd;
     snd[1] = snd[0];
     mixed->write(snd);
 }

@@ -48,8 +48,7 @@ module jtopl_reg(
     output     [9:0] fnum_I,
     output     [2:0] block_I,
     // channel configuration
-    output reg [2:0] fb_I,
-    // output      [2:0]   alg_I,
+    output     [2:0] fb_I,
     
     output     [3:0] mul_II,  // frequency multiplier
     output     [1:0] ksl_I,   // key shift level

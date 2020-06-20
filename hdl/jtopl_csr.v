@@ -39,7 +39,7 @@ module jtopl_csr #(
 );
 
 
-reg [W-1:0] regop_in;
+wire [W-1:0] regop_in;
 
 jtopl_sh_rst #(.width(W),.stages(LEN)) u_regch(
     .clk    ( clk          ),
