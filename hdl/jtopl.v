@@ -34,44 +34,50 @@ module jtopl(
     output                 sample
 );
 
-wire            cenop;
-
-wire            write = !cs_n && !wr_n;
+wire          cenop;
+wire          write;
+wire  [ 1:0]  group;
 
 // Timers
-wire            flag_A, flag_B, flagen_A, flagen_B;
-wire    [ 7:0]  value_A;
-wire    [ 7:0]  value_B;
-wire            load_A, load_B;
-wire            clr_flag_A, clr_flag_B;
-wire            overflow_A;
-wire            zero; // Single-clock pulse at the begginig of s1_enters
+wire          flag_A, flag_B, flagen_A, flagen_B;
+wire  [ 7:0]  value_A;
+wire  [ 7:0]  value_B;
+wire          load_A, load_B;
+wire          clr_flag_A, clr_flag_B;
+wire          overflow_A;
+wire          zero; // Single-clock pulse at the begginig of s1_enters
 
 // Phase
-wire    [ 9:0]  fnum_I;
-wire    [ 2:0]  block_I;
-wire    [ 3:0]  mul_II;
-wire    [ 9:0]  phase_VIII;
-wire            pg_rst_II;
+wire  [ 9:0]  fnum_I;
+wire  [ 2:0]  block_I;
+wire  [ 3:0]  mul_II;
+wire  [ 9:0]  phase_IV;
+wire          pg_rst_II;
 
 // envelope configuration
-wire            en_sus_I; // enable sustain
-wire    [ 3:0]  keycode_II;
-wire    [ 3:0]  arate_I; // attack  rate
-wire    [ 3:0]  drate_I; // decay   rate
-wire    [ 3:0]  rrate_I; // release rate
-wire    [ 3:0]  sl_I;   // sustain level
-wire            ks_II;     // key scale
+wire          en_sus_I; // enable sustain
+wire  [ 3:0]  keycode_II;
+wire  [ 3:0]  arate_I; // attack  rate
+wire  [ 3:0]  drate_I; // decay   rate
+wire  [ 3:0]  rrate_I; // release rate
+wire  [ 3:0]  sl_I;   // sustain level
+wire          ks_II;     // key scale
 // envelope operation
-wire            keyon_I;
-wire            eg_stop;
+wire          keyon_I;
+wire          eg_stop;
 // envelope number
-wire    [ 6:0]  lfo_mod;
-wire            amsen_IV;
-wire            ams_IV;
-wire    [ 6:0]  tl_IV;
-wire    [ 9:0]  eg_V;
+wire  [ 6:0]  lfo_mod;
+wire          amsen_IV;
+wire          ams_IV;
+wire  [ 6:0]  tl_IV;
+wire  [ 9:0]  eg_V;
+// Operator
+wire  [ 2:0]  fb_II;
+wire          op, fm_en;
 
+wire signed [13:0] op_result;
+
+assign          write   = !cs_n && !wr_n;
 assign          dout    = { ~irq_n, flag_A, flag_B, 5'd6 };
 assign          sound   = 16'd0;
 assign          eg_stop = 0;
@@ -85,6 +91,8 @@ jtopl_mmr u_mmr(
     .write      ( write         ),
     .addr       ( addr          ),
     .zero       ( zero          ),
+    .group      ( group         ),
+    .op         ( op            ),
     // Timers
     .value_A    ( value_A       ),
     .value_B    ( value_B       ),
@@ -100,6 +108,7 @@ jtopl_mmr u_mmr(
     .fnum_I     ( fnum_I        ),
     .block_I    ( block_I       ),
     // Envelope Generator
+    .keyon_I    ( keyon_I       ),
     .en_sus_I   ( en_sus_I      ),
     .arate_I    ( arate_I       ),
     .drate_I    ( drate_I       ),
@@ -143,7 +152,7 @@ jtopl_pg u_pg(
     .pg_rst_II  ( pg_rst_II     ),
     
     .keycode_II ( keycode_II    ),
-    .phase_VIII ( phase_VIII    )
+    .phase_IV   ( phase_IV      )
 );
 
 jtopl_eg u_eg(
@@ -169,6 +178,24 @@ jtopl_eg u_eg(
     .tl_IV      ( tl_IV         ),
     .eg_V       ( eg_V          ),
     .pg_rst_II  ( pg_rst_II     )
+);
+
+jtopl_op u_op(
+    .rst        ( rst           ),
+    .clk        ( clk           ),
+    .cenop      ( cenop         ),
+
+    // location of current operator
+    .group      ( group         ),
+    .op         ( op            ),
+    .zero       ( zero          ),
+
+    .pg_phase_I ( phase_IV      ),
+    .eg_atten_II( eg_V          ), // output from envelope generator
+    .fb_II      ( fb_II         ), // voice feedback
+    
+    .fm_en      ( fm_en         ),
+    .op_result  ( op_result     )
 );
 
 endmodule

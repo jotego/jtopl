@@ -1,0 +1,12 @@
+#Attack rate
+$60,44
+$63,88
+# Decay rate
+$80,F4
+$83,F8
+wait 10
+
+# Issue a key-on
+$A0,F0
+$B0,2F
+wait 4000

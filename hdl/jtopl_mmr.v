@@ -26,7 +26,10 @@ module jtopl_mmr(
     input       [ 7:0]  din,
     input               write,
     input               addr,
+    // location
     output              zero,
+    output      [ 1:0]  group,
+    output              op,
     // Timers
     output  reg [ 7:0]  value_A,
     output  reg [ 7:0]  value_B,
@@ -42,6 +45,7 @@ module jtopl_mmr(
     output      [ 9:0]  fnum_I,
     output      [ 2:0]  block_I,
     // Envelope Generator
+    output              keyon_I,
     output              en_sus_I, // enable sustain
     output      [3:0]   arate_I, // attack  rate
     output      [3:0]   drate_I, // decay   rate
@@ -64,7 +68,7 @@ localparam  REG_TESTYM  =   8'h01,
 
 reg  [ 7:0] selreg;       // selected register
 reg  [ 7:0] din_copy;
-reg  [ 4:0] latch_fnum;
+reg  [ 7:0] latch_fnum;
 reg         csm, effect;
 reg  [ 1:0] sel_group;     // group to update
 reg  [ 2:0] sel_sub;       // subslot to update
@@ -79,6 +83,7 @@ always @(posedge clk) begin
         selreg    <= 8'h0;
         sel_group <= 2'd0;
         sel_sub   <= 3'd0;
+        latch_fnum<= 8'd0;
         // Updaters
         up_fbcon  <= 0;
         up_fnum   <= 0;
@@ -133,12 +138,14 @@ always @(posedge clk) begin
                     endcase
                 end                
                 // Channel registers
-                case( selreg[7:4] )
-                    4'hA: if( selreg[3:0]<=4'd8) up_fnum <= 1;
-                    4'hB: latch_fnum <= din[4:0];
-                    4'hC: up_fbcon <= 1;
-                    default:;
-                endcase
+                if( selreg[3:0]<=4'd8) begin
+                    case( selreg[7:4] )
+                        4'hA: latch_fnum <= din;
+                        4'hB: up_fnum <= 1;
+                        4'hC: up_fbcon <= 1;
+                        default:;
+                    endcase
+                end
                 if( selreg[7:4]>=4'hA ) begin
                     sel_group <= selreg[3:0] < 4'd3 ? 2'd0 :
                         ( selreg[3:0] < 4'd6 ? 2'd1 : 
@@ -161,6 +168,8 @@ jtopl_reg u_reg(
     .din        ( din_copy      ),
     // Pipeline order
     .zero       ( zero          ),
+    .group      ( group         ),
+    .op         ( op            ),
     
     .sel_group  ( sel_group     ),     // group to update
     .sel_sub    ( sel_sub       ),     // subslot to update
@@ -182,6 +191,7 @@ jtopl_reg u_reg(
     .fnum_I     ( fnum_I        ),
     .block_I    ( block_I       ),
     // EG
+    .keyon_I    ( keyon_I       ),
     .en_sus_I   ( en_sus_I      ),
     .arate_I    ( arate_I       ),
     .drate_I    ( drate_I       ),

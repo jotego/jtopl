@@ -35,7 +35,7 @@ module jtopl_pg(
     input               pg_rst_II,
     
     output  reg [ 3:0]  keycode_II,
-    output      [ 9:0]  phase_VIII
+    output      [ 9:0]  phase_IV
 );
 
 parameter CH=9;
@@ -79,12 +79,12 @@ jtopl_sh_rst #( .width(20), .stages(4*CH) ) u_phsh(
     .drop   ( phase_drop)
 );
 
-jtopl_sh_rst #( .width(10), .stages(6) ) u_pad(
+jtopl_sh_rst #( .width(10), .stages(2) ) u_pad(
     .clk    ( clk       ),
     .cen    ( cenop     ),
     .rst    ( rst       ),  
     .din    ( phase_II  ),
-    .drop   ( phase_VIII)
+    .drop   ( phase_IV  )
 );
 
 endmodule

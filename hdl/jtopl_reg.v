@@ -20,54 +20,56 @@
 */
 
 module jtopl_reg(
-    input           rst,
-    input           clk,
-    input           cen,
-    input   [7:0]   din,
+    input            rst,
+    input            clk,
+    input            cen,
+    input      [7:0] din,
     // Pipeline order
-    output reg      zero,
+    output reg       zero,
+    output reg [1:0] group,
+    output reg       op,            // 0 for modulator operators
     
-    input   [1:0]   sel_group,     // group to update
-    input   [2:0]   sel_sub,       // subslot to update
+    input      [1:0] sel_group,     // group to update
+    input      [2:0] sel_sub,       // subslot to update
     
     //input           csm,
     //input           flag_A,
     //input           overflow_A,
 
-    input           up_fbcon,
-    input           up_fnum,
-    input           up_mult,
-    input           up_ksl_tl,
-    input           up_ar_dr,
-    input           up_sl_rr,
+    input            up_fbcon,
+    input            up_fnum,
+    input            up_mult,
+    input            up_ksl_tl,
+    input            up_ar_dr,
+    input            up_sl_rr,
     
     // PG
-    input       [ 4:0]  latch_fnum,
-    output      [ 9:0]  fnum_I,
-    output      [ 2:0]  block_I,
+    input      [7:0] latch_fnum,
+    output     [9:0] fnum_I,
+    output     [2:0] block_I,
     // channel configuration
     // output reg  [2:0]   fb_II,
     // output      [2:0]   alg_I,
     
-    output      [ 3:0]  mul_II, // frequency multiplier
-    output      [ 1:0]  ksl_I,  // key shift level
-    output              am_I,
-    output              vib_I,    
+    output     [3:0] mul_II, // frequency multiplier
+    output     [1:0] ksl_I,  // key shift level
+    output           am_I,
+    output           vib_I,    
     // EG
-    output      [5:0]   tl_IV,
-    output              en_sus_I,// enable sustain
-    output      [3:0]   arate_I, // attack  rate
-    output      [3:0]   drate_I, // decay   rate
-    output      [3:0]   rrate_I, // release rate
-    output      [3:0]   sl_I,    // sustain level
-    output              ks_II    // key scale
+    output           keyon_I,
+    output     [5:0] tl_IV,
+    output           en_sus_I,// enable sustain
+    output     [3:0] arate_I, // attack  rate
+    output     [3:0] drate_I, // decay   rate
+    output     [3:0] rrate_I, // release rate
+    output     [3:0] sl_I,    // sustain level
+    output           ks_II    // key scale
 );
 
 localparam CH=9;
 
 // Each group contains three channels
 // and each subslot contains six operators
-reg  [1:0] group;
 reg  [2:0] subslot;
 
 `ifdef SIMULATION
@@ -99,7 +101,6 @@ reg        match;
 // channel data
 wire [2:0] fb_in   = din[3:1];
 wire       con_in  = din[0];
-wire [7:0] fnlo_in = din;
 
 wire       up_fnum_ch  = up_fnum  & match, 
            up_fbcon_ch = up_fbcon & match,
@@ -111,27 +112,13 @@ always @(posedge clk) begin : up_counter
         { group, subslot }  <= { next_group, next_sub };
         match               <= { next_group, next_sub } == { sel_group, sel_sub};
         zero                <= { next_group, next_sub }==5'd0;
+        op                  <= next_sub >= 3'd3;
         update_op_II        <= update_op_I;
         update_op_III       <= update_op_II;
         update_op_IV        <= update_op_III;
     end
 end
 
-// jtopl_kon #(.CH(CH)) u_kon(
-//     .rst        ( rst       ),
-//     .clk        ( clk       ),
-//     .cen     ( cen    ),
-//     .keyon_op   ( keyon_op  ),
-//     .keyon_ch   ( keyon_ch  ),
-//     .next_op    ( next_op   ),
-//     .next_ch    ( next_ch   ),
-//     .up_keyon   ( up_keyon  ),
-//     .csm        ( csm       ),
-//     // .flag_A      ( flag_A    ),
-//     .overflow_A ( overflow_A),
-//     
-//     .keyon_I    ( keyon_I   )
-// );
 // 
 // jtopl_mod #(.CH(CH)) u_mod(
 //     .alg_I      ( alg_I     ),
@@ -178,17 +165,18 @@ assign { am_I, vib_I, en_sus_I, ks_II, mul_II,
 // Trying to synthesize this memory as M-9K RAM in Altera devices
 // turns out worse in terms of resource utilization. Probably because
 // this memory is already very small. It is better to leave it as it is.
-localparam FNUMW  = 10,
+localparam KONW   =  1,
+           FNUMW  = 10,
            BLOCKW =  3,
            FBW    =  3,
            CONW   =  1;
-localparam CHCSRW = FNUMW+BLOCKW+FBW+CONW;
+localparam CHCSRW = KONW+FNUMW+BLOCKW+FBW+CONW;
 
 wire [CHCSRW-1:0] chcfg0_out, chcfg1_out, chcfg2_out;
 reg  [CHCSRW-1:0] chcfg, chcfg0_in, chcfg1_in, chcfg2_in;
 
 wire [CHCSRW-1:0] chcfg_inmux = {
-    up_fnum_ch  ? { latch_fnum, fnlo_in } : { block_I, fnum_I },
+    up_fnum_ch  ? { din[5:0], latch_fnum } : { keyon_I, block_I, fnum_I },
     up_fbcon_ch ? { fb_in, con_in } : { fb_I, con_I }
 }; 
 
@@ -203,7 +191,7 @@ always @(*) begin
     chcfg2_in = group==2'b10 ? chcfg_inmux : chcfg2_out;
 end
 
-assign { block_I, fnum_I, fb_I, con_I } = chcfg;
+assign { keyon_I, block_I, fnum_I, fb_I, con_I } = chcfg;
 
 jtopl_sh_rst #(.width(CHCSRW),.stages(3)) u_group0(
     .clk    ( clk        ),
