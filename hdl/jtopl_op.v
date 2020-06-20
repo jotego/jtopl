@@ -40,7 +40,9 @@ module jtopl_op(
     input   [9:0]   eg_atten_II, // output from envelope generator
     
     
-    output reg signed [13:0] op_result
+    output reg signed [13:0] op_result,
+    output                   op_out,
+    output                   con_out
 );
 
 reg  [11:0] atten_internal_II;
@@ -61,6 +63,13 @@ jtopl_sh #( .width(7), .stages(3)) u_delay(
     .cen    ( cenop     ),
     .din    ( ctrl_in   ),
     .drop   ( ctrl_dly  )
+);
+
+jtopl_sh #( .width(2), .stages(3)) u_condly(
+    .clk    ( clk                ),
+    .cen    ( cenop              ),
+    .din    ( {op_d, con_I_d}    ),
+    .drop   ( {op_out, con_out}  )
 );
 
 always @(*) begin
@@ -117,7 +126,7 @@ always @(*) begin
     // Shift FM feedback signal
     if (op_d)
         // Bit 0 of pm_preshift_I is never used
-        phasemod_I = con_I_d ? pm_preshift_I[10:1] : 10'd0;
+        phasemod_I = con_I_d ? 10'd0 : pm_preshift_I[10:1];
     else
         case( fb_I_d )
             3'd0: phasemod_I = 10'd0;      

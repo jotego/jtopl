@@ -40,6 +40,7 @@ Chip                   | Repository
 -----------------------|------------
 YM2203, YM2612, YM2610 | [JT12](https://github.com/jotego/jt12)
 YM2151                 | [JT51](https://github.com/jotego/jt51)
+YM3526                 | [JTOPL](https://github.com/jotego/jtopl)
 YM2149                 | [JT49](https://github.com/jotego/jt49)
 sn76489an              | [JT89](https://github.com/jotego/jt89)
 OKI 6295               | [JT6295](https://github.com/jotego/jt6295)

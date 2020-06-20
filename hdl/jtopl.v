@@ -73,7 +73,7 @@ wire  [ 5:0]  tl_IV;
 wire  [ 9:0]  eg_V;
 // Operator
 wire  [ 2:0]  fb_I;
-wire          op, con_I;
+wire          op, con_I, op_out, con_out;
 
 wire signed [13:0] op_result;
 
@@ -200,7 +200,20 @@ jtopl_op u_op(
     .fb_I       ( fb_I          ), // voice feedback
     
     .con_I      ( con_I         ),
-    .op_result  ( op_result     )
+    .op_result  ( op_result     ),
+    .op_out     ( op_out        ),
+    .con_out    ( con_out       )
+);
+
+jtopl_acc u_acc(
+    .rst        ( rst           ),
+    .clk        ( clk           ),
+    .cenop      ( cenop         ),
+    .zero       ( zero          ),
+    .op_result  ( op_result     ),
+    .op         ( op_out        ),
+    .con        ( con_out       ),
+    .snd        ( sound         )
 );
 
 endmodule
