@@ -1,13 +1,17 @@
 #Attack rate
 $60,40
-$63,40
+$63,80
+# Less level for modulator
+$40,10
+# Modulator set to 4x frequency
+$20,24
 # Decay rate
 $80,F4
 $83,F4
 wait 10
 
 # no FB, FM modulation
-$C0,1
+$C0,0
 
 # Issue a key-on
 $A0,F0
@@ -15,5 +19,5 @@ $B0,2F
 wait 3000
 
 #Disable modulation
-$C0,0
+$C0,1
 wait 1000
