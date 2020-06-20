@@ -18,13 +18,15 @@ The implementation tries to be as close to original hardware as possible. Low us
 
 Directories:
 
-hdl -> all relevant RTL files, written in verilog
-ver -> test benches
-ver/verilator -> test bench that can play vgm files
+* hdl -> all relevant RTL files, written in verilog
+* ver -> test benches
+* ver/verilator -> test bench that can play vgm files
 
 Usage:
 
-YM3526: top level file hdl/jtopl.v. Use jt26.qip to automatically get all relevant files in Quartus.
+Chip    | Top Level Cell | QIP file
+--------|----------------|----------
+YM3526  | hdl/jtopl.v    | jt26.qip
 
 ## Simulation
 
