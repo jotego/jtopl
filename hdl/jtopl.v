@@ -69,11 +69,11 @@ wire          eg_stop;
 wire  [ 6:0]  lfo_mod;
 wire          amsen_IV;
 wire          ams_IV;
-wire  [ 6:0]  tl_IV;
+wire  [ 5:0]  tl_IV;
 wire  [ 9:0]  eg_V;
 // Operator
-wire  [ 2:0]  fb_II;
-wire          op, fm_en;
+wire  [ 2:0]  fb_I;
+wire          op, con_I;
 
 wire signed [13:0] op_result;
 
@@ -107,6 +107,7 @@ jtopl_mmr u_mmr(
     // Phase Generator
     .fnum_I     ( fnum_I        ),
     .block_I    ( block_I       ),
+    .mul_II     ( mul_II        ),
     // Envelope Generator
     .keyon_I    ( keyon_I       ),
     .en_sus_I   ( en_sus_I      ),
@@ -114,7 +115,11 @@ jtopl_mmr u_mmr(
     .drate_I    ( drate_I       ),
     .rrate_I    ( rrate_I       ),
     .sl_I       ( sl_I          ),
-    .ks_II      ( ks_II         )
+    .ks_II      ( ks_II         ),
+    .tl_IV      ( tl_IV         ),
+    // Timbre
+    .fb_I       ( fb_I          ),
+    .con_I      ( con_I         )
 );
 
 jtopl_timers u_timers(
@@ -192,9 +197,9 @@ jtopl_op u_op(
 
     .pg_phase_I ( phase_IV      ),
     .eg_atten_II( eg_V          ), // output from envelope generator
-    .fb_II      ( fb_II         ), // voice feedback
+    .fb_I       ( fb_I          ), // voice feedback
     
-    .fm_en      ( fm_en         ),
+    .con_I      ( con_I         ),
     .op_result  ( op_result     )
 );
 

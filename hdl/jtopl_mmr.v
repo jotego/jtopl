@@ -44,14 +44,19 @@ module jtopl_mmr(
     // Phase Generator
     output      [ 9:0]  fnum_I,
     output      [ 2:0]  block_I,
+    output      [ 3:0]  mul_II,
     // Envelope Generator
     output              keyon_I,
     output              en_sus_I, // enable sustain
-    output      [3:0]   arate_I, // attack  rate
-    output      [3:0]   drate_I, // decay   rate
-    output      [3:0]   rrate_I, // release rate
-    output      [3:0]   sl_I,   // sustain level
-    output              ks_II      // key scale
+    output      [ 3:0]  arate_I,  // attack  rate
+    output      [ 3:0]  drate_I,  // decay   rate
+    output      [ 3:0]  rrate_I,  // release rate
+    output      [ 3:0]  sl_I,     // sustain level
+    output              ks_II,    // key scale
+    output      [ 5:0]  tl_IV,
+    // Operator configuration
+    output      [ 2:0]  fb_I,
+    output              con_I
 );
 
 jtopl_div u_div (
@@ -198,12 +203,15 @@ jtopl_reg u_reg(
     .rrate_I    ( rrate_I       ),
     .sl_I       ( sl_I          ),
     .ks_II      ( ks_II         ),
+    // Timbre - Neiro
+    .fb_I       ( fb_I          ),
+    .con_I      ( con_I         ),
     // Other
-    .mul_II     (               ),
+    .mul_II     ( mul_II        ),
     .ksl_I      (               ),
     .am_I       (               ),
     .vib_I      (               ),
-    .tl_IV      (               )
+    .tl_IV      ( tl_IV         )
 );
 
 endmodule

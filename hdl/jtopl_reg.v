@@ -48,22 +48,23 @@ module jtopl_reg(
     output     [9:0] fnum_I,
     output     [2:0] block_I,
     // channel configuration
-    // output reg  [2:0]   fb_II,
+    output reg [2:0] fb_I,
     // output      [2:0]   alg_I,
     
-    output     [3:0] mul_II, // frequency multiplier
-    output     [1:0] ksl_I,  // key shift level
+    output     [3:0] mul_II,  // frequency multiplier
+    output     [1:0] ksl_I,   // key shift level
     output           am_I,
     output           vib_I,    
     // EG
     output           keyon_I,
     output     [5:0] tl_IV,
-    output           en_sus_I,// enable sustain
-    output     [3:0] arate_I, // attack  rate
-    output     [3:0] drate_I, // decay   rate
-    output     [3:0] rrate_I, // release rate
-    output     [3:0] sl_I,    // sustain level
-    output           ks_II    // key scale
+    output           en_sus_I, // enable sustain
+    output     [3:0] arate_I,  // attack  rate
+    output     [3:0] drate_I,  // decay   rate
+    output     [3:0] rrate_I,  // release rate
+    output     [3:0] sl_I,     // sustain level
+    output           ks_II,    // key scale
+    output           con_I
 );
 
 localparam CH=9;
@@ -87,14 +88,8 @@ end
 wire [2:0] next_sub   = subslot==3'd5 ? 3'd0 : (subslot+3'd1);
 wire [1:0] next_group = subslot==3'd5 ? (group==2'b10 ? 2'b00 : group+2'b1) : group;
 
-wire [2:0] fb_I;
-wire       con_I;
 reg        match;
-
-// always @(posedge clk) if( cen ) begin
-//     fb_II <= fb_I;
-// end 
-                
+               
 // key on/off
 //wire    [3:0]   keyon_op = din[7:4];
 //wire    [2:0]   keyon_ch = din[2:0];

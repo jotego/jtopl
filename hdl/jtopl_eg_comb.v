@@ -59,7 +59,7 @@ module jtopl_eg_comb(
     input   [ 6:0]  lfo_mod,
     input           amsen,
     input           ams,
-    input   [ 6:0]  tl,
+    input   [ 5:0]  tl,
     input   [ 9:0]  final_eg_in,
     output  [ 9:0]  final_eg_out
 );

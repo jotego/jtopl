@@ -23,7 +23,7 @@ module jtopl_eg_final(
     input      [6:0] lfo_mod,
     input            amsen,
     input            ams,
-    input      [6:0] tl,
+    input      [5:0] tl,
     input      [9:0] eg_pure_in,
     output reg [9:0] eg_limited
 );
@@ -43,7 +43,7 @@ always @(*) begin
         2'b1_0: am_final = { 5'd0, am_inverted[5:2]    }; // Max 1   dB
         2'b1_1: am_final = { 3'd0, am_inverted         }; // Max 4.8 dB
     endcase
-    sum_eg_tl = {  1'b0, tl,   3'd0 } + {1'b0, eg_pure_in}; // leading zeros needed to compute correctly
+    sum_eg_tl = {  2'b0, tl,   3'd0 } + {1'b0, eg_pure_in}; // leading zeros needed to compute correctly
     sum_eg_tl_am = sum_eg_tl + { 3'd0, am_final };
 end
 

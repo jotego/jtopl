@@ -31,8 +31,8 @@ module jtopl_op(
     // these signals need be delayed
     input   [1:0]   group,
     input           op, // 0 for modulator operators
-    input           fm_en,
-    input   [2:0]   fb_II,       // voice feedback
+    input           con_I,
+    input   [2:0]   fb_I,       // voice feedback
 
     input           zero,
 
@@ -50,11 +50,11 @@ wire [13:0] prev0, prev1,     prev2;
 
 wire [ 6:0] ctrl_in, ctrl_dly;
 wire [ 1:0] group_d;
-wire        op_d, fm_en_d;
-wire [ 2:0] fb_II_d;
+wire        op_d, con_I_d;
+wire [ 2:0] fb_I_d;
 
-assign      ctrl_in = { group, op, fm_en, fb_II };
-assign      { group_d, op_d, fm_en_d, fb_II_d } = ctrl_dly;
+assign      ctrl_in = { group, op, con_I, fb_I };
+assign      { group_d, op_d, con_I_d, fb_I_d } = ctrl_dly;
 
 jtopl_sh #( .width(7), .stages(3)) u_delay(
     .clk    ( clk       ),
@@ -64,10 +64,10 @@ jtopl_sh #( .width(7), .stages(3)) u_delay(
 );
 
 always @(*) begin
-    prev0_din     = op && group==2'd0 ? op_result : prev0;
-    prev1_din     = op && group==2'd1 ? op_result : prev1;
-    prev2_din     = op && group==2'd2 ? op_result : prev2;
-    case( group )
+    prev0_din     = op_d && group_d==2'd0 ? op_result : prev0;
+    prev1_din     = op_d && group_d==2'd1 ? op_result : prev1;
+    prev2_din     = op_d && group_d==2'd2 ? op_result : prev2;
+    case( group_d )
         default: prev = prev0;
         2'd1:    prev = prev1;
         2'd2:    prev = prev2;
@@ -107,19 +107,19 @@ reg signed [14:0]  pm_preshift_I;
 reg         s1_II;
 
 always @(*) begin
-    x = op ? op_result : prev;
+    x = op_d ? op_result : prev;
     pm_preshift_I = { x[13], x }; // sign-extend
 end
 
 reg  [9:0]  phasemod_I;
-wire [9:0]  phasemod_VIII;
 
 always @(*) begin
     // Shift FM feedback signal
-    if (op)
-        phasemod_I = pm_preshift_I[10:1]; // Bit 0 of pm_preshift_I is never used
+    if (op_d)
+        // Bit 0 of pm_preshift_I is never used
+        phasemod_I = con_I_d ? pm_preshift_I[10:1] : 10'd0;
     else
-        case( fb_II )
+        case( fb_I_d )
             3'd0: phasemod_I = 10'd0;      
             3'd1: phasemod_I = { {4{pm_preshift_I[14]}}, pm_preshift_I[14:9] };
             3'd2: phasemod_I = { {3{pm_preshift_I[14]}}, pm_preshift_I[14:8] };

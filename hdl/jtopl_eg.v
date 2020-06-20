@@ -39,7 +39,7 @@ module jtopl_eg (
     input       [6:0]   lfo_mod,
     input               amsen_IV,
     input               ams_IV,
-    input       [6:0]   tl_IV,
+    input       [5:0]   tl_IV,
 
     output  reg [9:0]   eg_V,
     output  reg         pg_rst_II
