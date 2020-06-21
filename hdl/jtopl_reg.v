@@ -24,6 +24,7 @@ module jtopl_reg(
     input            clk,
     input            cen,
     input      [7:0] din,
+    input            write,
     // Pipeline order
     output reg       zero,
     output reg [1:0] group,
@@ -98,7 +99,7 @@ wire       con_in  = din[0];
 
 wire       up_fnum_ch  = up_fnum  & match, 
            up_fbcon_ch = up_fbcon & match,
-           update_op_I = sel_group == group && sel_sub == subslot;
+           update_op_I = !write && sel_group == group && sel_sub == subslot;
 reg        update_op_II, update_op_III, update_op_IV;
 
 always @(posedge clk) begin : up_counter
@@ -107,9 +108,18 @@ always @(posedge clk) begin : up_counter
         match               <= { next_group, next_sub } == { sel_group, sel_sub};
         zero                <= { next_group, next_sub }==5'd0;
         op                  <= next_sub >= 3'd3;
-        update_op_II        <= update_op_I;
-        update_op_III       <= update_op_II;
-        update_op_IV        <= update_op_III;
+    end
+end
+
+always @(posedge clk) begin
+    if(write) begin
+        update_op_II   <= 0;
+        update_op_III  <= 0;
+        update_op_IV   <= 0;
+    end else if( cen ) begin
+        update_op_II   <= update_op_I;
+        update_op_III  <= update_op_II;
+        update_op_IV   <= update_op_III;
     end
 end
 

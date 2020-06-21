@@ -44,6 +44,7 @@ Feature       | JTT
  FB           | fb
  connection   | mod
  EG type      | perc
+ All slots    | slots
 
 ## Related Projects
 

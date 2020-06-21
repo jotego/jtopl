@@ -487,7 +487,7 @@ void CmdWritter::Eval() {
             case 40:
                 top->wr_n = 1;
                 state     = 50;
-                waitcnt   = 72;
+                waitcnt   = 84;
                 break;
             case 50:
                 if( waitcnt )

@@ -171,6 +171,7 @@ jtopl_reg u_reg(
     .clk        ( clk           ),
     .cen        ( cenop         ),
     .din        ( din_copy      ),
+    .write      ( write         ),
     // Pipeline order
     .zero       ( zero          ),
     .group      ( group         ),
