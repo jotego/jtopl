@@ -36,6 +36,25 @@ $72,F0
 $73,F0
 $74,F0
 $75,F0
+# Release rate to max
+$80,FF
+$81,FF
+$82,FF
+$83,FF
+$84,FF
+$85,FF
+$88,FF
+$89,FF
+$8A,FF
+$8B,FF
+$8C,FF
+$8D,FF
+$90,FF
+$91,FF
+$92,FF
+$93,FF
+$94,FF
+$95,FF
 # No FM
 $C0,1
 $C1,1
@@ -45,6 +64,7 @@ $C4,1
 $C5,1
 $C6,1
 $C7,1
+$C8,1
 # Each channel has a different phase
 $A0,02
 $A1,12
@@ -54,6 +74,7 @@ $A4,42
 $A5,52
 $A6,62
 $A7,72
+$A8,82
 # Op 0 of each channel has twice the frequency
 $20,2
 $21,2
@@ -64,12 +85,6 @@ $2A,2
 $30,2
 $31,2
 $32,2
-# Keyon
-#$B3,22
-#$B4,22
-#$B5,22
-#$B6,22
-#$B7,22
 # Test slot by slot
 
 #Channel 0
@@ -104,3 +119,72 @@ $45,10
 wait 500
 $45,3f
 $B2,2
+
+#Channel 3
+$B3,22
+$48,10
+wait 500
+$48,3f
+
+$4b,10
+wait 500
+$4b,3f
+$B3,2
+
+#Channel 4
+$B4,22
+$49,10
+wait 500
+$49,3f
+
+$4c,10
+wait 500
+$4c,3f
+$B4,2
+
+#Channel 5
+$B5,22
+$4a,10
+wait 500
+$4a,3f
+
+$4d,10
+wait 500
+$4d,3f
+$B5,2
+
+#Channel 6
+$B6,22
+$50,10
+wait 500
+$50,3f
+
+$53,10
+wait 500
+$53,3f
+$B6,2
+
+#Channel 7
+$B7,22
+$51,10
+wait 500
+$51,3f
+
+$54,10
+wait 500
+$54,3f
+$B7,2
+
+#Channel 8
+$B8,22
+$52,10
+wait 500
+$52,3f
+
+$55,10
+wait 500
+$55,3f
+$B8,2
+
+# All should be muted
+wait 500

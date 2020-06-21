@@ -42,6 +42,8 @@ module jtopl_pg_comb(
 
 wire signed [8:0] pm_offset;
 
+assign keycode = { block, fnum[9] };
+
 jtopl_pg_inc u_inc(
     .block      ( block     ),
     .fnum       ( fnum      ),

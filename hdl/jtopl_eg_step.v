@@ -25,7 +25,7 @@ module jtopl_eg_step(
     input      [ 3:0] keycode,
     input      [14:0] eg_cnt,
     input             cnt_in,
-    input             ks,
+    input             ksr,
     output            cnt_lsb,
     output reg        step,
     output reg [ 5:0] rate,
@@ -38,7 +38,7 @@ always @(*) begin : pre_rate_calc
     if( base_rate == 5'd0 )
         pre_rate = 7'd0;
     else
-        pre_rate = { 1'b0, base_rate, 1'b0 } + (ks ?
+        pre_rate = { 1'b0, base_rate, 1'b0 } + (ksr ?
                 { 3'b0, keycode      }:
                 { 5'b0, keycode[3:2] });
 end

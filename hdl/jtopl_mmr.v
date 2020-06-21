@@ -54,6 +54,7 @@ module jtopl_mmr(
     output      [ 3:0]  sl_I,     // sustain level
     output              ks_II,    // key scale
     output      [ 5:0]  tl_IV,
+    output      [ 1:0]  ksl_IV,
     // Operator configuration
     output      [ 2:0]  fb_I,
     output              con_I
@@ -204,12 +205,12 @@ jtopl_reg u_reg(
     .rrate_I    ( rrate_I       ),
     .sl_I       ( sl_I          ),
     .ks_II      ( ks_II         ),
+    .ksl_IV     ( ksl_IV        ),
     // Timbre - Neiro
     .fb_I       ( fb_I          ),
     .con_I      ( con_I         ),
     // Other
     .mul_II     ( mul_II        ),
-    .ksl_I      (               ),
     .am_I       (               ),
     .vib_I      (               ),
     .tl_IV      ( tl_IV         )

@@ -41,7 +41,7 @@ module jtopl_eg_comb(
     input   [ 3:0]  keycode,
     input   [14:0]  eg_cnt,
     input           cnt_in,
-    input           ks,
+    input           ksr,
     output          cnt_lsb,
     output          step,
     output  [ 5:0]  step_rate_out,
@@ -60,6 +60,8 @@ module jtopl_eg_comb(
     input           amsen,
     input           ams,
     input   [ 5:0]  tl,
+    input   [ 1:0]  ksl,
+    input   [ 3:0]  final_keycode,
     input   [ 9:0]  final_eg_in,
     output  [ 9:0]  final_eg_out
 );
@@ -90,7 +92,7 @@ jtopl_eg_step u_step(
     .keycode    ( keycode       ),
     .eg_cnt     ( eg_cnt        ),
     .cnt_in     ( cnt_in        ),
-    .ks         ( ks            ),
+    .ksr        ( ksr           ),
     .cnt_lsb    ( cnt_lsb       ),
     .step       ( step          ),
     .rate       ( step_rate_out ),
@@ -116,6 +118,8 @@ jtopl_eg_final u_final(
     .amsen      ( amsen         ),
     .ams        ( ams           ),
     .tl         ( tl            ),
+    .ksl        ( ksl           ),
+    .keycode    ( final_keycode ),
     .eg_pure_in ( final_eg_in   ),
     .eg_limited ( final_eg_out  )
 );

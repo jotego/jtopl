@@ -32,7 +32,7 @@ module jtopl_eg (
     input       [3:0]   drate_I, // decay   rate
     input       [3:0]   rrate_I, // release rate
     input       [3:0]   sl_I,   // sustain level
-    input               ks_II,     // key scale
+    input               ksr_II,     // key scale
     // envelope operation
     input               keyon_I,
     // envelope number
@@ -40,6 +40,7 @@ module jtopl_eg (
     input               amsen_IV,
     input               ams_IV,
     input       [5:0]   tl_IV,
+    input       [1:0]   ksl_IV,
 
     output  reg [9:0]   eg_V,
     output  reg         pg_rst_II
@@ -76,7 +77,7 @@ reg sum_in_III;
 
 wire [9:0] eg_in_I, pure_eg_out_III, eg_next_III, eg_out_IV;
 reg  [9:0] eg_in_II, eg_in_III, eg_in_IV;
-
+reg  [3:0] keycode_III, keycode_IV;
 
 
 jtopl_eg_comb u_comb(
@@ -103,7 +104,7 @@ jtopl_eg_comb u_comb(
     .keycode        ( keycode_II    ),
     .eg_cnt         ( eg_cnt        ),
     .cnt_in         ( cnt_in_II     ),
-    .ks             ( ks_II         ),
+    .ksr            ( ksr_II        ),
     .cnt_lsb        ( cnt_lsb_II    ),
     .step           ( step_II       ),
     .step_rate_out  ( rate_out_II   ),
@@ -121,7 +122,9 @@ jtopl_eg_comb u_comb(
     .lfo_mod        ( lfo_mod       ),
     .amsen          ( amsen_IV      ),
     .ams            ( ams_IV        ),
+    .ksl            ( ksl_IV        ),
     .tl             ( tl_IV         ),
+    .final_keycode  ( keycode_IV    ),
     .final_eg_in    ( eg_in_IV      ),
     .final_eg_out   ( eg_out_IV     )
 );
@@ -140,6 +143,9 @@ always @(posedge clk) if(cenop) begin
 
     eg_in_IV    <= pure_eg_out_III;
     eg_V        <= eg_out_IV;
+
+    keycode_III <= keycode_II;
+    keycode_IV  <= keycode_III;
 end
 
 jtopl_sh #( .width(1), .stages(SLOTS) ) u_cntsh(

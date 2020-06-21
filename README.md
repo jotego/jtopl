@@ -36,15 +36,17 @@ There are several simulation test benches in the **ver** folder. The most import
 
 Each feature is tested with a given .jtt file in the **ver/verilator/tests** folder.
 
-Feature       | JTT
---------------|--------
- TL           | TL
- EG rates     | rates
- fnum         | fnum
- FB           | fb
- connection   | mod
- EG type      | perc
- All slots    | slots
+Feature       | JTT       | Remarks
+--------------|-----------|--------
+ TL           | TL        |
+ EG rates     | rates     |
+ fnum         | fnum      |
+ FB           | fb        |
+ connection   | mod       |
+ EG type      | perc      |
+ All slots    | slots     | no modulation
+ All slots    | slots_mod | Modulate some channels
+ keycode      | keycode   | Sweeps fnum and block, KSL also used
 
 ## Related Projects
 

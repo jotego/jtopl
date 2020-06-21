@@ -61,7 +61,8 @@ wire  [ 3:0]  arate_I; // attack  rate
 wire  [ 3:0]  drate_I; // decay   rate
 wire  [ 3:0]  rrate_I; // release rate
 wire  [ 3:0]  sl_I;   // sustain level
-wire          ks_II;     // key scale
+wire          ksr_II;    // key scale rate - affects rates
+wire  [ 1:0]  ksl_IV;   // key scale level - affects amplitude
 // envelope operation
 wire          keyon_I;
 wire          eg_stop;
@@ -114,8 +115,9 @@ jtopl_mmr u_mmr(
     .drate_I    ( drate_I       ),
     .rrate_I    ( rrate_I       ),
     .sl_I       ( sl_I          ),
-    .ks_II      ( ks_II         ),
+    .ks_II      ( ksr_II        ),
     .tl_IV      ( tl_IV         ),
+    .ksl_IV     ( ksl_IV        ),
     // Timbre
     .fb_I       ( fb_I          ),
     .con_I      ( con_I         )
@@ -172,7 +174,7 @@ jtopl_eg u_eg(
     .drate_I    ( drate_I       ), // decay   rate
     .rrate_I    ( rrate_I       ), // release rate
     .sl_I       ( sl_I          ), // sustain level
-    .ks_II      ( ks_II         ), // key scale
+    .ksr_II     ( ksr_II        ), // key scale
     // envelope operation
     .keyon_I    ( keyon_I       ),
     // envelope number
@@ -180,6 +182,7 @@ jtopl_eg u_eg(
     .amsen_IV   ( amsen_IV      ),
     .ams_IV     ( ams_IV        ),
     .tl_IV      ( tl_IV         ),
+    .ksl_IV     ( ksl_IV        ),
     .eg_V       ( eg_V          ),
     .pg_rst_II  ( pg_rst_II     )
 );

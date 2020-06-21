@@ -24,6 +24,8 @@ module jtopl_eg_final(
     input            amsen,
     input            ams,
     input      [5:0] tl,
+    input      [1:0] ksl,   // level damped by pitch
+    input      [3:0] keycode,
     input      [9:0] eg_pure_in,
     output reg [9:0] eg_limited
 );
@@ -32,9 +34,16 @@ reg [ 8:0]  am_final;
 reg [11:0]  sum_eg_tl;
 reg [11:0]  sum_eg_tl_am;
 reg [ 5:0]  am_inverted;
+reg [ 5:0]  ksl_dB;
 
 always @(*) begin
     am_inverted = lfo_mod[6] ? ~lfo_mod[5:0] : lfo_mod[5:0];
+    case( ksl )
+        2'd0: ksl_dB = 6'd0;
+        2'd1: ksl_dB = {2'd0,keycode};
+        2'd2: ksl_dB = {1'd0,keycode,1'b0};
+        2'd3: ksl_dB = {keycode, 2'b0};
+    endcase
 end
 
 always @(*) begin
@@ -43,7 +52,9 @@ always @(*) begin
         2'b1_0: am_final = { 5'd0, am_inverted[5:2]    }; // Max 1   dB
         2'b1_1: am_final = { 3'd0, am_inverted         }; // Max 4.8 dB
     endcase
-    sum_eg_tl = {  2'b0, tl,   3'd0 } + {1'b0, eg_pure_in}; // leading zeros needed to compute correctly
+    sum_eg_tl = {  2'b0, tl,     3'd0 } + 
+                {  2'b0, ksl_dB, 3'd0 } +
+                {  1'b0, eg_pure_in}; // leading zeros needed to compute correctly
     sum_eg_tl_am = sum_eg_tl + { 3'd0, am_final };
 end
 
