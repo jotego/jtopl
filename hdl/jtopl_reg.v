@@ -77,7 +77,6 @@ reg  [2:0] subslot;
 // These signals need to operate during rst
 // initial state is not relevant (or critical) in real life
 // but we need a clear value during simulation
-// This does not work with NCVERILOG
 initial begin
     group   = 2'd0;
     subslot = 3'd0;
@@ -85,14 +84,11 @@ initial begin
 end
 `endif
 
+wire       match      = { group, subslot } == { sel_group, sel_sub};
 wire [2:0] next_sub   = subslot==3'd5 ? 3'd0 : (subslot+3'd1);
 wire [1:0] next_group = subslot==3'd5 ? (group==2'b10 ? 2'b00 : group+2'b1) : group;
 
-reg        match;
                
-// key on/off
-//wire    [3:0]   keyon_op = din[7:4];
-//wire    [2:0]   keyon_ch = din[2:0];
 // channel data
 wire [2:0] fb_in   = din[3:1];
 wire       con_in  = din[0];
@@ -105,7 +101,6 @@ reg        update_op_II, update_op_III, update_op_IV;
 always @(posedge clk) begin : up_counter
     if( cen ) begin
         { group, subslot }  <= { next_group, next_sub };
-        match               <= { next_group, next_sub } == { sel_group, sel_sub};
         zero                <= { next_group, next_sub }==5'd0;
         op                  <= next_sub >= 3'd3;
     end
@@ -122,22 +117,6 @@ always @(posedge clk) begin
         update_op_IV   <= update_op_III;
     end
 end
-
-// 
-// jtopl_mod #(.CH(CH)) u_mod(
-//     .alg_I      ( alg_I     ),
-//     .s1_enters  ( s1_enters ),
-//     .s3_enters  ( s3_enters ),
-//     .s2_enters  ( s2_enters ),
-//     .s4_enters  ( s4_enters ),
-//     
-//     .xuse_prevprev1 ( xuse_prevprev1  ),
-//     .xuse_internal  ( xuse_internal   ),
-//     .yuse_internal  ( yuse_internal   ),  
-//     .xuse_prev2     ( xuse_prev2      ),
-//     .yuse_prev1     ( yuse_prev1      ),
-//     .yuse_prev2     ( yuse_prev2      )
-// );
 
 localparam OPCFGW = 4*8;
 
@@ -164,11 +143,7 @@ assign { am_I, vib_I, en_sus_I, ks_II, mul_II,
          sl_I, rrate_I  } = shift_out;
 
 
-// memory for CH registers
-// Block/fnum data is latched until fnum low byte is written to
-// Trying to synthesize this memory as M-9K RAM in Altera devices
-// turns out worse in terms of resource utilization. Probably because
-// this memory is already very small. It is better to leave it as it is.
+// Memory for CH registers
 localparam KONW   =  1,
            FNUMW  = 10,
            BLOCKW =  3,
