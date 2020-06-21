@@ -35,7 +35,8 @@ reg [19:0] phinc_mul;
 
 always @(*) begin
     phinc_premul = phinc_pure + {{11{detune_signed[5]}},detune_signed};
-    phinc_mul    = ( mul==4'd0 ) ? {3'b0,phinc_premul} : ({2'd0,phinc_premul,1'b0} * mul);
+//    phinc_mul    = ( mul==4'd0 ) ? {3'b0,phinc_premul} : ({2'd0,phinc_premul,1'b0} * mul);
+    phinc_mul    = ( mul==4'd0 ) ? {4'b0,phinc_premul[16:1]} : ({3'd0,phinc_premul} * mul);
     
     phase_out   = pg_rst ? 20'd0 : (phase_in + { phinc_mul});
     phase_op    = phase_out[19:10];
