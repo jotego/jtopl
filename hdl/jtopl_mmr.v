@@ -54,6 +54,10 @@ module jtopl_mmr(
     output      [ 3:0]  sl_I,     // sustain level
     output              ks_II,    // key scale
     output      [ 5:0]  tl_IV,
+    output              amen_IV,
+    // global values
+    output reg          am_dep,
+    output reg          vib_dep,
     output      [ 1:0]  ksl_IV,
     // Operator configuration
     output      [ 2:0]  fb_I,
@@ -97,6 +101,9 @@ always @(posedge clk) begin
         up_ksl_tl <= 0;
         up_ar_dr  <= 0;
         up_sl_rr  <= 0;
+        // sensitivity to LFO
+        am_dep    <= 0;
+        vib_dep   <= 0;
         // timers
         { value_A, value_B } <= 16'd0;
         { clr_flag_B, clr_flag_A, load_B, load_A } <= 4'd0;
@@ -159,6 +166,11 @@ always @(posedge clk) begin
                     sel_sub <= selreg[3:0] < 4'd6 ? selreg[2:0] :
                         { 1'b0, ~&selreg[2:1], selreg[0] };
                 end
+                // Global register
+                if( selreg==8'hBD ) begin
+                    am_dep  <= din[7];
+                    vib_dep <= din[6];
+                end
             end
         end
         else if(cenop) begin /* clear once-only bits */
@@ -197,6 +209,8 @@ jtopl_reg u_reg(
     .latch_fnum ( latch_fnum    ),
     .fnum_I     ( fnum_I        ),
     .block_I    ( block_I       ),
+    .mul_II     ( mul_II        ),
+    .vib_I      (               ),
     // EG
     .keyon_I    ( keyon_I       ),
     .en_sus_I   ( en_sus_I      ),
@@ -206,14 +220,11 @@ jtopl_reg u_reg(
     .sl_I       ( sl_I          ),
     .ks_II      ( ks_II         ),
     .ksl_IV     ( ksl_IV        ),
+    .amen_IV    ( amen_IV       ),
+    .tl_IV      ( tl_IV         ),
     // Timbre - Neiro
     .fb_I       ( fb_I          ),
-    .con_I      ( con_I         ),
-    // Other
-    .mul_II     ( mul_II        ),
-    .am_I       (               ),
-    .vib_I      (               ),
-    .tl_IV      ( tl_IV         )
+    .con_I      ( con_I         )
 );
 
 endmodule

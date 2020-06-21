@@ -46,11 +46,25 @@ always @(*) begin
     endcase
 end
 
+// Although it is possible to achieve about the 1dB and 4.8dB values
+// shown in the application notes; this implementation makes more sense.
+// It uses two bits for modulation and produces 1.1 and 4.5dB
+// I think this is the likely way real hardware works, so until I have
+// evidence against it, I'll keep it this way:
+
 always @(*) begin
     casez( {amsen, ams } )
         default: am_final = 9'd0;
-        2'b1_0: am_final = { 5'd0, am_inverted[5:2]    }; // Max 1   dB
-        2'b1_1: am_final = { 3'd0, am_inverted         }; // Max 4.8 dB
+        2'b1_0: am_final = { 5'd0, am_inverted[5:4], 2'b0 }; // Max 1.1 dB
+        2'b1_1: am_final = { 3'd0, am_inverted[5:4], 4'b0 };   // Max 4.5 dB
+        // Just for reference, how to obtain other attenuation values:
+        //2'b1_0: am_final = { 5'd0, am_inverted[5:2]      }; // Max 1.4 dB
+        //2'b1_0: am_final = { 5'd0, am_inverted[5:3], 1'b0  }; // Max 1.3 dB
+        //2'b1_0: am_final = { 5'd0, am_inverted[5], 2'b0,am_inverted[4]  }; // Max 0.8 dB
+        //2'b1_0: am_final = { 5'd0, am_inverted[5], 1'b0, am_inverted[4], 1'b0  }; // Max 0.9 dB
+        //2'b1_1: am_final = { 3'd0, am_inverted[5:4],2'b0,am_inverted[3:2] }; // Max 4.8 dB
+        //2'b1_1: am_final = { 3'd0, am_inverted[5:3],3'b0 }; // Max 4.5 dB
+        //2'b1_1: am_final = { 3'd0, am_inverted[5:4],1'b0,am_inverted[3], 2'b0 }; // Max 4.9 dB
     endcase
     sum_eg_tl = {  2'b0, tl,     3'd0 } + 
                 {  2'b0, ksl_dB, 3'd0 } +

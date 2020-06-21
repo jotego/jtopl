@@ -54,6 +54,7 @@ wire  [ 3:0]  mul_II;
 wire  [ 9:0]  phase_IV;
 wire          pg_rst_II;
 
+wire  [ 6:0]  lfo_mod;
 // envelope configuration
 wire          en_sus_I; // enable sustain
 wire  [ 3:0]  keycode_II;
@@ -67,11 +68,11 @@ wire  [ 1:0]  ksl_IV;   // key scale level - affects amplitude
 wire          keyon_I;
 wire          eg_stop;
 // envelope number
-wire  [ 6:0]  lfo_mod;
-wire          amsen_IV;
-wire          ams_IV;
+wire          amen_IV;
 wire  [ 5:0]  tl_IV;
 wire  [ 9:0]  eg_V;
+// Global values
+wire          am_dep, vib_dep;
 // Operator
 wire  [ 2:0]  fb_I;
 wire          op, con_I, op_out, con_out;
@@ -118,6 +119,10 @@ jtopl_mmr u_mmr(
     .ks_II      ( ksr_II        ),
     .tl_IV      ( tl_IV         ),
     .ksl_IV     ( ksl_IV        ),
+    .amen_IV    ( amen_IV       ),
+    // Global Values
+    .am_dep     ( am_dep        ),
+    .vib_dep    ( vib_dep       ),
     // Timbre
     .fb_I       ( fb_I          ),
     .con_I      ( con_I         )
@@ -142,6 +147,14 @@ jtopl_timers u_timers(
     .irq_n      ( irq_n         )
 );
 
+jtopl_lfo u_lfo(
+    .rst        ( rst           ),
+    .clk        ( clk           ),
+    .cenop      ( cenop         ),
+    .zero       ( zero          ),
+    .lfo_mod    ( lfo_mod       )
+);
+
 jtopl_pg u_pg(
     .rst        ( rst           ),
     .clk        ( clk           ),
@@ -152,7 +165,7 @@ jtopl_pg u_pg(
     // Operator multiplying
     .mul_II     ( mul_II        ),
     // phase modulation from LFO (vibrato at 6.4Hz)
-    .lfo_mod    ( 7'd0          ),
+    .lfo_mod    ( lfo_mod       ),
     .pms_I      ( 3'd0          ),
     // phase operation
     .pg_rst_II  ( pg_rst_II     ),
@@ -179,8 +192,8 @@ jtopl_eg u_eg(
     .keyon_I    ( keyon_I       ),
     // envelope number
     .lfo_mod    ( lfo_mod       ),
-    .amsen_IV   ( amsen_IV      ),
-    .ams_IV     ( ams_IV        ),
+    .amsen_IV   ( amen_IV       ),
+    .ams_IV     ( am_dep        ),
     .tl_IV      ( tl_IV         ),
     .ksl_IV     ( ksl_IV        ),
     .eg_V       ( eg_V          ),
@@ -219,3 +232,4 @@ jtopl_acc u_acc(
 );
 
 endmodule
+    

@@ -51,12 +51,14 @@ jtopl_sh_rst #(.width(W),.stages(LEN)) u_regch(
 
 wire up_mult_I    = up_mult   & update_op_I;
 wire up_mult_II   = up_mult   & update_op_II;
+wire up_mult_IV   = up_mult   & update_op_IV;
 wire up_ksl_tl_IV = up_ksl_tl & update_op_IV;
 wire up_ar_dr_op  = up_ar_dr  & update_op_I;
 wire up_sl_rr_op  = up_sl_rr  & update_op_I;
 
 assign regop_in = { // 4 bytes:
-        up_mult_I   ? din[7:5]    : shift_out[31:29],
+        up_mult_IV  ? din[7]      : shift_out[31], // AM enable
+        up_mult_I   ? din[6:5]    : shift_out[30:29],
         up_mult_II  ? din[4:0]    : shift_out[28:24], // KSR + Mult
 
         up_ksl_tl_IV? din         : shift_out[23:16], // KSL + TL

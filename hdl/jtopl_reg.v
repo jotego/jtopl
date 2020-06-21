@@ -53,7 +53,7 @@ module jtopl_reg(
     
     output     [3:0] mul_II,  // frequency multiplier
     output     [1:0] ksl_IV,  // key shift level
-    output           am_I,
+    output           amen_IV,
     output           vib_I,    
     // EG
     output           keyon_I,
@@ -137,7 +137,7 @@ jtopl_csr #(.LEN(CH*2),.W(OPCFGW)) u_csr(
     .update_op_IV   ( update_op_IV  )
 );
 
-assign { am_I, vib_I, en_sus_I, ks_II, mul_II,
+assign { amen_IV, vib_I, en_sus_I, ks_II, mul_II,
          ksl_IV, tl_IV,
          arate_I, drate_I, 
          sl_I, rrate_I  } = shift_out;

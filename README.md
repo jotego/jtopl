@@ -47,6 +47,9 @@ Feature       | JTT       | Remarks
  All slots    | slots     | no modulation
  All slots    | slots_mod | Modulate some channels
  keycode      | keycode   | Sweeps fnum and block, KSL also used
+ AM           | am        |
+ Vibratto     | vib       |
+ CSM          |           | Not implemented
 
 ## Related Projects
 
