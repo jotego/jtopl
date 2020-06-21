@@ -24,7 +24,8 @@ module jtopl_pg_comb(
     input       [ 9:0]  fnum,
     // Phase Modulation
     input       [ 4:0]  lfo_mod,
-    input       [ 2:0]  pms,
+    input               vib_dep,
+    input               viben,
 
     output      [ 3:0]  keycode,
     // Phase increment  
@@ -43,6 +44,15 @@ module jtopl_pg_comb(
 wire signed [8:0] pm_offset;
 
 assign keycode = { block, fnum[9] };
+
+/*  pm, pg_dt and pg_inc operate in parallel */ 
+jtopl_pm u_pm(
+    .lfo_mod    ( lfo_mod       ),
+    .fnum       ( { fnum, 1'b0 }),
+    .vib_dep    ( vib_dep       ),
+    .viben      ( viben         ),
+    .pm_offset  ( pm_offset     )
+);
 
 jtopl_pg_inc u_inc(
     .block      ( block     ),

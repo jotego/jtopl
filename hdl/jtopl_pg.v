@@ -30,7 +30,8 @@ module jtopl_pg(
     input       [ 3:0]  mul_II,
     // phase modulation from LFO (vibrato at 6.4Hz)
     input       [ 6:0]  lfo_mod,
-    input       [ 2:0]  pms_I,
+    input               vib_dep,
+    input               viben_I,
     // phase operation
     input               pg_rst_II,
     
@@ -56,7 +57,8 @@ jtopl_pg_comb u_comb(
     .fnum       ( fnum_I        ),
     // Phase Modulation
     .lfo_mod    ( lfo_mod[6:2]  ),
-    .pms        ( pms_I         ),
+    .vib_dep    ( vib_dep       ),
+    .viben      ( viben_I       ),
 
     .keycode    ( keycode_I     ),
     // Phase increment  

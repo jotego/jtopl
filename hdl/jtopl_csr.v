@@ -58,7 +58,7 @@ wire up_sl_rr_op  = up_sl_rr  & update_op_I;
 
 assign regop_in = { // 4 bytes:
         up_mult_IV  ? din[7]      : shift_out[31], // AM enable
-        up_mult_I   ? din[6:5]    : shift_out[30:29],
+        up_mult_I   ? din[6:5]    : shift_out[30:29], // Vib enable, EG type, KSR
         up_mult_II  ? din[4:0]    : shift_out[28:24], // KSR + Mult
 
         up_ksl_tl_IV? din         : shift_out[23:16], // KSL + TL

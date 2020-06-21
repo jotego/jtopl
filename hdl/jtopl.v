@@ -53,7 +53,7 @@ wire  [ 2:0]  block_I;
 wire  [ 3:0]  mul_II;
 wire  [ 9:0]  phase_IV;
 wire          pg_rst_II;
-
+wire          viben_I;
 wire  [ 6:0]  lfo_mod;
 // envelope configuration
 wire          en_sus_I; // enable sustain
@@ -120,6 +120,7 @@ jtopl_mmr u_mmr(
     .tl_IV      ( tl_IV         ),
     .ksl_IV     ( ksl_IV        ),
     .amen_IV    ( amen_IV       ),
+    .viben_I    ( viben_I       ),
     // Global Values
     .am_dep     ( am_dep        ),
     .vib_dep    ( vib_dep       ),
@@ -166,7 +167,8 @@ jtopl_pg u_pg(
     .mul_II     ( mul_II        ),
     // phase modulation from LFO (vibrato at 6.4Hz)
     .lfo_mod    ( lfo_mod       ),
-    .pms_I      ( 3'd0          ),
+    .vib_dep    ( vib_dep       ),
+    .viben_I    ( viben_I       ),
     // phase operation
     .pg_rst_II  ( pg_rst_II     ),
     

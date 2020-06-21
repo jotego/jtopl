@@ -1,0 +1,76 @@
+#No modulation
+$C0,1
+
+#Only operator 1 of channel 0 used (slot 3)
+$23,1
+# KSL=3
+$43,C0
+$63,F0
+$83,F0
+
+
+#Start from a low frequency
+$A0,20
+$B0,20
+wait 200
+
+$B0,21
+wait 200
+$B0,22
+wait 200
+$B0,23
+wait 200
+$B0,24
+wait 200
+$B0,25
+wait 200
+$B0,26
+wait 200
+$B0,27
+wait 200
+$B0,28
+wait 200
+$B0,29
+wait 200
+$B0,2A
+wait 200
+$B0,2B
+wait 200
+$B0,2C
+wait 200
+$B0,2D
+wait 200
+$B0,2E
+wait 200
+$B0,2F
+wait 200
+$B0,30
+wait 200
+$B0,31
+wait 200
+$B0,32
+wait 200
+$B0,33
+wait 200
+$B0,34
+wait 200
+$B0,35
+wait 200
+$B0,36
+wait 200
+$B0,37
+wait 200
+$B0,38
+wait 200
+$B0,39
+wait 200
+$B0,3A
+wait 200
+$B0,3B
+wait 200
+$B0,3C
+wait 200
+$B0,3D
+wait 200
+$B0,3E
+wait 200

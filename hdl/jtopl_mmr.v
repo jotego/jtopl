@@ -45,6 +45,7 @@ module jtopl_mmr(
     output      [ 9:0]  fnum_I,
     output      [ 2:0]  block_I,
     output      [ 3:0]  mul_II,
+    output              viben_I,
     // Envelope Generator
     output              keyon_I,
     output              en_sus_I, // enable sustain
@@ -210,7 +211,7 @@ jtopl_reg u_reg(
     .fnum_I     ( fnum_I        ),
     .block_I    ( block_I       ),
     .mul_II     ( mul_II        ),
-    .vib_I      (               ),
+    .viben_I    ( viben_I       ),
     // EG
     .keyon_I    ( keyon_I       ),
     .en_sus_I   ( en_sus_I      ),

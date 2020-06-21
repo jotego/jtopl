@@ -2,6 +2,7 @@ set_global_assignment -name VERILOG_FILE [file join $::quartus(qip_path) jtopl_a
 set_global_assignment -name VERILOG_FILE [file join $::quartus(qip_path) jtopl_csr.v]
 set_global_assignment -name VERILOG_FILE [file join $::quartus(qip_path) jtopl_div.v]
 set_global_assignment -name VERILOG_FILE [file join $::quartus(qip_path) jtopl_lfo.v]
+set_global_assignment -name VERILOG_FILE [file join $::quartus(qip_path) jtopl_pm.v]
 set_global_assignment -name VERILOG_FILE [file join $::quartus(qip_path) jtopl_eg_cnt.v]
 set_global_assignment -name VERILOG_FILE [file join $::quartus(qip_path) jtopl_eg_comb.v]
 set_global_assignment -name VERILOG_FILE [file join $::quartus(qip_path) jtopl_eg_ctrl.v]
