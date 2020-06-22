@@ -79,11 +79,10 @@ localparam  REG_TESTYM  =   8'h01,
 
 reg  [ 7:0] selreg;       // selected register
 reg  [ 7:0] din_copy;
-reg  [ 7:0] latch_fnum;
 reg         csm, effect;
 reg  [ 1:0] sel_group;     // group to update
 reg  [ 2:0] sel_sub;       // subslot to update
-reg         up_fnum, up_fbcon, 
+reg         up_fnumlo, up_fnumhi, up_fbcon, 
             up_mult, up_ksl_tl, up_ar_dr, up_sl_rr;
 
 // this runs at clk speed, no clock gating here
@@ -94,10 +93,10 @@ always @(posedge clk) begin
         selreg    <= 8'h0;
         sel_group <= 2'd0;
         sel_sub   <= 3'd0;
-        latch_fnum<= 8'd0;
         // Updaters
         up_fbcon  <= 0;
-        up_fnum   <= 0;
+        up_fnumlo <= 0;
+        up_fnumhi <= 0;
         up_mult   <= 0;
         up_ksl_tl <= 0;
         up_ar_dr  <= 0;
@@ -119,7 +118,8 @@ always @(posedge clk) begin
             end else begin
                 // Global registers
                 din_copy  <= din;
-                up_fnum   <= 0;
+                up_fnumhi <= 0;
+                up_fnumlo <= 0;
                 up_fbcon  <= 0;
                 up_mult   <= 0;
                 up_ksl_tl <= 0;
@@ -154,9 +154,9 @@ always @(posedge clk) begin
                 // Channel registers
                 if( selreg[3:0]<=4'd8) begin
                     case( selreg[7:4] )
-                        4'hA: latch_fnum <= din;
-                        4'hB: up_fnum <= 1;
-                        4'hC: up_fbcon <= 1;
+                        4'hA: up_fnumlo <= 1;
+                        4'hB: up_fnumhi <= 1;
+                        4'hC: up_fbcon  <= 1;
                         default:;
                     endcase
                 end
@@ -199,7 +199,8 @@ jtopl_reg u_reg(
     //input           overflow_A,
 
     .up_fbcon   ( up_fbcon      ),
-    .up_fnum    ( up_fnum       ),
+    .up_fnumlo  ( up_fnumlo     ),
+    .up_fnumhi  ( up_fnumhi     ),
 
     .up_mult    ( up_mult       ),
     .up_ksl_tl  ( up_ksl_tl     ),
@@ -207,7 +208,6 @@ jtopl_reg u_reg(
     .up_sl_rr   ( up_sl_rr      ),
 
     // PG
-    .latch_fnum ( latch_fnum    ),
     .fnum_I     ( fnum_I        ),
     .block_I    ( block_I       ),
     .mul_II     ( mul_II        ),

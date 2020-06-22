@@ -24,6 +24,11 @@
 // will throw away unused bits but also unused entries in the LUT
 // as half of it is not used now
 
+// Note that the app notes say that options are 7 and 14 cents
+// but we obtain 6.3 and 13.5 cents with this modulator
+// Also, maybe more bits should be dropped off lfo_mod to match
+// the use in the AM modulator
+
 module jtopl_pm (
     input             [ 4:0] lfo_mod,
     input             [10:0] fnum,

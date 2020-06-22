@@ -38,14 +38,14 @@ module jtopl_reg(
     //input           overflow_A,
 
     input            up_fbcon,
-    input            up_fnum,
+    input            up_fnumlo,
+    input            up_fnumhi,
     input            up_mult,
     input            up_ksl_tl,
     input            up_ar_dr,
     input            up_sl_rr,
     
     // PG
-    input      [7:0] latch_fnum,
     output     [9:0] fnum_I,
     output     [2:0] block_I,
     // channel configuration
@@ -93,9 +93,11 @@ wire [1:0] next_group = subslot==3'd5 ? (group==2'b10 ? 2'b00 : group+2'b1) : gr
 wire [2:0] fb_in   = din[3:1];
 wire       con_in  = din[0];
 
-wire       up_fnum_ch  = up_fnum  & match, 
-           up_fbcon_ch = up_fbcon & match,
-           update_op_I = !write && sel_group == group && sel_sub == subslot;
+wire       up_fnumlo_ch = up_fnumlo & match, 
+           up_fnumhi_ch = up_fnumhi & match, 
+           up_fbcon_ch  = up_fbcon  & match,
+           update_op_I  = !write && sel_group == group && sel_sub == subslot;
+
 reg        update_op_II, update_op_III, update_op_IV;
 
 always @(posedge clk) begin : up_counter
@@ -155,8 +157,9 @@ wire [CHCSRW-1:0] chcfg0_out, chcfg1_out, chcfg2_out;
 reg  [CHCSRW-1:0] chcfg, chcfg0_in, chcfg1_in, chcfg2_in;
 
 wire [CHCSRW-1:0] chcfg_inmux = {
-    up_fnum_ch  ? { din[5:0], latch_fnum } : { keyon_I, block_I, fnum_I },
-    up_fbcon_ch ? { fb_in, con_in } : { fb_I, con_I }
+    up_fnumhi_ch ? din[5:0] : { keyon_I, block_I, fnum_I[9:8] },
+    up_fnumlo_ch ? din      : fnum_I[7:0],
+    up_fbcon_ch  ? { fb_in, con_in } : { fb_I, con_I }
 }; 
 
 always @(*) begin
