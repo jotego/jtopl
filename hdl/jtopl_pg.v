@@ -29,7 +29,7 @@ module jtopl_pg(
     // Operator multiplying
     input       [ 3:0]  mul_II,
     // phase modulation from LFO (vibrato at 6.4Hz)
-    input       [ 6:0]  lfo_mod,
+    input       [ 2:0]  vib_cnt,
     input               vib_dep,
     input               viben_I,
     // phase operation
@@ -42,9 +42,9 @@ module jtopl_pg(
 parameter CH=9;
 
 wire [ 3:0] keycode_I;
-wire [16:0] phinc_I;
-reg  [16:0] phinc_II;
-wire [19:0] phase_drop, phase_in;
+wire [17:0] phinc_I;
+reg  [17:0] phinc_II;
+wire [18:0] phase_drop, phase_in;
 wire [ 9:0] phase_II;
 
 always @(posedge clk) if(cenop) begin
@@ -56,7 +56,7 @@ jtopl_pg_comb u_comb(
     .block      ( block_I       ),
     .fnum       ( fnum_I        ),
     // Phase Modulation
-    .lfo_mod    ( lfo_mod[6:2]  ),
+    .vib_cnt    ( vib_cnt       ),
     .vib_dep    ( vib_dep       ),
     .viben      ( viben_I       ),
 
@@ -73,7 +73,7 @@ jtopl_pg_comb u_comb(
     .phase_op   ( phase_II      )
 );
 
-jtopl_sh_rst #( .width(20), .stages(2*CH) ) u_phsh(
+jtopl_sh_rst #( .width(19), .stages(2*CH) ) u_phsh(
     .clk    ( clk       ),
     .cen    ( cenop     ),
     .rst    ( rst       ),

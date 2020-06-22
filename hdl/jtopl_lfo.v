@@ -19,29 +19,24 @@
     */
 
 module jtopl_lfo(
-    input               rst,
-    input               clk,
-    input               cenop,
-    input               zero,
-    output  reg [6:0]   lfo_mod     // 7-bit width according to spritesmind.net
+    input             rst,
+    input             clk,
+    input             cenop,
+    input             zero,
+    output      [2:0] vib_cnt
 );
 
 parameter [6:0] LIM=7'd60;
 
-reg [6:0] cnt;
+reg  [12:0] cnt;
+
+assign vib_cnt = cnt[12:10];
 
 always @(posedge clk) begin
     if( rst ) begin
-        lfo_mod <= 7'd0;
-        cnt     <= 7'd0;
+        cnt <= 13'd0;
     end else if( cenop && zero) begin
-        if( cnt == LIM ) begin
-            cnt     <= 7'd0;
-            lfo_mod <= lfo_mod + 1'b1;
-        end
-        else begin
-            cnt <= cnt + 1'b1;
-        end
+        cnt <= cnt + 1'b1;
     end
 end
 

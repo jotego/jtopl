@@ -19,27 +19,34 @@
     
     */
 
-module jtopl_pg_sum (
-    input       [ 3:0]  mul,        
-    input       [19:0]  phase_in,
-    input               pg_rst,
-    input signed [5:0]  detune_signed,
-    input       [16:0]  phinc_pure,
+// Original hardware uses an adder to do the multiplication
+// but I think it will take less resources of the FPGA to
+// use a real multiplier instead
 
-    output reg  [19:0]  phase_out,
-    output reg  [ 9:0]  phase_op
+module jtopl_pg_sum (
+    input       [ 3:0] mul,        
+    input       [18:0] phase_in,
+    input              pg_rst,
+    input       [17:0] phinc_pure,
+
+    output reg  [18:0] phase_out,
+    output reg  [ 9:0] phase_op
 );
 
-reg [16:0] phinc_premul; 
-reg [19:0] phinc_mul;
+reg [22:0] phinc_mul;
+reg [ 4:0] factor[0:15];
 
 always @(*) begin
-    phinc_premul = phinc_pure + {{11{detune_signed[5]}},detune_signed};
-//    phinc_mul    = ( mul==4'd0 ) ? {3'b0,phinc_premul} : ({2'd0,phinc_premul,1'b0} * mul);
-    phinc_mul    = ( mul==4'd0 ) ? {4'b0,phinc_premul[16:1]} : ({3'd0,phinc_premul} * mul);
-    
-    phase_out   = pg_rst ? 20'd0 : (phase_in + { phinc_mul});
-    phase_op    = phase_out[19:10];
+    phinc_mul = { 5'b0, phinc_pure} * factor[mul];
+    phase_out = pg_rst ? 'd0 : (phase_in + phinc_mul[19:1]);
+    phase_op  = phase_out[18:9];
+end
+
+initial begin
+    factor[ 0] = 5'd01; factor[ 1] = 5'd02; factor[ 2] = 5'd04; factor[ 3] = 5'd06;
+    factor[ 4] = 5'd08; factor[ 5] = 5'd10; factor[ 6] = 5'd12; factor[ 7] = 5'd14;
+    factor[ 8] = 5'd16; factor[ 9] = 5'd18; factor[10] = 5'd20; factor[11] = 5'd20;
+    factor[12] = 5'd24; factor[13] = 5'd24; factor[14] = 5'd30; factor[15] = 5'd30;
 end
 
 endmodule // jtopl_pg_sum

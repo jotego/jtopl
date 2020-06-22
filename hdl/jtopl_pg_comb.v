@@ -19,39 +19,39 @@
     
 */
 
-module jtopl_pg_comb(
+module jtopl_pg_comb (
     input       [ 2:0]  block,
     input       [ 9:0]  fnum,
     // Phase Modulation
-    input       [ 4:0]  lfo_mod,
+    input       [ 2:0]  vib_cnt,
     input               vib_dep,
     input               viben,
 
     output      [ 3:0]  keycode,
     // Phase increment  
-    output      [16:0]  phinc_out,
+    output      [17:0]  phinc_out,
     // Phase add
     input       [ 3:0]  mul,
-    input       [19:0]  phase_in,
+    input       [18:0]  phase_in,
     input               pg_rst,
     // input signed [7:0]   pm_in,
-    input       [16:0]  phinc_in,
+    input       [17:0]  phinc_in,
 
-    output      [19:0]  phase_out,
+    output      [18:0]  phase_out,
     output      [ 9:0]  phase_op
 );
 
-wire signed [8:0] pm_offset;
+wire signed [3:0] pm_offset;
 
 assign keycode = { block, fnum[9] };
 
-/*  pm, pg_dt and pg_inc operate in parallel */ 
+/*  pm and pg_inc operate in parallel */ 
 jtopl_pm u_pm(
-    .lfo_mod    ( lfo_mod       ),
-    .fnum       ( { fnum, 1'b0 }),
-    .vib_dep    ( vib_dep       ),
-    .viben      ( viben         ),
-    .pm_offset  ( pm_offset     )
+    .vib_cnt    ( vib_cnt   ),
+    .fnum       ( fnum      ),
+    .vib_dep    ( vib_dep   ),
+    .viben      ( viben     ),
+    .pm_offset  ( pm_offset )
 );
 
 jtopl_pg_inc u_inc(
@@ -64,13 +64,12 @@ jtopl_pg_inc u_inc(
 // pg_sum uses the output from the previous blocks
 
 jtopl_pg_sum u_sum(
-    .mul            ( mul           ),
-    .detune_signed  ( 6'd0          ),
-    .phase_in       ( phase_in      ),
-    .pg_rst         ( pg_rst        ),
-    .phinc_pure     ( phinc_in      ),
-    .phase_out      ( phase_out     ),
-    .phase_op       ( phase_op      )
+    .mul        ( mul           ),
+    .phase_in   ( phase_in      ),
+    .pg_rst     ( pg_rst        ),
+    .phinc_pure ( phinc_in      ),
+    .phase_out  ( phase_out     ),
+    .phase_op   ( phase_op      )
 );
 
 endmodule // jtopl_pg_comb

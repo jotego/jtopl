@@ -54,7 +54,7 @@ wire  [ 3:0]  mul_II;
 wire  [ 9:0]  phase_IV;
 wire          pg_rst_II;
 wire          viben_I;
-wire  [ 6:0]  lfo_mod;
+wire  [ 2:0]  vib_cnt;
 // envelope configuration
 wire          en_sus_I; // enable sustain
 wire  [ 3:0]  keycode_II;
@@ -153,7 +153,7 @@ jtopl_lfo u_lfo(
     .clk        ( clk           ),
     .cenop      ( cenop         ),
     .zero       ( zero          ),
-    .lfo_mod    ( lfo_mod       )
+    .vib_cnt    ( vib_cnt       )
 );
 
 jtopl_pg u_pg(
@@ -166,7 +166,7 @@ jtopl_pg u_pg(
     // Operator multiplying
     .mul_II     ( mul_II        ),
     // phase modulation from LFO (vibrato at 6.4Hz)
-    .lfo_mod    ( lfo_mod       ),
+    .vib_cnt    ( vib_cnt       ),
     .vib_dep    ( vib_dep       ),
     .viben_I    ( viben_I       ),
     // phase operation
@@ -193,7 +193,7 @@ jtopl_eg u_eg(
     // envelope operation
     .keyon_I    ( keyon_I       ),
     // envelope number
-    .lfo_mod    ( lfo_mod       ),
+    .lfo_mod    ( 7'd0          ),
     .amsen_IV   ( amen_IV       ),
     .ams_IV     ( am_dep        ),
     .tl_IV      ( tl_IV         ),
