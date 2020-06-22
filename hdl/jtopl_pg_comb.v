@@ -29,13 +29,13 @@ module jtopl_pg_comb (
 
     output      [ 3:0]  keycode,
     // Phase increment  
-    output      [17:0]  phinc_out,
+    output      [16:0]  phinc_out,
     // Phase add
     input       [ 3:0]  mul,
     input       [18:0]  phase_in,
     input               pg_rst,
     // input signed [7:0]   pm_in,
-    input       [17:0]  phinc_in,
+    input       [16:0]  phinc_in,
 
     output      [18:0]  phase_out,
     output      [ 9:0]  phase_op

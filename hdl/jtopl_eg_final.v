@@ -21,6 +21,8 @@
 
 module jtopl_eg_final(
     input      [6:0] lfo_mod,
+    input      [3:0] fnum,
+    input      [2:0] block,
     input            amsen,
     input            ams,
     input      [5:0] tl,
@@ -30,20 +32,22 @@ module jtopl_eg_final(
     output reg [9:0] eg_limited
 );
 
-reg [ 8:0]  am_final;
-reg [11:0]  sum_eg_tl;
-reg [11:0]  sum_eg_tl_am;
-reg [ 5:0]  am_inverted;
-reg [ 5:0]  ksl_dB;
+reg [ 8:0] am_final;
+reg [11:0] sum_eg_tl;
+reg [11:0] sum_eg_tl_am;
+reg [ 5:0] am_inverted;
+reg [ 8:0] ksl_dB;
+reg [ 6:0] ksl_lut[0:15];
+reg [ 7:0] ksl_base;
 
 always @(*) begin
     am_inverted = lfo_mod[6] ? ~lfo_mod[5:0] : lfo_mod[5:0];
-    case( ksl )
-        2'd0: ksl_dB = 6'd0;
-        2'd1: ksl_dB = {2'd0,keycode};
-        2'd2: ksl_dB = {1'd0,keycode,1'b0};
-        2'd3: ksl_dB = {keycode, 2'b0};
-    endcase
+    ksl_base = {1'b0, ksl_lut[fnum]}- { 1'b0, 4'd8-{1'b0,block}, 3'b0 };
+    if( ksl_base[7] || ksl==2'b0 ) begin
+        ksl_dB = 9'd0;
+    end else begin
+        ksl_dB = {ksl_base[6:0],2'b0} >> ~ksl;
+    end
 end
 
 // Although it is possible to achieve about the 1dB and 4.8dB values
@@ -67,12 +71,20 @@ always @(*) begin
         //2'b1_1: am_final = { 3'd0, am_inverted[5:4],1'b0,am_inverted[3], 2'b0 }; // Max 4.9 dB
     endcase
     sum_eg_tl = {  2'b0, tl,     3'd0 } + 
-                {  2'b0, ksl_dB, 3'd0 } +
+                {  1'b0, ksl_dB, 1'd0 } +
                 {  1'b0, eg_pure_in}; // leading zeros needed to compute correctly
     sum_eg_tl_am = sum_eg_tl + { 3'd0, am_final };
 end
 
-always @(*)  
+always @(*) begin
     eg_limited = sum_eg_tl_am[11:10]==2'd0 ? sum_eg_tl_am[9:0] : 10'h3ff;
+end
+
+initial begin
+    ksl_lut[ 0] = 7'd00; ksl_lut[ 1] = 7'd32; ksl_lut[ 2] = 7'd40; ksl_lut[ 3] = 7'd45;
+    ksl_lut[ 4] = 7'd48; ksl_lut[ 5] = 7'd51; ksl_lut[ 6] = 7'd53; ksl_lut[ 7] = 7'd55;
+    ksl_lut[ 8] = 7'd56; ksl_lut[ 9] = 7'd58; ksl_lut[10] = 7'd59; ksl_lut[11] = 7'd60;
+    ksl_lut[12] = 7'd61; ksl_lut[13] = 7'd62; ksl_lut[14] = 7'd63; ksl_lut[15] = 7'd64;
+end
 
 endmodule

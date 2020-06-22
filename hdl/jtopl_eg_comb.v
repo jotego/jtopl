@@ -57,6 +57,8 @@ module jtopl_eg_comb(
     ///////////////////////////////////
     // IV
     input   [ 6:0]  lfo_mod,
+    input   [ 3:0]  fnum,
+    input   [ 2:0]  block,
     input           amsen,
     input           ams,
     input   [ 5:0]  tl,
@@ -114,6 +116,8 @@ jtopl_eg_pure u_pure(
 // IV
 
 jtopl_eg_final u_final(
+    .fnum       ( fnum          ),
+    .block      ( block         ),
     .lfo_mod    ( lfo_mod       ),
     .amsen      ( amsen         ),
     .ams        ( ams           ),

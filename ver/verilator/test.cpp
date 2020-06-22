@@ -275,7 +275,7 @@ int main(int argc, char** argv, char** env) {
         cerr << "Setting PERIOD to " << dec << period << " ns\n";
         sim_time.set_period( period );
     }
-    SAMPLING_PERIOD = sim_time.period() * 32; // 32 operators
+    SAMPLING_PERIOD = sim_time.period() * 18; // # of operators
     SAMPLERATE = 1.0/(SAMPLING_PERIOD*1e-9);
     cerr << "Sample rate " << dec << SAMPLERATE << " Hz. Sampling period " << SAMPLING_PERIOD << "ns\n";
 
@@ -334,7 +334,7 @@ int main(int argc, char** argv, char** env) {
                     skip_zeros=false;
                     waves.write( top );
                 }
-                next_sample = sim_time.get_time() + SAMPLING_PERIOD;
+                next_sample += SAMPLING_PERIOD;
             }
             last_sample = top->sample;
             writter.Eval();

@@ -36,6 +36,8 @@ module jtopl_eg (
     // envelope operation
     input               keyon_I,
     // envelope number
+    input       [9:0]   fnum_I,
+    input       [2:0]   block_I,
     input       [6:0]   lfo_mod,
     input               amsen_IV,
     input               ams_IV,
@@ -78,6 +80,8 @@ reg sum_in_III;
 wire [9:0] eg_in_I, pure_eg_out_III, eg_next_III, eg_out_IV;
 reg  [9:0] eg_in_II, eg_in_III, eg_in_IV;
 reg  [3:0] keycode_III, keycode_IV;
+wire [3:0] fnum_IV;
+wire [2:0] block_IV;
 
 
 jtopl_eg_comb u_comb(
@@ -119,6 +123,8 @@ jtopl_eg_comb u_comb(
     .sum_up_in      ( sum_in_III        ),
     ///////////////////////////////////
     // IV
+    .fnum           ( fnum_IV       ),
+    .block          ( block_IV      ),
     .lfo_mod        ( lfo_mod       ),
     .amsen          ( amsen_IV      ),
     .ams            ( ams_IV        ),
@@ -153,6 +159,20 @@ jtopl_sh #( .width(1), .stages(SLOTS) ) u_cntsh(
     .cen    ( cenop     ),
     .din    ( cnt_lsb_II),
     .drop   ( cnt_in_II )
+);
+
+jtopl_sh #( .width(4), .stages(3) ) u_fnumsh(
+    .clk    ( clk         ),
+    .cen    ( cenop       ),
+    .din    ( fnum_I[9:6] ),
+    .drop   ( fnum_IV     )
+);
+
+jtopl_sh #( .width(3), .stages(3) ) u_blocksh(
+    .clk    ( clk         ),
+    .cen    ( cenop       ),
+    .din    ( block_I     ),
+    .drop   ( block_IV    )
 );
 
 jtopl_sh_rst #( .width(10), .stages(SLOTS-3), .rstval(1'b1) ) u_egsh(

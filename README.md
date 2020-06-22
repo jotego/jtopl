@@ -36,20 +36,22 @@ There are several simulation test benches in the **ver** folder. The most import
 
 Each feature is tested with a given .jtt file in the **ver/verilator/tests** folder.
 
-Feature       | JTT       | Remarks
---------------|-----------|--------
- TL           | TL        |
- EG rates     | rates     |
- fnum         | fnum      |
- FB           | fb        |
- connection   | mod       |
- EG type      | perc      |
- All slots    | slots     | no modulation
- All slots    | slots_mod | Modulate some channels
- keycode      | keycode   | Sweeps fnum and block, KSL also used
- AM           | am        |
- Vibratto     | vib       |
- CSM          |           | Not implemented
+Feature       | JTT       | Status (commit) | Remarks
+--------------|-----------|-----------------|--------
+ TL           | TL        |                 |
+ EG rates     | rates     |                 |
+ fnum         | fnum_abs  |                 |
+ FB           | fb        | Passed          | Checks absolute value of a note
+ connection   | mod       |                 |
+ EG type      | perc      |                 |
+ All slots    | slots     |                 | no modulation
+ All slots    | slots_mod |                 | Modulate some channels
+ KSL          | ksl1/2/3  | Passed          | See note*
+ AM           | am        |                 |
+ Vibratto     | vib       | Passed 44a540   |
+ CSM          |           |                 | Not implemented
+
+ Note* values don't match the app notes but implementation follows reverse engineering of OPLL and OPL3. Measuring from first note of an octave to last note of the next seems to fit better the table in the notes.
 
 ## Related Projects
 

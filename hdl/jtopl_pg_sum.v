@@ -27,13 +27,13 @@ module jtopl_pg_sum (
     input       [ 3:0] mul,        
     input       [18:0] phase_in,
     input              pg_rst,
-    input       [17:0] phinc_pure,
+    input       [16:0] phinc_pure,
 
     output reg  [18:0] phase_out,
     output reg  [ 9:0] phase_op
 );
 
-reg [22:0] phinc_mul;
+reg [21:0] phinc_mul;
 reg [ 4:0] factor[0:15];
 
 always @(*) begin

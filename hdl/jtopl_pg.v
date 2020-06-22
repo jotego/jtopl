@@ -42,8 +42,8 @@ module jtopl_pg(
 parameter CH=9;
 
 wire [ 3:0] keycode_I;
-wire [17:0] phinc_I;
-reg  [17:0] phinc_II;
+wire [16:0] phinc_I;
+reg  [16:0] phinc_II;
 wire [18:0] phase_drop, phase_in;
 wire [ 9:0] phase_II;
 

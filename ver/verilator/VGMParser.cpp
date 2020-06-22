@@ -557,6 +557,6 @@ int VGMParser::period() {
 }
 
 int JTTParser::period() {
-    return 280;
+    return 280; // 3.57MHz
 }
 

@@ -193,6 +193,8 @@ jtopl_eg u_eg(
     // envelope operation
     .keyon_I    ( keyon_I       ),
     // envelope number
+    .fnum_I     ( fnum_I        ),
+    .block_I    ( block_I       ),
     .lfo_mod    ( 7'd0          ),
     .amsen_IV   ( amen_IV       ),
     .ams_IV     ( am_dep        ),
