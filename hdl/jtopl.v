@@ -37,6 +37,8 @@ module jtopl(
 wire          cenop;
 wire          write;
 wire  [ 1:0]  group;
+wire  [17:0]  slot;
+wire  [ 3:0]  trem;
 
 // Timers
 wire          flag_A, flag_B, flagen_A, flagen_B;
@@ -94,6 +96,7 @@ jtopl_mmr u_mmr(
     .zero       ( zero          ),
     .group      ( group         ),
     .op         ( op            ),
+    .slot       ( slot          ),
     // Timers
     .value_A    ( value_A       ),
     .value_B    ( value_B       ),
@@ -152,8 +155,9 @@ jtopl_lfo u_lfo(
     .rst        ( rst           ),
     .clk        ( clk           ),
     .cenop      ( cenop         ),
-    .zero       ( zero          ),
-    .vib_cnt    ( vib_cnt       )
+    .slot       ( slot          ),
+    .vib_cnt    ( vib_cnt       ),
+    .trem       ( trem          )
 );
 
 jtopl_pg u_pg(
@@ -195,7 +199,7 @@ jtopl_eg u_eg(
     // envelope number
     .fnum_I     ( fnum_I        ),
     .block_I    ( block_I       ),
-    .lfo_mod    ( 7'd0          ),
+    .lfo_mod    ( trem          ),
     .amsen_IV   ( amen_IV       ),
     .ams_IV     ( am_dep        ),
     .tl_IV      ( tl_IV         ),

@@ -30,6 +30,7 @@ module jtopl_mmr(
     output              zero,
     output      [ 1:0]  group,
     output              op,
+    output      [17:0]  slot,
     // Timers
     output  reg [ 7:0]  value_A,
     output  reg [ 7:0]  value_B,
@@ -190,6 +191,7 @@ jtopl_reg u_reg(
     .zero       ( zero          ),
     .group      ( group         ),
     .op         ( op            ),
+    .slot       ( slot          ),
     
     .sel_group  ( sel_group     ),     // group to update
     .sel_sub    ( sel_sub       ),     // subslot to update

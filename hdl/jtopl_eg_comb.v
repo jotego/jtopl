@@ -56,7 +56,7 @@ module jtopl_eg_comb(
     input           sum_up_in,
     ///////////////////////////////////
     // IV
-    input   [ 6:0]  lfo_mod,
+    input   [ 3:0]  lfo_mod,
     input   [ 3:0]  fnum,
     input   [ 2:0]  block,
     input           amsen,

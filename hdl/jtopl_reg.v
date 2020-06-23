@@ -26,9 +26,10 @@ module jtopl_reg(
     input      [7:0] din,
     input            write,
     // Pipeline order
-    output reg       zero,
+    output           zero,
     output reg [1:0] group,
-    output reg       op,            // 0 for modulator operators
+    output reg       op,           // 0 for modulator operators
+    output reg [17:0] slot,        // hot one encoding of active slot
     
     input      [1:0] sel_group,     // group to update
     input      [2:0] sel_sub,       // subslot to update
@@ -80,7 +81,7 @@ reg  [2:0] subslot;
 initial begin
     group   = 2'd0;
     subslot = 3'd0;
-    zero    = 1'b1;
+    slot    = 18'd1;
 end
 `endif
 
@@ -100,10 +101,16 @@ wire       up_fnumlo_ch = up_fnumlo & match,
 
 reg        update_op_II, update_op_III, update_op_IV;
 
+assign     zero = slot[0];
+
 always @(posedge clk) begin : up_counter
     if( cen ) begin
         { group, subslot }  <= { next_group, next_sub };
-        zero                <= { next_group, next_sub }==5'd0;
+        if( { next_group, next_sub }==5'd0 ) begin
+            slot <= 18'd1;
+        end else begin
+            slot <= { slot[16:0], 1'b0 };
+        end
         op                  <= next_sub >= 3'd3;
     end
 end

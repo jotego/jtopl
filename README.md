@@ -41,14 +41,14 @@ Feature       | JTT       | Status (commit) | Remarks
  TL           | TL        |                 |
  EG rates     | rates     |                 |
  fnum         | fnum_abs  |                 |
- FB           | fb        | Passed          | Checks absolute value of a note
+ FB           | fb        | Passed 4a2c3cc  | Checks absolute value of a note
  connection   | mod       |                 |
  EG type      | perc      |                 |
  All slots    | slots     |                 | no modulation
  All slots    | slots_mod |                 | Modulate some channels
- KSL          | ksl1/2/3  | Passed          | See note*
+ KSL          | ksl1/2/3  | Passed 4a2c3cc  | See note*
  AM           | am        |                 |
- Vibratto     | vib       | Passed 44a540   |
+ Vibratto     | vib       | Passed 44a540f  |
  CSM          |           |                 | Not implemented
 
  Note* values don't match the app notes but implementation follows reverse engineering of OPLL and OPL3. Measuring from first note of an octave to last note of the next seems to fit better the table in the notes.

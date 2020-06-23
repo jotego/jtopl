@@ -20,7 +20,7 @@
     */
 
 module jtopl_eg_final(
-    input      [6:0] lfo_mod,
+    input      [3:0] lfo_mod,
     input      [3:0] fnum,
     input      [2:0] block,
     input            amsen,
@@ -32,16 +32,14 @@ module jtopl_eg_final(
     output reg [9:0] eg_limited
 );
 
-reg [ 8:0] am_final;
+reg [ 5:0] am_final;
 reg [11:0] sum_eg_tl;
 reg [11:0] sum_eg_tl_am;
-reg [ 5:0] am_inverted;
 reg [ 8:0] ksl_dB;
 reg [ 6:0] ksl_lut[0:15];
 reg [ 7:0] ksl_base;
 
 always @(*) begin
-    am_inverted = lfo_mod[6] ? ~lfo_mod[5:0] : lfo_mod[5:0];
     ksl_base = {1'b0, ksl_lut[fnum]}- { 1'b0, 4'd8-{1'b0,block}, 3'b0 };
     if( ksl_base[7] || ksl==2'b0 ) begin
         ksl_dB = 9'd0;
@@ -50,30 +48,12 @@ always @(*) begin
     end
 end
 
-// Although it is possible to achieve about the 1dB and 4.8dB values
-// shown in the application notes; this implementation makes more sense.
-// It uses two bits for modulation and produces 1.1 and 4.5dB
-// I think this is the likely way real hardware works, so until I have
-// evidence against it, I'll keep it this way:
-
 always @(*) begin
-    casez( {amsen, ams } )
-        default: am_final = 9'd0;
-        2'b1_0: am_final = { 5'd0, am_inverted[5:4], 2'b0 }; // Max 1.1 dB
-        2'b1_1: am_final = { 3'd0, am_inverted[5:4], 4'b0 };   // Max 4.5 dB
-        // Just for reference, how to obtain other attenuation values:
-        //2'b1_0: am_final = { 5'd0, am_inverted[5:2]      }; // Max 1.4 dB
-        //2'b1_0: am_final = { 5'd0, am_inverted[5:3], 1'b0  }; // Max 1.3 dB
-        //2'b1_0: am_final = { 5'd0, am_inverted[5], 2'b0,am_inverted[4]  }; // Max 0.8 dB
-        //2'b1_0: am_final = { 5'd0, am_inverted[5], 1'b0, am_inverted[4], 1'b0  }; // Max 0.9 dB
-        //2'b1_1: am_final = { 3'd0, am_inverted[5:4],2'b0,am_inverted[3:2] }; // Max 4.8 dB
-        //2'b1_1: am_final = { 3'd0, am_inverted[5:3],3'b0 }; // Max 4.5 dB
-        //2'b1_1: am_final = { 3'd0, am_inverted[5:4],1'b0,am_inverted[3], 2'b0 }; // Max 4.9 dB
-    endcase
+    am_final = amsen ? ( ams ? {lfo_mod, 2'b0} : {2'b0, lfo_mod} ) : 6'd0;
     sum_eg_tl = {  2'b0, tl,     3'd0 } + 
                 {  1'b0, ksl_dB, 1'd0 } +
                 {  1'b0, eg_pure_in}; // leading zeros needed to compute correctly
-    sum_eg_tl_am = sum_eg_tl + { 3'd0, am_final };
+    sum_eg_tl_am = sum_eg_tl + { 5'd0, am_final };
 end
 
 always @(*) begin

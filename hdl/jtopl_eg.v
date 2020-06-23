@@ -38,7 +38,7 @@ module jtopl_eg (
     // envelope number
     input       [9:0]   fnum_I,
     input       [2:0]   block_I,
-    input       [6:0]   lfo_mod,
+    input       [3:0]   lfo_mod,
     input               amsen_IV,
     input               ams_IV,
     input       [5:0]   tl_IV,
