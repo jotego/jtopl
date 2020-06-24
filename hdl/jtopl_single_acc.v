@@ -24,7 +24,7 @@
 // restart the sum when input "zero" is high
 
 module jtopl_single_acc #(parameter 
-        INW=14, // input data width 
+        INW=13, // input data width 
         OUTW=16 // output data width
 )(
     input                 clk,

@@ -5,7 +5,7 @@ $63,00
 $80,F0
 
 # TL
-$40,10
+$40,18
 
 #FB
 $C0,1
@@ -14,20 +14,20 @@ $A0,F0
 $B0,2F
 
 #Change FB to different values
-wait 300
+wait 500
 $C0,3
-wait 300
+wait 500
 $C0,3
-wait 300
+wait 500
 $C0,5
-wait 300
+wait 500
 $C0,7
-wait 300
+wait 500
 $C0,9
-wait 300
+wait 500
 $C0,B
-wait 300
+wait 500
 $C0,D
-wait 300
+wait 500
 $C0,F
-wait 300
+wait 500

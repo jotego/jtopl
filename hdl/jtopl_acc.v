@@ -24,7 +24,7 @@ module jtopl_acc(
     input                rst,
     input                clk,
     input                cenop,
-    input  signed [13:0] op_result,
+    input  signed [12:0] op_result,
     input                zero,
     input                op,  // 0 for modulator operators
     input                con, // 0 for modulated connection

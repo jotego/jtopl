@@ -22,6 +22,12 @@
 
 */
 
+// Yamaha used the same table for OPN, OPM and OPL
+// Originally written in more compact way that required some logic to decompress
+// Not really worth compressing when the target is an FPGA as one BRAM will be
+// used in either case. So it's better to leave it uncompress and save the 
+// decoding logic
+
 // altera message_off 10030
 
 module jtopl_exprom

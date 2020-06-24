@@ -11,8 +11,17 @@ JTOPL is an FM sound source written in Verilog, fully compatible with YM3526. Th
 
 The implementation tries to be as close to original hardware as possible. Low usage of FPGA resources has also been a design goal. 
 
+*Accuracy*
+
 * Follows Y8950 block diagram by Yamaha
 * Barrel shift registers used for configuration values
+* Takes note of all known reverse engineered information, particularly die shots
+* Accurate at sample level, and at internal cycle clock where reasonable
+* Original architecture kept as much as possible
+
+*Modern Design for FPGA*
+
+* Fully synchronous
 * Clock enable input for easy integration
 * Avoids bulky multiplexers
 
@@ -54,8 +63,8 @@ Feature       | JTT       | Status (commit) | Remarks
 --------------|-----------|-----------------|--------
  TL           | TL        |                 |
  EG rates     | rates     |                 |
- fnum         | fnum_abs  |                 |
- FB           | fb        | Passed 4a2c3cc  | Checks absolute value of a note
+ fnum         | fnum_abs  | Passed 4a2c3cc  | Checks absolute value of a note
+ FB           | fb        | Passed 6e6178d  |
  connection   | mod       |                 |
  EG type      | perc      |                 |
  All slots    | slots     |                 | no modulation
@@ -69,7 +78,7 @@ Feature       | JTT       | Status (commit) | Remarks
 
 ## Related Projects
 
-Other sound chips from the same author
+Other sound chips from the same author (verilog RTL)
 
 Chip                   | Repository
 -----------------------|------------
@@ -80,3 +89,11 @@ YM2149                 | [JT49](https://github.com/jotego/jt49)
 sn76489an              | [JT89](https://github.com/jotego/jt89)
 OKI 6295               | [JT6295](https://github.com/jotego/jt6295)
 OKI MSM5205            | [JT5205](https://github.com/jotego/jt5205)
+
+Cycle accurate FM chips from Nuked (software emulation)
+
+Chip                |  Repository
+--------------------|------------------------
+OPLL                | [Nuked-OPLL](https://github.com/nukeykt/Nuked-OPLL)
+OPL3                | [Nuked-OPL3](https://github.com/nukeykt/Nuked-OPL3) 
+YM3438              | [Nuked-OPN2](https://github.com/nukeykt/Nuked-OPN2)

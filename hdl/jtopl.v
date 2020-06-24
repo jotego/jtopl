@@ -79,7 +79,7 @@ wire          am_dep, vib_dep;
 wire  [ 2:0]  fb_I;
 wire          op, con_I, op_out, con_out;
 
-wire signed [13:0] op_result;
+wire signed [12:0] op_result;
 
 assign          write   = !cs_n && !wr_n;
 assign          dout    = { ~irq_n, flag_A, flag_B, 5'd6 };

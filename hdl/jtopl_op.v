@@ -40,15 +40,15 @@ module jtopl_op(
     input   [9:0]   eg_atten_II, // output from envelope generator
     
     
-    output reg signed [13:0] op_result,
+    output reg signed [12:0] op_result,
     output                   op_out,
     output                   con_out
 );
 
-localparam  OPW=14,     // Operator Width
+localparam  OPW=13,     // Operator Width
             PW=OPW*2;   // Previous data Width
 
-reg  [11:0] atten_internal_II;
+reg  [11:0] level_II;
 reg         signbit_II, signbit_III;
 
 wire [ 6:0] ctrl_in, ctrl_dly;
@@ -109,39 +109,33 @@ jtopl_sh #( .width(PW), .stages(3)) u_csr2(
 );
 
 
-reg [10:0]  subtresult;
-
-reg [12:0]  shifter, shifter_2, shifter_3;
+reg [   10:0]  subtresult;
+reg [OPW-1:0]  shifter;
+wire signed [OPW-1:0] fb1 = prev[PW-1:OPW];
+wire signed [OPW-1:0] fb0 = prev[OPW-1:0];
 
 // REGISTER/CYCLE 1
 // Creation of phase modulation (FM) feedback signal, before shifting
-reg signed [13:0]  x;
-reg signed [14:0]  pm_preshift_I;
-reg         s1_II;
+reg signed [OPW-1:0] modmux_I;
+reg signed [OPW-1:0] fbmod_I;
 
 always @(*) begin
-    x = op_d ? op_result : prev[OPW-1:0] + prev[PW-1:OPW];
-    pm_preshift_I = { x[13], x }; // sign-extend
+    modmux_I = op_d ? op_result : fb1+fb0;
+    // OPL-L shifts by 8-FB
+    // OPL3  shifts by 9-FB
+    // OPLL seems to use lower resolution for OPW so it makes
+    // sense that it shifts by one fewer
+    fbmod_I  = modmux_I>>>(4'd9-{1'b0,fb_I_d});
 end
 
-reg  [9:0]  phasemod_I;
+reg signed [9:0] phasemod_I;
 
 always @(*) begin
     // Shift FM feedback signal
     if (op_d)
-        // Bit 0 of pm_preshift_I is never used
-        phasemod_I = con_I_d ? 10'd0 : pm_preshift_I[10:1];
+        phasemod_I = con_I_d ? 10'd0 : modmux_I[9:0];
     else
-        case( fb_I_d )
-            3'd0: phasemod_I = 10'd0;      
-            3'd1: phasemod_I = { {4{pm_preshift_I[14]}}, pm_preshift_I[14:9] };
-            3'd2: phasemod_I = { {3{pm_preshift_I[14]}}, pm_preshift_I[14:8] };
-            3'd3: phasemod_I = { {2{pm_preshift_I[14]}}, pm_preshift_I[14:7] };
-            3'd4: phasemod_I = {    pm_preshift_I[14],   pm_preshift_I[14:6] };
-            3'd5: phasemod_I = pm_preshift_I[14:5];
-            3'd6: phasemod_I = pm_preshift_I[13:4];
-            3'd7: phasemod_I = pm_preshift_I[12:3];
-        endcase
+        phasemod_I = fb_I_d==3'd0 ? 10'd0 : fbmod_I[9:0];
 end
 
 reg [ 9:0]  phase;
@@ -173,21 +167,21 @@ jtopl_logsin u_logsin (
 
 always @(*) begin
     subtresult = eg_atten_II + logsin_II[11:2];
-    atten_internal_II = { subtresult[9:0], logsin_II[1:0] } | {12{subtresult[10]}};
+    level_II   = { subtresult[9:0], logsin_II[1:0] } | {12{subtresult[10]}};
 end
 
 wire [9:0] mantissa_III;
 reg  [3:0] exponent_III;
 
 jtopl_exprom u_exprom(
-    .clk    ( clk       ),
-    .cen    ( cenop     ),
-    .addr   ( atten_internal_II[7:0] ),
-    .exp    ( mantissa_III           )
+    .clk    ( clk           ),
+    .cen    ( cenop         ),
+    .addr   ( level_II[7:0] ),
+    .exp    ( mantissa_III  )
 );
 
 always @(posedge clk) if( cenop ) begin
-    exponent_III <= atten_internal_II[11:8];    
+    exponent_III <= level_II[11:8];    
     signbit_III  <= signbit_II;    
 end
 
@@ -196,47 +190,33 @@ end
 
 always @(*) begin    
     // Floating-point to integer, and incorporating sign bit
-    // Two-stage shifting of mantissa_IIII by exponent_IIII
-    shifter = { 3'b001, mantissa_III };
-    case( ~exponent_III[1:0] )
-        2'b00: shifter_2 = { 1'b0, shifter[12:1] }; // LSB discarded
-        2'b01: shifter_2 = shifter;
-        2'b10: shifter_2 = { shifter[11:0], 1'b0 };
-        2'b11: shifter_2 = { shifter[10:0], 2'b0 };
-    endcase
-    case( ~exponent_III[3:2] )
-        2'b00: shifter_3 = {12'b0, shifter_2[12]   };
-        2'b01: shifter_3 = { 8'b0, shifter_2[12:8] };
-        2'b10: shifter_3 = { 4'b0, shifter_2[12:4] };
-        2'b11: shifter_3 = shifter_2;
-    endcase
+    shifter = { 2'b01, mantissa_III,1'b0 } >> exponent_III;
 end
 
 // It looks like OPLL and OPL3 don't do full 2's complement but just bit inversion
-// I'm leaving full 2's complement for now
 always @(posedge clk) if( cenop ) begin
-    op_result <= ({ 1'b0, shifter_3 } ^ {14{signbit_III}}) + {13'd0,signbit_III};
+    op_result <= ( shifter ^ {OPW{signbit_III}});// + {13'd0,signbit_III};
 end
 
 `ifdef SIMULATION
-reg signed [13:0] op_sep0_0;
-reg signed [13:0] op_sep1_0;
-reg signed [13:0] op_sep2_0;
-reg signed [13:0] op_sep0_1;
-reg signed [13:0] op_sep1_1;
-reg signed [13:0] op_sep2_1;
-reg signed [13:0] op_sep4_0;
-reg signed [13:0] op_sep5_0;
-reg signed [13:0] op_sep6_0;
-reg signed [13:0] op_sep4_1;
-reg signed [13:0] op_sep5_1;
-reg signed [13:0] op_sep6_1;
-reg signed [13:0] op_sep7_0;
-reg signed [13:0] op_sep8_0;
-reg signed [13:0] op_sep9_0;
-reg signed [13:0] op_sep7_1;
-reg signed [13:0] op_sep8_1;
-reg signed [13:0] op_sep9_1;
+reg signed [OPW-1:0] op_sep0_0;
+reg signed [OPW-1:0] op_sep1_0;
+reg signed [OPW-1:0] op_sep2_0;
+reg signed [OPW-1:0] op_sep0_1;
+reg signed [OPW-1:0] op_sep1_1;
+reg signed [OPW-1:0] op_sep2_1;
+reg signed [OPW-1:0] op_sep4_0;
+reg signed [OPW-1:0] op_sep5_0;
+reg signed [OPW-1:0] op_sep6_0;
+reg signed [OPW-1:0] op_sep4_1;
+reg signed [OPW-1:0] op_sep5_1;
+reg signed [OPW-1:0] op_sep6_1;
+reg signed [OPW-1:0] op_sep7_0;
+reg signed [OPW-1:0] op_sep8_0;
+reg signed [OPW-1:0] op_sep9_0;
+reg signed [OPW-1:0] op_sep7_1;
+reg signed [OPW-1:0] op_sep8_1;
+reg signed [OPW-1:0] op_sep9_1;
 reg        [ 4:0] sepcnt;
 
 always @(posedge clk) if(cenop) begin
