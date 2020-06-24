@@ -45,15 +45,19 @@ module jtopl_op(
     output                   con_out
 );
 
+localparam  OPW=14,     // Operator Width
+            PW=OPW*2;   // Previous data Width
+
 reg  [11:0] atten_internal_II;
 reg         signbit_II, signbit_III;
-reg  [13:0] prev,  prev0_din, prev1_din, prev2_din;
-wire [13:0] prev0, prev1,     prev2;
 
 wire [ 6:0] ctrl_in, ctrl_dly;
 wire [ 1:0] group_d;
 wire        op_d, con_I_d;
 wire [ 2:0] fb_I_d;
+
+reg  [PW-1:0] prev,  prev0_din, prev1_din, prev2_din;
+wire [PW-1:0] prev0, prev1,     prev2;
 
 assign      ctrl_in = { group, op, con_I, fb_I };
 assign      { group_d, op_d, con_I_d, fb_I_d } = ctrl_dly;
@@ -73,9 +77,9 @@ jtopl_sh #( .width(2), .stages(3)) u_condly(
 );
 
 always @(*) begin
-    prev0_din     = op_d && group_d==2'd0 ? op_result : prev0;
-    prev1_din     = op_d && group_d==2'd1 ? op_result : prev1;
-    prev2_din     = op_d && group_d==2'd2 ? op_result : prev2;
+    prev0_din     = op_d && group_d==2'd0 ? { prev0[OPW-1:0], op_result } : prev0;
+    prev1_din     = op_d && group_d==2'd1 ? { prev1[OPW-1:0], op_result } : prev1;
+    prev2_din     = op_d && group_d==2'd2 ? { prev2[OPW-1:0], op_result } : prev2;
     case( group_d )
         default: prev = prev0;
         2'd1:    prev = prev1;
@@ -83,21 +87,21 @@ always @(*) begin
     endcase
 end
 
-jtopl_sh #( .width(14), .stages(3)) u_csr0(
+jtopl_sh #( .width(PW), .stages(3)) u_csr0(
     .clk    ( clk       ),
     .cen    ( cenop     ),
     .din    ( prev0_din ),
     .drop   ( prev0     )
 );
 
-jtopl_sh #( .width(14), .stages(3)) u_csr1(
+jtopl_sh #( .width(PW), .stages(3)) u_csr1(
     .clk    ( clk       ),
     .cen    ( cenop     ),
     .din    ( prev1_din ),
     .drop   ( prev1     )
 );
 
-jtopl_sh #( .width(14), .stages(3)) u_csr2(
+jtopl_sh #( .width(PW), .stages(3)) u_csr2(
     .clk    ( clk       ),
     .cen    ( cenop     ),
     .din    ( prev2_din ),
@@ -116,7 +120,7 @@ reg signed [14:0]  pm_preshift_I;
 reg         s1_II;
 
 always @(*) begin
-    x = op_d ? op_result : prev;
+    x = op_d ? op_result : prev[OPW-1:0] + prev[PW-1:OPW];
     pm_preshift_I = { x[13], x }; // sign-extend
 end
 
@@ -208,6 +212,8 @@ always @(*) begin
     endcase
 end
 
+// It looks like OPLL and OPL3 don't do full 2's complement but just bit inversion
+// I'm leaving full 2's complement for now
 always @(posedge clk) if( cenop ) begin
     op_result <= ({ 1'b0, shifter_3 } ^ {14{signbit_III}}) + {13'd0,signbit_III};
 end

@@ -35,7 +35,7 @@ always @(*) begin
 end
 
 always @(posedge clk, posedge rst) begin
-    if( cen )
+    if( rst )
         no <= 23'd1<<22;
     else if(cen) begin
         no <= { nbit, no[22:1] };
