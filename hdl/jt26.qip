@@ -23,4 +23,5 @@ set_global_assignment -name VERILOG_FILE [file join $::quartus(qip_path) jtopl_s
 set_global_assignment -name VERILOG_FILE [file join $::quartus(qip_path) jtopl_sh.v]
 set_global_assignment -name VERILOG_FILE [file join $::quartus(qip_path) jtopl_single_acc.v]
 set_global_assignment -name VERILOG_FILE [file join $::quartus(qip_path) jtopl_timers.v]
+set_global_assignment -name VERILOG_FILE [file join $::quartus(qip_path) jtopl_noise.v]
 set_global_assignment -name VERILOG_FILE [file join $::quartus(qip_path) jtopl.v]

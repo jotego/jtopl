@@ -24,9 +24,23 @@ Directories:
 
 Usage:
 
-Chip    | Top Level Cell | QIP file
---------|----------------|----------
-YM3526  | hdl/jtopl.v    | jt26.qip
+Chip    | Top Level Cell | QIP file   | Remarks     | Implemented
+--------|----------------|------------|-------------|-------------
+YM3526  |  jtopl.v       | jt26.qip   | OPL         | Yes
+YM3812  |  jt3812.v      | jt3812.qip | OPL2        | No
+Y8950   |  jt8950.v      | jt8950.qip | OPL+ADPCM   | No
+YM2413  |  jt2413.v      | jt2413.qip | OPL-L       | No
+YMF262  |  jt262.v       | jt262.qip  | OPL3        | No
+
+### Chip differences
+
+Chip     |  Type        | Features
+---------|--------------|----------------------------------------
+YM3526   | OPL          | Basic OPL
+YM2413   | OPLL         | Removes depth options for vibrato/tremolo
+Y8950    | OPL+ADPCM    | Adds ADPCM
+YM3812   | OPL2         | Adds waveform select. Four waveforms
+YMF262   | OPL3         | No CSM. More operator modes, more channels
 
 ## Simulation
 
@@ -47,7 +61,7 @@ Feature       | JTT       | Status (commit) | Remarks
  All slots    | slots     |                 | no modulation
  All slots    | slots_mod |                 | Modulate some channels
  KSL          | ksl1/2/3  | Passed 4a2c3cc  | See note*
- AM           | am        |                 |
+ AM           | am        | Passed fc6ad19  |
  Vibratto     | vib       | Passed 44a540f  |
  CSM          |           |                 | Not implemented
 

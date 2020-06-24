@@ -46,11 +46,19 @@ wire [16:0] phinc_I;
 reg  [16:0] phinc_II;
 wire [18:0] phase_drop, phase_in;
 wire [ 9:0] phase_II;
+wire        noise;
 
 always @(posedge clk) if(cenop) begin
     keycode_II      <= keycode_I;
     phinc_II        <= phinc_I;
 end
+
+jtopl_noise u_noise(
+    .clk    ( clk       ),
+    .cen    ( cenop     ),
+    .rst    ( rst       ),
+    .noise  ( noise     )
+);
 
 jtopl_pg_comb u_comb(
     .block      ( block_I       ),
