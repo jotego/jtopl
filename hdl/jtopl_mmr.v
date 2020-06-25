@@ -31,6 +31,7 @@ module jtopl_mmr(
     output      [ 1:0]  group,
     output              op,
     output      [17:0]  slot,
+    output  reg         rhy_en,
     // Timers
     output  reg [ 7:0]  value_A,
     output  reg [ 7:0]  value_B,
@@ -85,6 +86,7 @@ reg  [ 1:0] sel_group;     // group to update
 reg  [ 2:0] sel_sub;       // subslot to update
 reg         up_fnumlo, up_fnumhi, up_fbcon, 
             up_mult, up_ksl_tl, up_ar_dr, up_sl_rr;
+reg  [ 4:0] rhy_kon;
 
 // this runs at clk speed, no clock gating here
 // if I try to make this an async rst it fails to map it
@@ -102,6 +104,9 @@ always @(posedge clk) begin
         up_ksl_tl <= 0;
         up_ar_dr  <= 0;
         up_sl_rr  <= 0;
+        // Rhythms
+        rhy_en    <= 0;
+        rhy_kon   <= 5'd0;
         // sensitivity to LFO
         am_dep    <= 0;
         vib_dep   <= 0;
@@ -172,6 +177,8 @@ always @(posedge clk) begin
                 if( selreg==8'hBD ) begin
                     am_dep  <= din[7];
                     vib_dep <= din[6];
+                    rhy_en  <= din[5];
+                    rhy_kon <= din[4:0];
                 end
             end
         end
@@ -195,6 +202,9 @@ jtopl_reg u_reg(
     
     .sel_group  ( sel_group     ),     // group to update
     .sel_sub    ( sel_sub       ),     // subslot to update
+
+    .rhy_en     ( rhy_en        ),
+    .rhy_kon    ( rhy_kon       ),
     
     //input           csm,
     //input           flag_A,

@@ -31,15 +31,21 @@ Directories:
 * ver -> test benches
 * ver/verilator -> test bench that can play vgm files
 
-Usage:
+## Usage
 
-Chip    | Top Level Cell | QIP file   | Remarks     | Implemented
---------|----------------|------------|-------------|-------------
-YM3526  |  jtopl.v       | jt26.qip   | OPL         | Yes
-YM3812  |  jt3812.v      | jt3812.qip | OPL2        | No
-Y8950   |  jt8950.v      | jt8950.qip | OPL+ADPCM   | No
-YM2413  |  jt2413.v      | jt2413.qip | OPL-L       | No
-YMF262  |  jt262.v       | jt262.qip  | OPL3        | No
+Although many files are shared, each chip has its own top level file to instantiate. There are QIP files for each one that detail the list of files used for each file. Intel Quartus software can take qip files as part of the project.
+
+Not all the chips of OPL series are implemented yet, so take the following table as a plan which I am working on.
+
+Chip    | Top Level Cell | QIP file   | Type        | Patches | Implemented  | Usage
+--------|----------------|------------|-------------|---------|--------------|-------
+YM3526  |  jtopl.v       | jt26.qip   | OPL         |         | Yes          | Bubble Bobble
+YM3812  |  jt3812.v      | jt3812.qip | OPL2        |         | No           |
+Y8950   |  jt8950.v      | jt8950.qip | OPL+ADPCM   |         | No           | MSX-Audio
+YM2413  |  jt2413.v      | jt2413.qip | OPL-L       | Yes     | No           |
+YM2423  |     -          |      -     | OPL-LX      | Yes     | No plans     | Atari ST FM cart
+YMF281  |     -          |      -     | OPL-LLP     | Yes     | No plans     | Pachinko
+YMF262  |  jt262.v       | jt262.qip  | OPL3        |         | No           |
 
 ### Chip differences
 
@@ -75,6 +81,24 @@ Feature       | JTT       | Status (commit) | Remarks
  CSM          |           |                 | Not implemented
 
  Note* values don't match the app notes but implementation follows reverse engineering of OPLL and OPL3. Measuring from first note of an octave to last note of the next seems to fit better the table in the notes.
+
+## Rhythm Instruments
+
+They are bass drum, snare drum, tom-tom, high-hat, cymbals and top cymbals. Channels 6,7 and 8 are used for these instruments. 
+
+For patch-based OPL chips, there were specific values for each operator register of these instruments. However, for non-patched synthesizers, the user still had to enter register values. So it looks like the benefit from the rhythm feature was:
+
+* Ability to enter more than one key-on command at once
+* Noisy phase for three instruments
+* Forced no modulation on 5 five instruments
+
+Short name | Instrument | Slot    | Phase   | EG   | Modulation |
+-----------|------------|---------|---------|------|------------|
+ BD        | Bass drum  | 13 & 16 |         | Drum | Normal     |
+ HH        | High hat   | 14      | Special | Drum |   No       |
+ TOM       | Tom tom    | 15      |         | Drum |   No       |
+ SD        | Snare drum | 17      | Special | Drum |   No       |
+ TOP-CYM   | Top cymbal | 18      | Special | Drum |   No       |
 
 ## Related Projects
 

@@ -395,7 +395,7 @@ void OPLL_DoRegWrite(opll_t *chip) {
 }
 void OPLL_PreparePatch1(opll_t *chip) {
     uint8_t instr;
-    uint32_t mcsel = ((chip->cycles + 1) / 3) & 0x01;
+    uint32_t mcsel = ((chip->cycles + 1) / 3) & 0x01; // modulator-carrier selection
     uint32_t instr_index;
     uint32_t ch = ch_offset[chip->cycles];
     const opll_patch_t *patch;

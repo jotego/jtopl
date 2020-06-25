@@ -23,6 +23,8 @@ module jtopl_pg(
     input               rst,
     input               clk,
     input               cenop,
+    input       [17:0]  slot,
+    input               rhy_en,
     // Channel frequency
     input       [ 9:0]  fnum_I,
     input       [ 2:0]  block_I,
@@ -47,11 +49,30 @@ reg  [16:0] phinc_II;
 wire [18:0] phase_drop, phase_in;
 wire [ 9:0] phase_II;
 wire        noise;
+reg  [ 9:0] hh, tc;
+reg         rm_xor;
+wire        hh_en, sd_en, tc_en;
 
 always @(posedge clk) if(cenop) begin
     keycode_II      <= keycode_I;
     phinc_II        <= phinc_I;
 end
+
+// Rhythm phase
+always @(posedge clk, posedge rst) begin
+    if( rst ) begin
+        hh <= 10'd0;
+        tc <= 10'd0;
+    end else begin
+        if( slot[13] ) hh <= phase_drop[18:9];
+        if( slot[17] ) tc <= phase_drop[18:9];
+        rm_xor <= (hh[2]^hh[7]) | (hh[3]^tc[5]) | (tc[3]^tc[5]);
+    end
+end
+
+assign  hh_en = rhy_en & slot[14]; // 13+1
+assign  sd_en = rhy_en & slot[17]; // 16+1
+assign  tc_en = rhy_en & slot[ 0]; // (17+1)%18
 
 jtopl_noise u_noise(
     .clk    ( clk       ),
@@ -76,6 +97,13 @@ jtopl_pg_comb u_comb(
     .phase_in   ( phase_drop    ),
     .pg_rst     ( pg_rst_II     ),
     .phinc_in   ( phinc_II      ),
+    // Rhythm
+    .hh_en      ( hh_en         ),
+    .sd_en      ( sd_en         ),
+    .tc_en      ( tc_en         ),
+    .rm_xor     ( rm_xor        ),
+    .noise      ( noise         ),
+    .hh         ( hh            ),
 
     .phase_out  ( phase_in      ),
     .phase_op   ( phase_II      )

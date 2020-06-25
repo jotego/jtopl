@@ -33,7 +33,10 @@ module jtopl_reg(
     
     input      [1:0] sel_group,     // group to update
     input      [2:0] sel_sub,       // subslot to update
-    
+
+    input            rhy_en,        // rhythm enable
+    input      [4:0] rhy_kon,    // key-on for each rhythm instrument
+
     //input           csm,
     //input           flag_A,
     //input           overflow_A,
@@ -130,6 +133,10 @@ end
 localparam OPCFGW = 4*8;
 
 wire [OPCFGW-1:0] shift_out;
+wire              en_sus;
+
+// Sustained is disabled in rhythm mode for channels in group 2 (i.e. 6,7,8)
+assign            en_sus_I = (rhy_oen && group==2'b10) ? 1'b0 : en_sus;
 
 jtopl_csr #(.LEN(CH*2),.W(OPCFGW)) u_csr(
     .rst            ( rst           ),
@@ -146,7 +153,7 @@ jtopl_csr #(.LEN(CH*2),.W(OPCFGW)) u_csr(
     .update_op_IV   ( update_op_IV  )
 );
 
-assign { amen_IV, viben_I, en_sus_I, ks_II, mul_II,
+assign { amen_IV, viben_I, en_sus, ks_II, mul_II,
          ksl_IV, tl_IV,
          arate_I, drate_I, 
          sl_I, rrate_I  } = shift_out;
@@ -162,12 +169,18 @@ localparam CHCSRW = KONW+FNUMW+BLOCKW+FBW+CONW;
 
 wire [CHCSRW-1:0] chcfg0_out, chcfg1_out, chcfg2_out;
 reg  [CHCSRW-1:0] chcfg, chcfg0_in, chcfg1_in, chcfg2_in;
+wire [CHCSRW-1:0] chcfg_inmux;
+wire              keyon_csr, con_csr;
+wire              disable_con;
 
-wire [CHCSRW-1:0] chcfg_inmux = {
-    up_fnumhi_ch ? din[5:0] : { keyon_I, block_I, fnum_I[9:8] },
+assign chcfg_inmux = {
+    up_fnumhi_ch ? din[5:0] : { keyon_csr, block_I, fnum_I[9:8] },
     up_fnumlo_ch ? din      : fnum_I[7:0],
-    up_fbcon_ch  ? { fb_in, con_in } : { fb_I, con_I }
-}; 
+    up_fbcon_ch  ? { fb_in, con_in } : { fb_I, con_csr }
+};
+
+assign disable_con = rhy_oen && group==2'b10 && !slot[12] && !slot[13];
+assign con_I       = ~disable_con | con_csr;
 
 always @(*) begin
     case( group )
@@ -180,7 +193,29 @@ always @(*) begin
     chcfg2_in = group==2'b10 ? chcfg_inmux : chcfg2_out;
 end
 
-assign { keyon_I, block_I, fnum_I, fb_I, con_I } = chcfg;
+assign { keyon_csr, block_I, fnum_I, fb_I, con_csr } = chcfg;
+
+// Rhythm key-on CSR
+localparam BD=4, SD=3, TOM=2, TC=1, HH=0;
+reg [5:0] rhy_csr;
+reg       rhy_oen;
+
+always @(posedge clk, posedge rst) begin
+    if( rst ) begin
+        rhy_csr <= 6'd0;
+        rhy_oen <= 0;
+    end else if(cen) begin
+        if(slot[11]) rhy_oen <= rhy_en;
+        if(slot[17]) begin
+            rhy_csr <= { rhy_kon[BD], rhy_kon[HH], rhy_kon[TOM],
+                         rhy_kon[BD], rhy_kon[SD], rhy_kon[TC] };
+            rhy_oen <= 0;
+        end else
+            rhy_csr <= { rhy_csr[4:0], rhy_csr[5] };
+    end
+end
+
+assign keyon_I = rhy_oen && group==2'b10 ? rhy_csr[5] : keyon_csr;
 
 jtopl_sh_rst #(.width(CHCSRW),.stages(3)) u_group0(
     .clk    ( clk        ),

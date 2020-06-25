@@ -36,12 +36,20 @@ module jtopl_pg_comb (
     input               pg_rst,
     // input signed [7:0]   pm_in,
     input       [16:0]  phinc_in,
+    // Rhythm
+    input               noise,
+    input       [ 9:0]  hh,
+    input               hh_en,
+    input               tc_en,
+    input               sd_en,
+    input               rm_xor,
 
     output      [18:0]  phase_out,
     output      [ 9:0]  phase_op
 );
 
 wire signed [3:0] pm_offset;
+wire        [9:0] phase_pre;
 
 assign keycode = { block, fnum[9] };
 
@@ -69,7 +77,19 @@ jtopl_pg_sum u_sum(
     .pg_rst     ( pg_rst        ),
     .phinc_pure ( phinc_in      ),
     .phase_out  ( phase_out     ),
-    .phase_op   ( phase_op      )
+    .phase_op   ( phase_pre     )
+);
+
+jtopl_pg_rhy u_rhy(
+    .phase_pre  ( phase_pre ),
+    // Rhythm
+    .noise      ( noise     ),
+    .hh         ( hh        ),
+    .hh_en      ( hh_en     ),
+    .tc_en      ( tc_en     ),
+    .sd_en      ( sd_en     ),
+    .rm_xor     ( rm_xor    ),
+    .phase_op   ( phase_op  )
 );
 
 endmodule // jtopl_pg_comb

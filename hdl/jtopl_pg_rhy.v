@@ -12,36 +12,38 @@
 
     You should have received a copy of the GNU General Public License
     along with JTOPL.  If not, see <http://www.gnu.org/licenses/>.
-
+    
     Author: Jose Tejada Gomez. Twitter: @topapate
     Version: 1.0
-    Date: 24-6-2020
-
+    Date: 25-6-2020
+    
     */
 
-module jtopl_noise(
-    input  rst,        // rst should be at least 6 clk&cen cycles long
-    input  clk,        // CPU clock
-    input  cen,        // optional clock enable, it not needed leave as 1'b1
-    output noise
+module jtopl_pg_rhy (
+    input       [ 9:0]  phase_pre,
+    // Rhythm
+    input               noise,
+    input       [ 9:0]  hh,
+    input               hh_en,
+    input               tc_en,
+    input               sd_en,
+    input               rm_xor,
+    output reg  [ 9:0]  phase_op
 );
 
-reg [22:0] no;
-reg        nbit;
-
-assign     noise = no[0];
-
 always @(*) begin
-    nbit = no[0] ^ no[14];
-    nbit = nbit | (no==23'd0);
+    if( hh_en ) begin
+        phase_op = {rm_xor, 9'd0 };
+        if( rm_xor ^ noise )
+            phase_op = phase_op | 10'hd0;
+        else
+            phase_op = phase_op | 10'h34;
+    end else if( sd_en ) begin
+        phase_op = { hh[8], hh[8]^noise, 8'd0 };
+    end else if( tc_en ) begin
+        phase_op = { rm_xor, 9'h80 };
+    end else
+        phase_op = phase_pre;
 end
 
-always @(posedge clk, posedge rst) begin
-    if( rst )
-        no <= 23'd1<<22;
-    else if(cen) begin
-        no <= { nbit, no[22:1] };
-    end
-end
-
-endmodule
+endmodule // jtopl_pg_sum

@@ -74,7 +74,7 @@ wire          amen_IV;
 wire  [ 5:0]  tl_IV;
 wire  [ 9:0]  eg_V;
 // Global values
-wire          am_dep, vib_dep;
+wire          am_dep, vib_dep, rhy_en;
 // Operator
 wire  [ 2:0]  fb_I;
 wire          op, con_I, op_out, con_out;
@@ -97,6 +97,7 @@ jtopl_mmr u_mmr(
     .group      ( group         ),
     .op         ( op            ),
     .slot       ( slot          ),
+    .rhy_en     ( rhy_en        ),
     // Timers
     .value_A    ( value_A       ),
     .value_B    ( value_B       ),
@@ -164,6 +165,8 @@ jtopl_pg u_pg(
     .rst        ( rst           ),
     .clk        ( clk           ),
     .cenop      ( cenop         ),
+    .slot       ( slot          ),
+    .rhy_en     ( rhy_en        ),
     // Channel frequency
     .fnum_I     ( fnum_I        ),
     .block_I    ( block_I       ),
