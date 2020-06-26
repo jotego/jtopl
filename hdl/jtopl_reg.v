@@ -136,7 +136,7 @@ wire [OPCFGW-1:0] shift_out;
 wire              en_sus;
 
 // Sustained is disabled in rhythm mode for channels in group 2 (i.e. 6,7,8)
-assign            en_sus_I = (rhy_oen && group==2'b10) ? 1'b0 : en_sus;
+assign            en_sus_I = rhy_oen ? 1'b0 : en_sus;
 
 jtopl_csr #(.LEN(CH*2),.W(OPCFGW)) u_csr(
     .rst            ( rst           ),
@@ -179,8 +179,8 @@ assign chcfg_inmux = {
     up_fbcon_ch  ? { fb_in, con_in } : { fb_I, con_csr }
 };
 
-assign disable_con = rhy_oen && group==2'b10 && !slot[12] && !slot[13];
-assign con_I       = ~disable_con | con_csr;
+assign disable_con = rhy_oen && !slot[12] && !slot[13];
+assign con_I       = !rhy_en || !disable_con ? con_csr : 1'b1;
 
 always @(*) begin
     case( group )
@@ -215,7 +215,7 @@ always @(posedge clk, posedge rst) begin
     end
 end
 
-assign keyon_I = rhy_oen && group==2'b10 ? rhy_csr[5] : keyon_csr;
+assign keyon_I = rhy_oen ? rhy_csr[5] : keyon_csr;
 
 jtopl_sh_rst #(.width(CHCSRW),.stages(3)) u_group0(
     .clk    ( clk        ),
