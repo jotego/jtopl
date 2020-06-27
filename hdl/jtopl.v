@@ -82,7 +82,8 @@ wire          op, con_I, op_out, con_out;
 wire signed [12:0] op_result;
 
 assign          write   = !cs_n && !wr_n;
-assign          dout    = { ~irq_n, flag_A, flag_B, 5'd6 };
+assign          read    = !cs_n && !addr;
+assign          dout    = read ? { ~irq_n, flag_A, flag_B, 5'd6 } : 8'd0;
 assign          eg_stop = 0;
 
 jtopl_mmr u_mmr(
