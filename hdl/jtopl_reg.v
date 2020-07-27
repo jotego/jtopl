@@ -77,6 +77,9 @@ localparam CH=9;
 // and each subslot contains six operators
 reg  [2:0] subslot;
 
+reg [5:0] rhy_csr;
+reg       rhy_oen;
+
 `ifdef SIMULATION
 // These signals need to operate during rst
 // initial state is not relevant (or critical) in real life
@@ -197,8 +200,6 @@ assign { keyon_csr, block_I, fnum_I, fb_I, con_csr } = chcfg;
 
 // Rhythm key-on CSR
 localparam BD=4, SD=3, TOM=2, TC=1, HH=0;
-reg [5:0] rhy_csr;
-reg       rhy_oen;
 
 always @(posedge clk, posedge rst) begin
     if( rst ) begin
