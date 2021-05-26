@@ -12,7 +12,7 @@
 
     You should have received a copy of the GNU General Public License
     along with JTOPL.  If not, see <http://www.gnu.org/licenses/>.
-    
+
     Author: Jose Tejada Gomez. Twitter: @topapate
     Version: 1.0
     Date: 21-6-2020
@@ -36,12 +36,12 @@ always @(*) begin
     else begin
         range = fnum[9:7]>>vib_cnt[0];
         if(!vib_dep) range = range>>1;
-        if( vib_cnt[2] )
-            pm_offset = ~{1'b0, range } + 4'd1;
-        else
-            pm_offset = {1'b0, range };
-        if(!viben) pm_offset = 4'd0;
     end
+    if( vib_cnt[2] )
+        pm_offset = ~{1'b0, range } + 4'd1;
+    else
+        pm_offset = {1'b0, range };
+    if(!viben) pm_offset = 4'd0;
 end
 
 endmodule
