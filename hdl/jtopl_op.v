@@ -37,6 +37,7 @@ module jtopl_op(
     input           zero,
 
     input   [9:0]   pg_phase_I,
+    input   [1:0]   wavsel_I,
     input   [9:0]   eg_atten_II, // output from envelope generator
     
     
@@ -45,11 +46,14 @@ module jtopl_op(
     output                   con_out
 );
 
+parameter OPL_TYPE=1;
+
 localparam  OPW=13,     // Operator Width
             PW=OPW*2;   // Previous data Width
 
 reg  [11:0] level_II;
 reg         signbit_II, signbit_III;
+reg         nullify_II;
 
 wire [ 6:0] ctrl_in, ctrl_dly;
 wire [ 1:0] group_d;
@@ -149,7 +153,13 @@ end
 // REGISTER/CYCLE 1
 
 always @(posedge clk) if( cenop ) begin    
-    signbit_II <= phase[9];     
+    if( OPL_TYPE==1 ) begin
+        signbit_II <= phase[9];
+        nullify_II <= 0;
+    end else begin
+        signbit_II <= wavsel_I==0 && phase[9];
+        nullify_II <= (wavsel_I==2'b01 && phase[9]) || (wavsel_I==2'b11 && phase[8]);
+    end
 end
 
 wire [11:0]  logsin_II;
@@ -168,6 +178,9 @@ jtopl_logsin u_logsin (
 always @(*) begin
     subtresult = eg_atten_II + logsin_II[11:2];
     level_II   = { subtresult[9:0], logsin_II[1:0] } | {12{subtresult[10]}};
+    if( nullify_II ) begin
+        level_II = ~12'h0;
+    end
 end
 
 wire [9:0] mantissa_III;

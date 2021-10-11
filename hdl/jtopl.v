@@ -34,6 +34,8 @@ module jtopl(
     output                 sample
 );
 
+parameter OPL_TYPE=1;
+
 wire          cenop;
 wire          write;
 wire  [ 1:0]  group;
@@ -77,6 +79,7 @@ wire  [ 9:0]  eg_V;
 wire          am_dep, vib_dep, rhy_en;
 // Operator
 wire  [ 2:0]  fb_I;
+wire  [ 1:0]  wavsel_I;
 wire          op, con_I, op_out, con_out;
 
 wire signed [12:0] op_result;
@@ -85,7 +88,7 @@ assign          write   = !cs_n && !wr_n;
 assign          dout    = { ~irq_n, flag_A, flag_B, 5'd6 };
 assign          eg_stop = 0;
 
-jtopl_mmr u_mmr(
+jtopl_mmr #(.OPL_TYPE(OPL_TYPE)) u_mmr(
     .rst        ( rst           ),
     .clk        ( clk           ),
     .cen        ( cen           ),  // external clock enable
@@ -113,6 +116,8 @@ jtopl_mmr u_mmr(
     .fnum_I     ( fnum_I        ),
     .block_I    ( block_I       ),
     .mul_II     ( mul_II        ),
+    // Operator
+    .wavsel_I   ( wavsel_I      ),
     // Envelope Generator
     .keyon_I    ( keyon_I       ),
     .en_sus_I   ( en_sus_I      ),
@@ -211,7 +216,7 @@ jtopl_eg u_eg(
     .pg_rst_II  ( pg_rst_II     )
 );
 
-jtopl_op u_op(
+jtopl_op #(.OPL_TYPE(OPL_TYPE)) u_op(
     .rst        ( rst           ),
     .clk        ( clk           ),
     .cenop      ( cenop         ),
@@ -224,6 +229,7 @@ jtopl_op u_op(
     .pg_phase_I ( phase_IV      ),
     .eg_atten_II( eg_V          ), // output from envelope generator
     .fb_I       ( fb_I          ), // voice feedback
+    .wavsel_I   ( wavsel_I      ), // sine mask (OPL2)
     
     .con_I      ( con_I         ),
     .op_result  ( op_result     ),

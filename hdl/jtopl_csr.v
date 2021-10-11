@@ -21,7 +21,7 @@
 */
 
 module jtopl_csr #(
-    parameter LEN=18, W=32
+    parameter LEN=18, W=34
 ) ( // Circular Shift Register + input mux
     input           rst,
     input           clk,
@@ -33,6 +33,7 @@ module jtopl_csr #(
     input           up_ksl_tl,
     input           up_ar_dr,
     input           up_sl_rr,
+    input           up_wav,
     input           update_op_I,
     input           update_op_II,
     input           update_op_IV
@@ -55,8 +56,9 @@ wire up_mult_IV   = up_mult   & update_op_IV;
 wire up_ksl_tl_IV = up_ksl_tl & update_op_IV;
 wire up_ar_dr_op  = up_ar_dr  & update_op_I;
 wire up_sl_rr_op  = up_sl_rr  & update_op_I;
+wire up_wav_I     = up_wav    & update_op_I;
 
-assign regop_in = { // 4 bytes:
+assign regop_in[31:0] = { // 4 bytes:
         up_mult_IV  ? din[7]      : shift_out[31], // AM enable
         up_mult_I   ? din[6:5]    : shift_out[30:29], // Vib enable, EG type, KSR
         up_mult_II  ? din[4:0]    : shift_out[28:24], // KSR + Mult
@@ -67,5 +69,10 @@ assign regop_in = { // 4 bytes:
 
         up_sl_rr_op ? din         : shift_out[ 7: 0]
     };
+
+generate
+    if(W>31)
+        assign regop_in[33:32] = up_wav_I ? din[1:0] : shift_out[33:32];
+endgenerate
 
 endmodule // jtopl_reg
