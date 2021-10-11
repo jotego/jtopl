@@ -78,11 +78,11 @@ jtopl_div #(OPL_TYPE) u_div  (
     .cenop          ( cenop           )
 );
 
-localparam  REG_TESTYM  =   8'h01,
-            REG_CLKA    =   8'h02,
-            REG_CLKB    =   8'h03,
-            REG_TIMER   =   8'h04,
-            REG_MODE    =   8'h05;
+localparam [7:0] REG_TESTYM  = 8'h01,
+                 REG_CLKA    = 8'h02,
+                 REG_CLKB    = 8'h03,
+                 REG_TIMER   = 8'h04,
+                 REG_CSM     = 8'h08;
 
 reg  [ 7:0] selreg;       // selected register
 reg  [ 7:0] din_copy;
@@ -92,7 +92,9 @@ reg  [ 2:0] sel_sub;       // subslot to update
 reg         up_fnumlo, up_fnumhi, up_fbcon, 
             up_mult, up_ksl_tl, up_ar_dr, up_sl_rr,
             up_wav;
-reg         wave_mode;     // 1 if waveform selection is enabled (OPL2)
+reg         wave_mode,     // 1 if waveform selection is enabled (OPL2)
+            csm_en,
+            note_sel;
 reg  [ 4:0] rhy_kon;
 
 // this runs at clk speed, no clock gating here
@@ -118,6 +120,8 @@ always @(posedge clk) begin
         // sensitivity to LFO
         am_dep    <= 0;
         vib_dep   <= 0;
+        csm_en    <= 0;
+        note_sel  <= 0;
         // OPL2 waveforms
         wave_mode <= 0;
         // timers
@@ -144,6 +148,7 @@ always @(posedge clk) begin
                 up_wav    <= 0;
                 // General control (<0x20 registers)
                 casez( selreg )
+                    REG_TESTYM: wave_mode <= din[5];
                     REG_CLKA: value_A <= din;
                     REG_CLKB: value_B <= din;
                     REG_TIMER: begin
@@ -153,7 +158,7 @@ always @(posedge clk) begin
                         flagen_B   <= ~din[5];
                         { load_B, load_A   } <= din[1:0];
                         end
-                    REG_MODE: wave_mode <= din[5];
+                    REG_CSM: {csm_en, note_sel} <= din[7:6];
                     default:;
                 endcase
                 // Operator registers
