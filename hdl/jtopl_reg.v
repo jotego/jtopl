@@ -62,6 +62,7 @@ module jtopl_reg(
     output           viben_I,
     // OP
     output     [1:0] wavsel_I,
+    input            wave_mode,
     // EG
     output           keyon_I,
     output     [5:0] tl_IV,
@@ -171,7 +172,7 @@ generate
     if( OPL_TYPE==1 )
         assign wavsel_I = 0;
     else
-        assign wavsel_I = shift_out[OPCFGW-1:OPCFGW-2];
+        assign wavsel_I = shift_out[OPCFGW-1:OPCFGW-2] & {2{wave_mode}};
 endgenerate
 
 

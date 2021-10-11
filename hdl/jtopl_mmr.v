@@ -118,6 +118,8 @@ always @(posedge clk) begin
         // sensitivity to LFO
         am_dep    <= 0;
         vib_dep   <= 0;
+        // OPL2 waveforms
+        wave_mode <= 0;
         // timers
         { value_A, value_B } <= 16'd0;
         { clr_flag_B, clr_flag_A, load_B, load_A } <= 4'd0;
@@ -238,6 +240,7 @@ jtopl_reg #(.OPL_TYPE(OPL_TYPE)) u_reg(
     .viben_I    ( viben_I       ),
     // OP
     .wavsel_I   ( wavsel_I      ),
+    .wave_mode  ( wave_mode     ),
     // EG
     .keyon_I    ( keyon_I       ),
     .en_sus_I   ( en_sus_I      ),
