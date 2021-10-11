@@ -26,8 +26,9 @@ module jtopl_div(
     output reg  cenop   // clock enable at operator rate
 );
 
-localparam DIVIDER = 4;
-localparam W       = 2;
+parameter OPL_TYPE=1;
+
+localparam W = 2; // OPL_TYPE==2 ? 1 : 2;
 
 reg  [W-1:0] cnt;
 

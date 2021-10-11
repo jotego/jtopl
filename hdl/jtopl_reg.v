@@ -48,6 +48,7 @@ module jtopl_reg(
     input            up_ksl_tl,
     input            up_ar_dr,
     input            up_sl_rr,
+    input            up_wav,
     
     // PG
     output     [9:0] fnum_I,
@@ -58,7 +59,9 @@ module jtopl_reg(
     output     [3:0] mul_II,  // frequency multiplier
     output     [1:0] ksl_IV,  // key shift level
     output           amen_IV,
-    output           viben_I,    
+    output           viben_I,
+    // OP
+    output     [1:0] wavsel_I,
     // EG
     output           keyon_I,
     output     [5:0] tl_IV,
@@ -70,6 +73,8 @@ module jtopl_reg(
     output           ks_II,    // key scale
     output           con_I
 );
+
+parameter OPL_TYPE=1;
 
 localparam CH=9;
 
@@ -133,7 +138,7 @@ always @(posedge clk) begin
     end
 end
 
-localparam OPCFGW = 4*8;
+localparam OPCFGW = 4*8 + (OPL_TYPE!=1 ? 2 : 0);
 
 wire [OPCFGW-1:0] shift_out;
 wire              en_sus;
@@ -151,6 +156,7 @@ jtopl_csr #(.LEN(CH*2),.W(OPCFGW)) u_csr(
     .up_ksl_tl      ( up_ksl_tl     ),
     .up_ar_dr       ( up_ar_dr      ),
     .up_sl_rr       ( up_sl_rr      ), 
+    .up_wav         ( up_wav        ),
     .update_op_I    ( update_op_I   ),
     .update_op_II   ( update_op_II  ),
     .update_op_IV   ( update_op_IV  )
@@ -159,7 +165,14 @@ jtopl_csr #(.LEN(CH*2),.W(OPCFGW)) u_csr(
 assign { amen_IV, viben_I, en_sus, ks_II, mul_II,
          ksl_IV, tl_IV,
          arate_I, drate_I, 
-         sl_I, rrate_I  } = shift_out;
+         sl_I, rrate_I  } = shift_out[4*8-1:0];
+
+generate
+    if( OPL_TYPE==1 )
+        assign wavsel_I = 0;
+    else
+        assign wavsel_I = shift_out[OPCFGW-1:OPCFGW-2];
+endgenerate
 
 
 // Memory for CH registers

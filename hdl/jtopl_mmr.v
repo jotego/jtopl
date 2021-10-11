@@ -48,6 +48,8 @@ module jtopl_mmr(
     output      [ 2:0]  block_I,
     output      [ 3:0]  mul_II,
     output              viben_I,
+    // Operator
+    output      [ 1:0]  wavsel_I,
     // Envelope Generator
     output              keyon_I,
     output              en_sus_I, // enable sustain
@@ -67,7 +69,9 @@ module jtopl_mmr(
     output              con_I
 );
 
-jtopl_div u_div (
+parameter OPL_TYPE=1;
+
+jtopl_div #(OPL_TYPE) u_div  (
     .rst            ( rst             ),
     .clk            ( clk             ),
     .cen            ( cen             ),
@@ -77,7 +81,8 @@ jtopl_div u_div (
 localparam  REG_TESTYM  =   8'h01,
             REG_CLKA    =   8'h02,
             REG_CLKB    =   8'h03,
-            REG_TIMER   =   8'h04;
+            REG_TIMER   =   8'h04,
+            REG_MODE    =   8'h05;
 
 reg  [ 7:0] selreg;       // selected register
 reg  [ 7:0] din_copy;
@@ -85,7 +90,9 @@ reg         csm, effect;
 reg  [ 1:0] sel_group;     // group to update
 reg  [ 2:0] sel_sub;       // subslot to update
 reg         up_fnumlo, up_fnumhi, up_fbcon, 
-            up_mult, up_ksl_tl, up_ar_dr, up_sl_rr;
+            up_mult, up_ksl_tl, up_ar_dr, up_sl_rr,
+            up_wav;
+reg         wave_mode;     // 1 if waveform selection is enabled (OPL2)
 reg  [ 4:0] rhy_kon;
 
 // this runs at clk speed, no clock gating here
@@ -104,6 +111,7 @@ always @(posedge clk) begin
         up_ksl_tl <= 0;
         up_ar_dr  <= 0;
         up_sl_rr  <= 0;
+        up_wav    <= 0;
         // Rhythms
         rhy_en    <= 0;
         rhy_kon   <= 5'd0;
@@ -131,6 +139,7 @@ always @(posedge clk) begin
                 up_ksl_tl <= 0;
                 up_ar_dr  <= 0;
                 up_sl_rr  <= 0;
+                up_wav    <= 0;
                 // General control (<0x20 registers)
                 casez( selreg )
                     REG_CLKA: value_A <= din;
@@ -142,6 +151,7 @@ always @(posedge clk) begin
                         flagen_B   <= ~din[5];
                         { load_B, load_A   } <= din[1:0];
                         end
+                    REG_MODE: wave_mode <= din[5];
                     default:;
                 endcase
                 // Operator registers
@@ -154,6 +164,7 @@ always @(posedge clk) begin
                         3'b010: up_ksl_tl <= 1;
                         3'b011: up_ar_dr  <= 1;
                         3'b100: up_sl_rr  <= 1;
+                        3'b111: up_wav    <= OPL_TYPE!=1;
                         default:;
                     endcase
                 end                
@@ -188,7 +199,7 @@ always @(posedge clk) begin
     end
 end
 
-jtopl_reg u_reg(
+jtopl_reg #(.OPL_TYPE(OPL_TYPE)) u_reg(
     .rst        ( rst           ),
     .clk        ( clk           ),
     .cen        ( cenop         ),
@@ -218,12 +229,15 @@ jtopl_reg u_reg(
     .up_ksl_tl  ( up_ksl_tl     ),
     .up_ar_dr   ( up_ar_dr      ),
     .up_sl_rr   ( up_sl_rr      ),
+    .up_wav     ( up_wav        ),
 
     // PG
     .fnum_I     ( fnum_I        ),
     .block_I    ( block_I       ),
     .mul_II     ( mul_II        ),
     .viben_I    ( viben_I       ),
+    // OP
+    .wavsel_I   ( wavsel_I      ),
     // EG
     .keyon_I    ( keyon_I       ),
     .en_sus_I   ( en_sus_I      ),
