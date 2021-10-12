@@ -65,20 +65,22 @@ There are several simulation test benches in the **ver** folder. The most import
 
 Each feature is tested with a given .jtt file in the **ver/verilator/tests** folder.
 
-Feature       | JTT       | Status (commit) | Remarks
---------------|-----------|-----------------|--------
- TL           | TL        |                 |
- EG rates     | rates     |                 |
- fnum         | fnum_abs  | Passed 4a2c3cc  | Checks absolute value of a note
- FB           | fb        | Passed 6e6178d  |
- connection   | mod       |                 |
- EG type      | perc      |                 |
- All slots    | slots     |                 | no modulation
- All slots    | slots_mod |                 | Modulate some channels
- KSL          | ksl1/2/3  | Passed 4a2c3cc  | See note*
- AM           | am        | Passed fc6ad19  |
- Vibratto     | vib       | Passed 44a540f  |
- CSM          |           |                 | Not implemented
+Feature        | JTT File  | Status (commit) | Remarks
+---------------|-----------|-----------------|--------
+ TL            | TL        |                 |
+ EG rates      | rates     |                 |
+ fnum          | fnum_abs  | Passed 4a2c3cc  | Checks absolute value of a note
+ FB            | fb        | Passed 6e6178d  |
+ connection    | mod       |                 |
+ EG type       | perc      |                 |
+ All slots     | slots     |                 | no modulation
+ All slots     | slots_mod |                 | Modulate some channels
+ KSL           | ksl1/2/3  | Passed 4a2c3cc  | See note*
+ AM            | am        | Passed fc6ad19  |
+ Vibratto      | vib       | Passed 44a540f  |
+ CSM           |           |                 | Not implemented
+ OPL2 waves    |           | Untested b4345fa| Implemented/not tested
+ Keyboard split|           | Untested b4345fa| Not implemented
 
  Note* values don't match the app notes but implementation follows reverse engineering of OPLL and OPL3. Measuring from first note of an octave to last note of the next seems to fit better the table in the notes.
 

@@ -94,7 +94,7 @@ reg         up_fnumlo, up_fnumhi, up_fbcon,
             up_wav;
 reg         wave_mode,     // 1 if waveform selection is enabled (OPL2)
             csm_en,
-            note_sel;
+            note_sel;      // keyboard split, not implemented
 reg  [ 4:0] rhy_kon;
 
 // this runs at clk speed, no clock gating here
