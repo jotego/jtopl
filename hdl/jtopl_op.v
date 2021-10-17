@@ -55,18 +55,19 @@ reg  [11:0] level_II;
 reg         signbit_II, signbit_III;
 reg         nullify_II;
 
-wire [ 6:0] ctrl_in, ctrl_dly;
+wire [ 8:0] ctrl_in, ctrl_dly;
 wire [ 1:0] group_d;
 wire        op_d, con_I_d;
+wire [ 1:0] wavsel_d;
 wire [ 2:0] fb_I_d;
 
 reg  [PW-1:0] prev,  prev0_din, prev1_din, prev2_din;
 wire [PW-1:0] prev0, prev1,     prev2;
 
-assign      ctrl_in = { group, op, con_I, fb_I };
-assign      { group_d, op_d, con_I_d, fb_I_d } = ctrl_dly;
+assign      ctrl_in = { wavsel_I, group, op, con_I, fb_I };
+assign      { wavsel_d, group_d, op_d, con_I_d, fb_I_d } = ctrl_dly;
 
-jtopl_sh #( .width(7), .stages(3)) u_delay(
+jtopl_sh #( .width(9), .stages(3)) u_delay(
     .clk    ( clk       ),
     .cen    ( cenop     ),
     .din    ( ctrl_in   ),
@@ -157,8 +158,8 @@ always @(posedge clk) if( cenop ) begin
         signbit_II <= phase[9];
         nullify_II <= 0;
     end else begin
-        signbit_II <= wavsel_I==0 && phase[9];
-        nullify_II <= (wavsel_I==2'b01 && phase[9]) || (wavsel_I==2'b11 && phase[8]);
+        signbit_II <= wavsel_d==0 && phase[9];
+        nullify_II <= (wavsel_d==2'b01 && phase[9]) || (wavsel_d==2'b11 && phase[8]);
     end
 end
 

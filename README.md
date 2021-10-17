@@ -79,7 +79,7 @@ Feature        | JTT File  | Status (commit) | Remarks
  AM            | am        | Passed fc6ad19  |
  Vibratto      | vib       | Passed 44a540f  |
  CSM           |           |                 | Not implemented
- OPL2 waves    |           | Untested b4345fa| Implemented/not tested
+ OPL2 waves    | tone_w?   | Passed          | Implemented
  Keyboard split|           | Untested b4345fa| Not implemented
 
  Note* values don't match the app notes but implementation follows reverse engineering of OPLL and OPL3. Measuring from first note of an octave to last note of the next seems to fit better the table in the notes.
