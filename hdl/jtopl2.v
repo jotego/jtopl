@@ -34,6 +34,7 @@ module jtopl2(
     output                 sample
 );
 
+    `define JTOPL2
     jtopl #(.OPL_TYPE(2)) u_base(
         .rst    ( rst       ),
         .clk    ( clk       ),

@@ -162,7 +162,8 @@ always @(posedge clk) begin
                     default:;
                 endcase
                 // Operator registers
-                if( selreg >= 8'h20 && selreg < 8'hA0 &&
+                if( selreg >= 8'h20 &&
+                    (selreg < 8'hA0 || selreg>=8'hE0) &&
                     selreg[2:0]<=3'd5 && selreg[4:3]!=2'b11) begin
                     sel_group <= selreg[4:3];
                     sel_sub   <= selreg[2:0];

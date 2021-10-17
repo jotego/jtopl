@@ -8,7 +8,9 @@ GYM_ARG=
 FAST=-DFASTDIV
 VERI_EXTRA="-DSIMULATION"
 WAV_FILE=
+GATHER=gather.f
 SKIPMAKE=FALSE
+MACROS=
 
 function set_slow {
     FAST=
@@ -45,6 +47,11 @@ function set_slow {
             if [[ "$WAV_FILE" == "" ]]; then
                 WAV_FILE=$(basename "$GYM_FILE" .vgm).wav
             fi;;
+        -opl2)
+            # Ideally, I should use jtopl2.v instead of jtopl.v as the top level
+            # but it gets messy to change the top level name in test.cpp
+            MACROS="$MACROS -GOPL_TYPE=2 -DJTOPL2"
+            ;;
         "-time" | "-t")
             shift
             EXTRA="$EXTRA -time $1";;
@@ -120,8 +127,8 @@ if [ ! -e WaveWritter.hpp ]; then
 fi
 
 if [ $SKIPMAKE = FALSE ]; then
-    if ! verilator --cc -f gather.f --top-module jtopl \
-        -I../../hdl --trace -DTEST_SUPPORT \
+    if ! verilator --cc -f $GATHER --top-module $TOP \
+        -I../../hdl --trace -DTEST_SUPPORT $MACROS \
         $VERI_EXTRA $FAST --exe test.cpp VGMParser.cpp WaveWritter.cpp; then
         exit $?
     fi

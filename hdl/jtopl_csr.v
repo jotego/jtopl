@@ -70,9 +70,8 @@ assign regop_in[31:0] = { // 4 bytes:
         up_sl_rr_op ? din         : shift_out[ 7: 0]
     };
 
-generate
-    if(W>31)
-        assign regop_in[33:32] = up_wav_I ? din[1:0] : shift_out[33:32];
-endgenerate
+`ifdef JTOPL2
+    assign regop_in[33:32] = up_wav_I ? din[1:0] : shift_out[33:32];
+`endif
 
 endmodule // jtopl_reg

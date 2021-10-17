@@ -3,11 +3,12 @@
 #include <fstream>
 #include <string>
 #include <list>
-#include "Vjtopl.h"
 #include "verilated_vcd_c.h"
 #include "VGMParser.hpp"
 #include "feature.hpp"
 #include "WaveWritter.hpp"
+
+#include "Vjtopl.h"
 
   // #include "verilated.h"
 
