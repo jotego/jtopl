@@ -85,9 +85,9 @@ module jtopl_timer #(parameter MW=2) (
     output reg overflow
 );
 
-localparam CW=8+MW;
-
-reg [CW-1:0] cnt, next, init;
+reg    [7:0] cnt, next, init;
+reg [MW-1:0] free_cnt, free_next;
+reg          load_l, free_ov;
 
 always@(posedge clk)
     if( clr_flag || rst)
@@ -95,15 +95,29 @@ always@(posedge clk)
     else if(overflow) flag<=1'b1;
 
 always @(*) begin
-    {overflow, next } = {1'b0, cnt}+1'b1;
-    init = { start_value, {MW{1'b0}} };
+    {free_ov, free_next} = { 1'b0, free_cnt} + 1'b1;
+    {overflow, next } = {1'b0, cnt}+free_ov;
+    init = start_value;
 end
 
-always @(posedge clk)
-    if( ~load || rst) begin
-      cnt  <= { start_value, {MW{1'b0}} };
+always @(posedge clk) begin
+    load_l <= load;
+    if( (!load_l && load) || rst) begin
+        cnt <= start_value;
+    end else if( cenop && zero ) begin
+        cnt <= overflow ? init : next;
     end
-    else if( cenop && zero )
-      cnt <= overflow ? init : next;
+end
+
+// Free running counter, resetting
+// the value of this part with the load
+// event can slow down music, vg Bad Dudes
+always @(posedge clk) begin
+    if( rst ) begin
+        free_cnt <= 0;
+    end else if( cenop && zero ) begin
+        free_cnt <= free_next;
+    end
+end
 
 endmodule
