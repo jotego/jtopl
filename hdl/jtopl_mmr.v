@@ -148,7 +148,7 @@ always @(posedge clk) begin
                 up_wav    <= 0;
                 // General control (<0x20 registers)
                 casez( selreg )
-                    REG_TESTYM: wave_mode <= din[5];
+                    REG_TESTYM: if(OPL_TYPE>1) wave_mode <= din[5];
                     REG_CLKA: value_A <= din;
                     REG_CLKB: value_B <= din;
                     REG_TIMER: begin
@@ -163,7 +163,7 @@ always @(posedge clk) begin
                 endcase
                 // Operator registers
                 if( selreg >= 8'h20 &&
-                    (selreg < 8'hA0 || selreg>=8'hE0) &&
+                    (selreg < 8'hA0 || (selreg>=8'hE0 && OPL_TYPE>1) ) &&
                     selreg[2:0]<=3'd5 && selreg[4:3]!=2'b11) begin
                     sel_group <= selreg[4:3];
                     sel_sub   <= selreg[2:0];
@@ -203,7 +203,6 @@ always @(posedge clk) begin
         end
         else if(cenop) begin /* clear once-only bits */
             { clr_flag_B, clr_flag_A } <= 2'd0;
-            { load_B, load_A   } <= 3; // active low
         end
     end
 end
