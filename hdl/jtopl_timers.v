@@ -104,7 +104,7 @@ always @(posedge clk) begin
     load_l <= load;
     if( (!load_l && load) || rst) begin
         cnt <= start_value;
-    end else if( cenop && zero ) begin
+    end else if( cenop && zero && load ) begin
         cnt <= overflow ? init : next;
     end
 end
