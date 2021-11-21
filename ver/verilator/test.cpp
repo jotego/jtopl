@@ -276,7 +276,7 @@ int main(int argc, char** argv, char** env) {
         cerr << "Setting PERIOD to " << dec << period << " ns\n";
         sim_time.set_period( period );
     }
-    SAMPLING_PERIOD = sim_time.period() * 18; // # of operators
+    SAMPLING_PERIOD = sim_time.period() * 18 * 4; // # of operators * divider
     SAMPLERATE = 1.0/(SAMPLING_PERIOD*1e-9);
     cerr << "Sample rate " << dec << SAMPLERATE << " Hz. Sampling period " << SAMPLING_PERIOD << "ns\n";
 
@@ -359,9 +359,9 @@ int main(int argc, char** argv, char** env) {
             int action;
             action = gym->parse();
             switch( action ) {
-                default:
+                default: // cmd_nop
                     if( !sim_time.finish() ) {
-                        cerr << "go on\n";
+                        //cerr << "go on\n";
                         continue;
                     }
                     goto finish;

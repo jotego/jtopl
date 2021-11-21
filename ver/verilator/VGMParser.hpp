@@ -22,7 +22,7 @@ public:
     virtual uint64_t length()=0;
     virtual ~RipParser() {};
     RipParser(int c) { clk_period = c; }
-    enum { cmd_error=-2, cmd_finish=-1, cmd_write=0, cmd_wait=1, cmd_psg=2 };
+    enum { cmd_error=-2, cmd_finish=-1, cmd_write=0, cmd_wait=1, cmd_psg=2, cmd_nop=3 };
     chip_type chip() { return chip_cfg; }
     virtual int period();
 };

@@ -197,7 +197,7 @@ void VGMParser::open(const char* filename, int limit) {
     // positions depending on the chip type so it also determines
     // which chip is used in the file
     chip_cfg = unknown;
-    file.seekg(0x30); // offset to YM2612
+    file.seekg(0x50); // offset to YM3812
     file.read( (char*) &ym_freq, 4 );
     if( ym_freq != 0 ) { // try YM2203
         chip_cfg = ym2151;
@@ -281,23 +281,19 @@ int VGMParser::parse() {
         // cerr << "VGM 0x" << hex << (((int)vgm_cmd)&0xff) << '\n';
         char extra[2];
         switch( vgm_cmd ) {
-            case 0x52: // A1=0
             case 0x55: // YM2203 write
             case 0x56:
             case 0x58: // YM2610
-                addr = 0;
+                // addr = 0;
                 file.read( extra, 2);
-                cmd = extra[0];
-                val = extra[1];
-                // int _cmd = cmd;
-                // _cmd &= 0xff;
-                // if( _cmd < 0x20 ) {
-                //  cerr << "INFO: write to register (0x" << hex << _cmd << ") below 0x20\n"; }
-                translate_cmd();
-                return cmd_write;
-            case 0xA5: // Write to dual YM2203
-                file.read(extra,2); // ignore
-                continue;
+                // cmd = extra[0];
+                // val = extra[1];
+                // translate_cmd();
+                // return cmd_write;
+                return cmd_nop;
+            //case 0xA5: // Write to dual YM2203
+            //    file.read(extra,2); // ignore
+            //    continue;
             case 0x53: // A1=1
             case 0x54: // YM2151 write
                 file.read( extra, 2);
@@ -306,6 +302,7 @@ int VGMParser::parse() {
                 translate_cmd();
                 return cmd_write;                
             case 0x57:
+            case 0x5A:   // YM3812 write register
             case 0x59: { // YM2610
                 addr = 1;
                 file.read( extra, 2);
