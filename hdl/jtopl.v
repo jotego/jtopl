@@ -87,6 +87,7 @@ wire signed [12:0] op_result;
 assign          write   = !cs_n && !wr_n;
 assign          dout    = { ~irq_n, flag_A, flag_B, 5'd6 };
 assign          eg_stop = 0;
+assign          sample  = zero;
 
 jtopl_mmr #(.OPL_TYPE(OPL_TYPE)) u_mmr(
     .rst        ( rst           ),
