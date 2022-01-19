@@ -210,6 +210,16 @@ always @(*) begin
     chcfg2_in = group==2'b10 ? chcfg_inmux : chcfg2_out;
 end
 
+`ifdef SIMULATION
+reg  [CHCSRW-1:0] chsnap0, chsnap1,chsnap2;
+
+always @(posedge clk) if(zero) begin
+    chsnap0 <= chcfg0_out;
+    chsnap1 <= chcfg1_out;
+    chsnap2 <= chcfg2_out;
+end
+`endif
+
 assign { keyon_csr, block_I, fnum_I, fb_I, con_csr } = chcfg;
 
 // Rhythm key-on CSR

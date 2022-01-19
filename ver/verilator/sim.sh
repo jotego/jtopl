@@ -128,7 +128,7 @@ fi
 
 if [ $SKIPMAKE = FALSE ]; then
     if ! verilator --cc -f $GATHER --top-module $TOP \
-        -I../../hdl --trace -DTEST_SUPPORT $MACROS \
+        -I../../hdl --trace -DTEST_SUPPORT $MACROS -DSIMULATION \
         $VERI_EXTRA $FAST --exe test.cpp VGMParser.cpp WaveWritter.cpp; then
         exit $?
     fi

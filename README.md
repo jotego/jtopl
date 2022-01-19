@@ -40,7 +40,7 @@ Not all the chips of OPL series are implemented yet, so take the following table
 Chip    | Top Level Cell | QIP file   | Type        | Patches | Implemented  | Usage
 --------|----------------|------------|-------------|---------|--------------|-------
 YM3526  |  jtopl.v       | jt26.qip   | OPL         |         | Yes          | Bubble Bobble
-YM3812  |  jtopl2.v      | jtopl2.qip | OPL2        |         | WIP          |
+YM3812  |  jtopl2.v      | jtopl2.qip | OPL2        |         | WIP          | Robocop
 Y8950   |  jt8950.v      | jt8950.qip | OPL+ADPCM   |         | No           | MSX-Audio
 YM2413  |  jt2413.v      | jt2413.qip | OPL-L       | Yes     | No           |
 YM2423  |     -          |      -     | OPL-LX      | Yes     | No plans     | Atari ST FM cart
