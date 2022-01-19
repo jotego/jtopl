@@ -82,7 +82,8 @@ localparam [7:0] REG_TESTYM  = 8'h01,
                  REG_CLKA    = 8'h02,
                  REG_CLKB    = 8'h03,
                  REG_TIMER   = 8'h04,
-                 REG_CSM     = 8'h08;
+                 REG_CSM     = 8'h08,
+                 REG_RYTHM   = 8'hBD;
 
 reg  [ 7:0] selreg;       // selected register
 reg  [ 7:0] din_copy;
@@ -185,7 +186,8 @@ always @(posedge clk) begin
                         default:;
                     endcase
                 end
-                if( selreg[7:4]>=4'hA ) begin
+                if( selreg[7:4]>=4'hA && selreg[7:4]<4'hd
+                    && selreg[3:0]<=8 ) begin
                     sel_group <= selreg[3:0] < 4'd3 ? 2'd0 :
                         ( selreg[3:0] < 4'd6 ? 2'd1 : 
                         ( selreg[3:0] < 4'd9 ? 2'd2 : 2'd3) );
@@ -193,7 +195,7 @@ always @(posedge clk) begin
                         { 1'b0, ~&selreg[2:1], selreg[0] };
                 end
                 // Global register
-                if( selreg==8'hBD ) begin
+                if( selreg==REG_RYTHM ) begin
                     am_dep  <= din[7];
                     vib_dep <= din[6];
                     rhy_en  <= din[5];
