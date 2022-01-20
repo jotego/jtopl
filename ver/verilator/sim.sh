@@ -99,8 +99,9 @@ if [[ "$GYM_FILE" = "" ]]; then
 fi
 
 echo EXTRA="$EXTRA"
+echo GYM_FILE="$GYM_FILE"
 
-if [[ $(expr match "$GYM_FILE" ".*\.vgz") != 0 ]]; then
+if [[ $(expr "$GYM_FILE" : ".*\.vgz$") != 0 ]]; then
     echo Uncompressing vgz file...
     UNZIP_GYM=$(basename "$GYM_FILE" .vgz).vgm
     if [ -e /tmp ]; then
