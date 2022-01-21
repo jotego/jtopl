@@ -29,7 +29,7 @@ module jtopl_pg_inc (
 reg [16:0] freq;
 
 always @(*) begin 
-    freq       = { 7'd0, fnum } + { {12{pm_offset[3]}}, pm_offset };
+    freq       = { 7'd0, fnum } + { {13{pm_offset[3]}}, pm_offset };
     // Add PM here
     freq       = freq << block;
     phinc_pure = freq >> 1;
