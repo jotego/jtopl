@@ -92,7 +92,7 @@ reg          load_l, free_ov;
 always@(posedge clk)
     if( clr_flag || rst)
         flag <= 1'b0;
-    else if(overflow) flag<=1'b1;
+    else if(cenop && zero && load && overflow) flag<=1'b1;
 
 always @(*) begin
     {free_ov, free_next} = { 1'b0, free_cnt} + 1'b1;
