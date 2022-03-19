@@ -163,6 +163,7 @@ always @(posedge clk) begin
                     default:;
                 endcase
                 // Operator registers
+                // Mapping done according to Table 2-3, page 7 of YM3812 App. Manual
                 if( selreg >= 8'h20 &&
                     (selreg < 8'hA0 || (selreg>=8'hE0 && OPL_TYPE>1) ) &&
                     selreg[2:0]<=3'd5 && selreg[4:3]!=2'b11) begin
@@ -188,9 +189,14 @@ always @(posedge clk) begin
                 end
                 if( selreg[7:4]>=4'hA && selreg[7:4]<4'hd
                     && selreg[3:0]<=8 ) begin
+                    // Each group has three channels
+                    // Channels 0-2 -> group 0
+                    // Channels 3-5 -> group 1
+                    // Channels 6-8 -> group 2
+                    // other        -> group 3 - ignored
                     sel_group <= selreg[3:0] < 4'd3 ? 2'd0 :
-                        ( selreg[3:0] < 4'd6 ? 2'd1 : 
-                        ( selreg[3:0] < 4'd9 ? 2'd2 : 2'd3) );
+                                 selreg[3:0] < 4'd6 ? 2'd1 :
+                                 selreg[3:0] < 4'd9 ? 2'd2 : 2'd3;
                     sel_sub <= selreg[3:0] < 4'd6 ? selreg[2:0] :
                         { 1'b0, ~&selreg[2:1], selreg[0] };
                 end

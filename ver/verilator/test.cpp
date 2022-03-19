@@ -391,7 +391,7 @@ int main(int argc, char** argv, char** env) {
             }
         }
         if( trace && sim_time.get_time()>trace_start_time )
-                tfp->dump(sim_time.get_time());
+                tfp->dump(sim_time.get_time()*1000);
     }
 finish:
     writter.report_usage();
