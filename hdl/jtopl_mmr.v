@@ -211,6 +211,7 @@ always @(posedge clk) begin
         end
         else if(cenop) begin /* clear once-only bits */
             { clr_flag_B, clr_flag_A } <= 2'd0;
+            { load_B, load_A   } <= 3; // active low
         end
     end
 end
