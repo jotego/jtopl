@@ -155,10 +155,12 @@ always @(posedge clk) begin
                     REG_TIMER: begin
                         clr_flag_A <= din[7];
                         clr_flag_B <= din[7];
-                        flagen_A   <= ~din[6];
-                        flagen_B   <= ~din[5];
-                        { load_B, load_A   } <= din[1:0];
+                        if (~din[7]) begin
+                            flagen_A   <= ~din[6];
+                            flagen_B   <= ~din[5];
+                            { load_B, load_A   } <= din[1:0];
                         end
+                    end
                     REG_CSM: {csm_en, note_sel} <= din[7:6];
                     default:;
                 endcase
@@ -211,7 +213,6 @@ always @(posedge clk) begin
         end
         else if(cenop) begin /* clear once-only bits */
             { clr_flag_B, clr_flag_A } <= 2'd0;
-            { load_B, load_A   } <= 3; // active low
         end
     end
 end
