@@ -230,7 +230,7 @@ static const uint32_t eg_ksltable[16] = {
     0, 32, 40, 45, 48, 51, 53, 55, 56, 58, 59, 60, 61, 62, 63, 64
 };
 
-void OPLL_DoIO(opll_t *chip) {
+static void OPLL_DoIO(opll_t *chip) {
     /* Write signal check */
     chip->write_a_en = (chip->write_a & 0x03) == 0x01;
     chip->write_d_en = (chip->write_d & 0x03) == 0x01;
@@ -238,10 +238,9 @@ void OPLL_DoIO(opll_t *chip) {
     chip->write_d <<= 1;
 }
 
-void OPLL_DoModeWrite(opll_t *chip) {
-    uint8_t slot;
+static void OPLL_DoModeWrite(opll_t *chip) {
     if ((chip->write_mode_address & 0x10) && chip->write_d_en) {
-        slot = chip->write_mode_address & 0x01;
+        uint8_t slot = chip->write_mode_address & 0x01;
         switch (chip->write_mode_address & 0x0f) {
         case 0x00:
         case 0x01:
@@ -326,9 +325,7 @@ void OPLL_Reset(opll_t *chip, uint32_t chip_type) {
     chip->rm_select = rm_num_tc + 1;
 }
 
-void OPLL_DoRegWrite(opll_t *chip) {
-    uint32_t channel;
-
+static void OPLL_DoRegWrite(opll_t *chip) {
     /* Address */
     if (chip->write_a_en) {
         if ((chip->write_data & 0xc0) == 0x00) {
@@ -347,7 +344,7 @@ void OPLL_DoRegWrite(opll_t *chip) {
     /* Update registers */
     if (chip->write_fm_data && !chip->write_a_en) {
         if ((chip->address & 0x0f) == chip->cycles && chip->cycles < 16) {
-            channel = chip->cycles % 9;
+            uint32_t channel = chip->cycles % 9;
             switch (chip->address & 0xf0) {
             case 0x10:
                 if (chip->chip_type == opll_type_ym2420)
@@ -393,9 +390,10 @@ void OPLL_DoRegWrite(opll_t *chip) {
     }
 
 }
-void OPLL_PreparePatch1(opll_t *chip) {
+
+static void OPLL_PreparePatch1(opll_t *chip) {
     uint8_t instr;
-    uint32_t mcsel = ((chip->cycles + 1) / 3) & 0x01; // modulator-carrier selection
+    uint32_t mcsel = ((chip->cycles + 1) / 3) & 0x01;
     uint32_t instr_index;
     uint32_t ch = ch_offset[chip->cycles];
     const opll_patch_t *patch;
@@ -430,7 +428,7 @@ void OPLL_PreparePatch1(opll_t *chip) {
     chip->c_ksl_block = (chip->block[ch]);
 }
 
-void OPLL_PreparePatch2(opll_t *chip) {
+static void OPLL_PreparePatch2(opll_t *chip) {
     uint8_t instr;
     uint32_t mcsel = ((chip->cycles + 1) / 3) & 0x01;
     uint32_t instr_index;
@@ -462,11 +460,11 @@ void OPLL_PreparePatch2(opll_t *chip) {
     chip->c_dm |= patch->dm;
 }
 
-void OPLL_PhaseGenerate(opll_t *chip) {
+static void OPLL_PhaseGenerate(opll_t *chip) {
     uint32_t ismod;
     uint32_t phase;
-    uint8_t rm_bit;
     uint16_t pg_out;
+    uint8_t rm_bit;
 
     chip->pg_phase[(chip->cycles + 17) % 18] = chip->pg_phase_next + chip->pg_inc;
 
@@ -528,7 +526,7 @@ void OPLL_PhaseGenerate(opll_t *chip) {
     chip->pg_out = pg_out;
 }
 
-void OPLL_PhaseCalcIncrement(opll_t *chip) {
+static void OPLL_PhaseCalcIncrement(opll_t *chip) {
     uint32_t freq;
     uint16_t block;
     freq = chip->c_fnum << 1;
@@ -561,8 +559,7 @@ void OPLL_PhaseCalcIncrement(opll_t *chip) {
     chip->pg_inc = (freq * pg_multi[chip->c_multi]) >> 1;
 }
 
-void OPLL_EnvelopeKSLTL(opll_t *chip)
-{
+static void OPLL_EnvelopeKSLTL(opll_t *chip) {
     int32_t ksl;
 
     ksl = eg_ksltable[chip->c_ksl_freq]-((8-chip->c_ksl_block)<<3);
@@ -581,8 +578,7 @@ void OPLL_EnvelopeKSLTL(opll_t *chip)
     chip->eg_ksltl = ksl + (chip->c_tl<<1);
 }
 
-void OPLL_EnvelopeOutput(opll_t *chip)
-{
+static void OPLL_EnvelopeOutput(opll_t *chip) {
     int32_t level = chip->eg_level[(chip->cycles+17)%18];
 
     level += chip->eg_ksltl;
@@ -602,7 +598,7 @@ void OPLL_EnvelopeOutput(opll_t *chip)
     chip->eg_out = level;
 }
 
-void OPLL_EnvelopeGenerate(opll_t *chip) {
+static void OPLL_EnvelopeGenerate(opll_t *chip) {
     uint8_t timer_inc;
     uint8_t timer_bit;
     uint8_t timer_low;
@@ -682,13 +678,8 @@ void OPLL_EnvelopeGenerate(opll_t *chip) {
     switch (state) {
     case eg_num_attack:
         if (!chip->eg_maxrate && (chip->eg_kon & 2) && !zero) {
-            int32_t shift = chip->eg_rate_hi - 11 + chip->eg_inc_hi;
-            if (chip->eg_inc_lo) {
-                shift = 1;
-            }
+            int32_t shift = (chip->eg_rate_hi < 12) ? chip->eg_inc_lo : (chip->eg_rate_hi - 11 + chip->eg_inc_hi);
             if (shift > 0) {
-                if (shift > 4)
-                    shift = 4;
                 step = ~level >> (5 - shift);
             }
         }
@@ -834,12 +825,10 @@ void OPLL_EnvelopeGenerate(opll_t *chip) {
     chip->eg_sl = chip->c_sl;
 }
 
-void OPLL_Channel(opll_t *chip) {
-    int16_t sign;
+static void OPLL_Channel(opll_t *chip) {
     int16_t ch_out = chip->ch_out;
     uint8_t ismod = (chip->cycles / 3) & 1;
     uint8_t mute_m = ismod || ((chip->rm_enable&0x40) && (chip->cycles+15)%18 >= 12);
-    uint8_t mute_r = 1;
     if (chip->chip_type == opll_type_ds1001) {
         chip->output_m = ch_out;
         if (chip->output_m >= 0) {
@@ -851,6 +840,7 @@ void OPLL_Channel(opll_t *chip) {
         chip->output_r = 0;
         return;
     } else {
+        uint8_t mute_r = 1;
         /* TODO: This might be incorrect */
         if ((chip->rm_enable & 0x40)) {
             switch (chip->cycles) {
@@ -878,7 +868,7 @@ void OPLL_Channel(opll_t *chip) {
             else
                 chip->output_r = ch_out;
         } else {
-            sign = ch_out >> 8;
+            int16_t sign = ch_out >> 8;
             if (ch_out >= 0) {
                 ch_out++;
                 sign++;
@@ -895,7 +885,7 @@ void OPLL_Channel(opll_t *chip) {
     }
 }
 
-void OPLL_Operator(opll_t *chip) {
+static void OPLL_Operator(opll_t *chip) {
     uint8_t ismod1, ismod2, ismod3;
     uint32_t op_mod;
     uint16_t exp_shift;
@@ -1009,7 +999,7 @@ void OPLL_Operator(opll_t *chip) {
     chip->ch_out = ismod1 ? routput : (output>>3);
 }
 
-void OPLL_DoRhythm(opll_t *chip) {
+static void OPLL_DoRhythm(opll_t *chip) {
     uint8_t nbit;
 
     /* Noise */
@@ -1018,14 +1008,13 @@ void OPLL_DoRhythm(opll_t *chip) {
     chip->rm_noise = (nbit << 22) | (chip->rm_noise >> 1);
 }
 
-void OPLL_DoLFO(opll_t *chip) {
-    uint8_t vib_step;
+static void OPLL_DoLFO(opll_t *chip) {
     uint8_t am_inc = 0;
     uint8_t am_bit;
     
     /* Update counter */
     if (chip->cycles == 17) {
-        vib_step = ((chip->lfo_counter & 0x3ff) + 1) >> 10;
+        uint8_t vib_step = ((chip->lfo_counter & 0x3ff) + 1) >> 10;
         chip->lfo_am_step = ((chip->lfo_counter & 0x3f) + 1) >> 6;
         vib_step |= (chip->testmode >> 3) & 0x01;
         chip->lfo_vib_counter += vib_step;

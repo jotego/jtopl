@@ -1,5 +1,5 @@
-all: lfo_count exprom
+all: lfo_count opll_patches
 
 lfo_count: lfo_count.cc opll.c
 
-exprom: exprom.c
+opll_patches: opll_patches.c opll.c
