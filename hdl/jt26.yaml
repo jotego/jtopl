@@ -23,6 +23,7 @@ here:
   - jtopl_reg.v
   - jtopl_sh_rst.v
   - jtopl_sh.v
+  - jtopl_slot_cnt.v
   - jtopl_single_acc.v
   - jtopl_timers.v
   - jtopl_noise.v

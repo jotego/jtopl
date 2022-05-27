@@ -27,9 +27,9 @@ module jtopl_reg(
     input            write,
     // Pipeline order
     output           zero,
-    output reg [1:0] group,
-    output reg       op,           // 0 for modulator operators
-    output reg [17:0] slot,        // hot one encoding of active slot
+    output     [1:0] group,
+    output           op,           // 0 for modulator operators
+    output    [17:0] slot,        // hot one encoding of active slot
     
     input      [1:0] sel_group,     // group to update
     input      [2:0] sel_sub,       // subslot to update
@@ -79,27 +79,10 @@ parameter OPL_TYPE=1;
 
 localparam CH=9;
 
-// Each group contains three channels
-// and each subslot contains six operators
-reg  [2:0] subslot;
-
-reg [5:0] rhy_csr;
-reg       rhy_oen;
-
-`ifdef SIMULATION
-// These signals need to operate during rst
-// initial state is not relevant (or critical) in real life
-// but we need a clear value during simulation
-initial begin
-    group   = 2'd0;
-    subslot = 3'd0;
-    slot    = 18'd1;
-end
-`endif
-
-wire       match      = { group, subslot } == { sel_group, sel_sub};
-wire [2:0] next_sub   = subslot==3'd5 ? 3'd0 : (subslot+3'd1);
-wire [1:0] next_group = subslot==3'd5 ? (group==2'b10 ? 2'b00 : group+2'b1) : group;
+reg  [5:0] rhy_csr;
+reg        rhy_oen;
+wire [2:0] subslot;
+wire       match;
 
                
 // channel data
@@ -113,19 +96,20 @@ wire       up_fnumlo_ch = up_fnumlo & match,
 
 reg        update_op_II, update_op_III, update_op_IV;
 
-assign     zero = slot[0];
+assign match = { group, subslot } == { sel_group, sel_sub};
 
-always @(posedge clk) begin : up_counter
-    if( cen ) begin
-        { group, subslot }  <= { next_group, next_sub };
-        if( { next_group, next_sub }==5'd0 ) begin
-            slot <= 18'd1;
-        end else begin
-            slot <= { slot[16:0], 1'b0 };
-        end
-        op                  <= next_sub >= 3'd3;
-    end
-end
+jtopl_slot_cnt u_slot_cnt(
+    .rst    ( rst   ),
+    .clk    ( clk   ),
+    .cen    ( cen   ),
+
+    // Pipeline order
+    .zero   ( zero  ),
+    .group  ( group ),
+    .op     ( op    ),           // 0 for modulator operators
+    .subslot(subslot),
+    .slot   ( slot  )         // hot one encoding of active slot
+);
 
 always @(posedge clk) begin
     if(write) begin

@@ -33,19 +33,19 @@ Directories:
 
 ## Usage
 
-Although many files are shared, each chip has its own top level file to instantiate. There are QIP files for each one that detail the list of files used for each file. Intel Quartus software can take qip files as part of the project.
+Although many files are shared, each chip has its own top level file to instantiate. There are YAML files for each one that detail the list of files used for each file. These files can be easily converted to whatever format you need, like .qip.
 
 Not all the chips of OPL series are implemented yet, so take the following table as a plan which I am working on.
 
-Chip    | Top Level Cell | QIP file   | Type        | Patches | Implemented  | Usage
---------|----------------|------------|-------------|---------|--------------|-------
-YM3526  |  jtopl.v       | jt26.qip   | OPL         |         | Yes          | Bubble Bobble
-YM3812  |  jtopl2.v      | jtopl2.qip | OPL2        |         | WIP          | Robocop
-Y8950   |  jt8950.v      | jt8950.qip | OPL+ADPCM   |         | No           | MSX-Audio
-YM2413  |  jt2413.v      | jt2413.qip | OPL-L       | Yes     | No           |
-YM2423  |     -          |      -     | OPL-LX      | Yes     | No plans     | Atari ST FM cart
-YMF281  |     -          |      -     | OPL-LLP     | Yes     | No plans     | Pachinko
-YMF262  |  jt262.v       | jt262.qip  | OPL3        |         | No           |
+Chip    | Top Level Cell | YAML file   | Type        | Patches | Implemented  | Usage
+--------|----------------|-------------|-------------|---------|--------------|-------
+YM3526  |  jtopl.v       | jt26.yaml   | OPL         |         | Yes          | Bubble Bobble
+YM3812  |  jtopl2.v      | jtopl2.yaml | OPL2        |         | Yes          | Robocop
+Y8950   |  jt8950.v      | jt8950.yaml | OPL+ADPCM   |         | Not yet      | MSX-Audio
+YM2413  |  jt2413.v      | jt2413.yaml | OPL-L       | Yes     | WIP          |
+YM2423  |     -          |      -      | OPL-LX      | Yes     | No plans     | Atari ST FM cart
+YMF281  |     -          |      -      | OPL-LLP     | Yes     | No plans     | Pachinko
+YMF262  |  jt262.v       | jt262.yaml  | OPL3        |         | Not yet      |
 
 ### Chip differences
 
