@@ -18,7 +18,7 @@
     Date: 10-6-2020
     */
 
-module jtopl_mmr(
+module jtopll_mmr(
     input               rst,
     input               clk,
     input               cen,
@@ -32,17 +32,6 @@ module jtopl_mmr(
     output              op,
     output      [17:0]  slot,
     output  reg         rhy_en,
-    // Timers
-    output  reg [ 7:0]  value_A,
-    output  reg [ 7:0]  value_B,
-    output  reg         load_A,
-    output  reg         load_B,
-    output  reg         flagen_A,
-    output  reg         flagen_B,
-    output  reg         clr_flag_A,
-    output  reg         clr_flag_B,
-    input               flag_A,
-    input               overflow_A,
     // Phase Generator
     output      [ 9:0]  fnum_I,
     output      [ 2:0]  block_I,
@@ -78,19 +67,15 @@ jtopl_div #(OPL_TYPE) u_div  (
     .cenop          ( cenop           )
 );
 
-localparam [7:0] REG_TESTYM  = 8'h01,
-                 REG_CLKA    = 8'h02,
-                 REG_CLKB    = 8'h03,
-                 REG_TIMER   = 8'h04,
-                 REG_CSM     = 8'h08,
-                 REG_RYTHM   = 8'hBD;
+localparam [7:0] REG_TESTYM  = 8'h0F,
+                 REG_RYTHM   = 8'h0E;
 
 reg  [ 7:0] selreg;       // selected register
 reg  [ 7:0] din_copy;
 reg         csm, effect;
 reg  [ 1:0] sel_group;     // group to update
 reg  [ 2:0] sel_sub;       // subslot to update
-reg         up_fnumlo, up_fnumhi, up_fbcon, 
+reg         up_fnumlo, up_fnumhi, up_inst,
             up_mult, up_ksl_tl, up_ar_dr, up_sl_rr,
             up_wav;
 reg         wave_mode,     // 1 if waveform selection is enabled (OPL2)
@@ -103,34 +88,25 @@ reg  [ 4:0] rhy_kon;
 // as flip flops but uses latches instead. So I keep it as sync. reset
 always @(posedge clk) begin
     if( rst ) begin
-        selreg    <= 8'h0;
-        sel_group <= 2'd0;
-        sel_sub   <= 3'd0;
+        selreg      <= 0;
+        sel_group   <= 0;
+        sel_sub     <= 0;
         // Updaters
-        up_fbcon  <= 0;
-        up_fnumlo <= 0;
-        up_fnumhi <= 0;
-        up_mult   <= 0;
-        up_ksl_tl <= 0;
-        up_ar_dr  <= 0;
-        up_sl_rr  <= 0;
-        up_wav    <= 0;
+        up_inst     <= 0;
+        up_fnumlo   <= 0;
+        up_fnumhi   <= 0;
+        up_original <= 0;
         // Rhythms
-        rhy_en    <= 0;
-        rhy_kon   <= 5'd0;
+        rhy_en      <= 0;
+        rhy_kon     <= 0;
         // sensitivity to LFO
-        am_dep    <= 0;
-        vib_dep   <= 0;
-        csm_en    <= 0;
-        note_sel  <= 0;
+        am_dep      <= 0;
+        vib_dep     <= 0;
+        csm_en      <= 0;
+        note_sel    <= 0;
         // OPL2 waveforms
-        wave_mode <= 0;
-        // timers
-        { value_A, value_B } <= 16'd0;
-        { clr_flag_B, clr_flag_A, load_B, load_A } <= 4'd0;
-        flagen_A   <= 1;
-        flagen_B   <= 1;
-        din_copy   <= 8'd0;
+        wave_mode   <= 0;
+        din_copy    <= 0;
     end else begin
         // WRITE IN REGISTERS
         if( write ) begin
@@ -138,56 +114,27 @@ always @(posedge clk) begin
                 selreg <= din;  
             end else begin
                 // Global registers
-                din_copy  <= din;
-                up_fnumhi <= 0;
-                up_fnumlo <= 0;
-                up_fbcon  <= 0;
-                up_mult   <= 0;
-                up_ksl_tl <= 0;
-                up_ar_dr  <= 0;
-                up_sl_rr  <= 0;
-                up_wav    <= 0;
-                // General control (<0x20 registers)
-                casez( selreg )
-                    REG_TESTYM: if(OPL_TYPE>1) wave_mode <= din[5];
-                    REG_CLKA: value_A <= din;
-                    REG_CLKB: value_B <= din;
-                    REG_TIMER: begin
-                        clr_flag_A <= din[7];
-                        clr_flag_B <= din[7];
-                        if (~din[7]) begin
-                            flagen_A   <= ~din[6];
-                            flagen_B   <= ~din[5];
-                            { load_B, load_A   } <= din[1:0];
-                        end
-                    end
-                    REG_CSM: {csm_en, note_sel} <= din[7:6];
-                    default:;
-                endcase
+                din_copy    <= din;
+                up_fnumhi   <= 0;
+                up_fnumlo   <= 0;
+                up_inst     <= 0;
+                up_original <= 0;
                 // Operator registers
                 // Mapping done according to Table 2-3, page 7 of YM3812 App. Manual
                 if( selreg < 8 ) begin
-                    sel_group <= selreg[4:3];
-                    sel_sub   <= selreg[2:0];
-                    case( selreg[7:5] )
-                        3'b001: up_mult   <= 1;
-                        3'b010: up_ksl_tl <= 1;
-                        3'b011: up_ar_dr  <= 1;
-                        3'b100: up_sl_rr  <= 1;
-                        3'b111: up_wav    <= OPL_TYPE!=1;
-                        default:;
-                    endcase
+                    up_original <= 1;
+                    sel_sub     <= addr[2:0];
                 end                
                 // Channel registers
                 if( selreg[3:0]<=4'd8) begin
                     case( selreg[7:4] )
-                        4'hA: up_fnumlo <= 1;
-                        4'hB: up_fnumhi <= 1;
-                        4'hC: up_fbcon  <= 1;
+                        4'h1: up_fnumlo <= 1;
+                        4'h2: up_fnumhi <= 1;
+                        4'h3: up_inst   <= 1;
                         default:;
                     endcase
                 end
-                if( selreg[7:4]>=4'hA && selreg[7:4]<4'hd
+                if( selreg[7:4]>=4'h1 && selreg[7:4]<4'h4
                     && selreg[3:0]<=8 ) begin
                     // Each group has three channels
                     // Channels 0-2 -> group 0
@@ -209,13 +156,10 @@ always @(posedge clk) begin
                 end
             end
         end
-        else if(cenop) begin /* clear once-only bits */
-            { clr_flag_B, clr_flag_A } <= 2'd0;
-        end
     end
 end
 
-jtopl_reg #(.OPL_TYPE(OPL_TYPE)) u_reg(
+jtopll_reg #(.OPL_TYPE(OPL_TYPE)) u_reg(
     .rst        ( rst           ),
     .clk        ( clk           ),
     .cen        ( cenop         ),
@@ -237,7 +181,7 @@ jtopl_reg #(.OPL_TYPE(OPL_TYPE)) u_reg(
     //input           flag_A,
     //input           overflow_A,
 
-    .up_fbcon   ( up_fbcon      ),
+    .up_inst    ( up_inst       ),
     .up_fnumlo  ( up_fnumlo     ),
     .up_fnumhi  ( up_fnumhi     ),
 

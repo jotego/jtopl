@@ -28,14 +28,14 @@ module jtopl_reg(
     // Pipeline order
     output           zero,
     output     [1:0] group,
-    output           op,           // 0 for modulator operators
+    output           op,          // 0 for modulator operators
     output    [17:0] slot,        // hot one encoding of active slot
     
-    input      [1:0] sel_group,     // group to update
-    input      [2:0] sel_sub,       // subslot to update
+    input      [1:0] sel_group,   // group to update
+    input      [2:0] sel_sub,     // subslot to update
 
-    input            rhy_en,        // rhythm enable
-    input      [4:0] rhy_kon,    // key-on for each rhythm instrument
+    input            rhy_en,      // rhythm enable
+    input      [4:0] rhy_kon,     // key-on for each rhythm instrument
 
     //input           csm,
     //input           flag_A,
@@ -166,8 +166,7 @@ localparam KONW   =  1,
            CONW   =  1;
 localparam CHCSRW = KONW+FNUMW+BLOCKW+FBW+CONW;
 
-wire [CHCSRW-1:0] chcfg;
-wire [CHCSRW-1:0] chcfg_inmux;
+wire [CHCSRW-1:0] chcfg, chcfg_inmux;
 wire              keyon_csr, con_csr, rhyon_csr;
 wire              disable_con;
 

@@ -19,7 +19,7 @@
 
     */
 
-module jtopll(
+module jt2413(
     input                  rst,        // rst should be at least 6 clk&cen cycles long
     input                  clk,        // CPU clock
     input                  cen,        // optional clock enable, it not needed leave as 1'b1
@@ -27,13 +27,13 @@ module jtopll(
     input                  addr,
     input                  cs_n,
     input                  wr_n,
-    output          [ 7:0] dout,
     // combined output
     output  signed  [15:0] snd,
     output                 sample
 );
 
-jtopl u_opl (
+jtopl #(.OPL_TYPE(11)) // OPL-L
+u_opl(
     .rst   (rst   ),
     .clk   (clk   ),
     .cen   (cen   ),
@@ -41,7 +41,7 @@ jtopl u_opl (
     .addr  (addr  ),
     .cs_n  (cs_n  ),
     .wr_n  (wr_n  ),
-    .dout  (dout  ),
+    .dout  (      ),
     .irq_n (      ),
     .snd   (snd   ),
     .sample(sample)

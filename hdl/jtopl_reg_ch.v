@@ -33,7 +33,7 @@ module jtopl_reg_ch#( parameter
     input      [CHCSRW-1:0] chcfg_inmux,
 
     output reg [CHCSRW-1:0] chcfg,
-    output reg              rhy_oen,
+    output reg              rhy_oen,    // high for rhythm operators if rhy_en is set
     output                  rhyon_csr
 );
 

@@ -38,11 +38,11 @@ Although many files are shared, each chip has its own top level file to instanti
 Not all the chips of OPL series are implemented yet, so take the following table as a plan which I am working on.
 
 Chip    | Top Level Cell | YAML file   | Type        | Patches | Implemented  | Usage
---------|----------------|-------------|-------------|---------|--------------|-------
+--------|----------------|-------------|-------------|---------|--------------|------------------
 YM3526  |  jtopl.v       | jt26.yaml   | OPL         |         | Yes          | Bubble Bobble
 YM3812  |  jtopl2.v      | jtopl2.yaml | OPL2        |         | Yes          | Robocop
 Y8950   |  jt8950.v      | jt8950.yaml | OPL+ADPCM   |         | Not yet      | MSX-Audio
-YM2413  |  jt2413.v      | jt2413.yaml | OPL-L       | Yes     | WIP          |
+YM2413  |  jt2413.v      | jt2413.yaml | OPL-L       | Yes     | WIP          | Pang!
 YM2423  |     -          |      -      | OPL-LX      | Yes     | No plans     | Atari ST FM cart
 YMF281  |     -          |      -      | OPL-LLP     | Yes     | No plans     | Pachinko
 YMF262  |  jt262.v       | jt262.yaml  | OPL3        |         | Not yet      |
@@ -104,7 +104,7 @@ Short name | Instrument | Slot    | Phase   | EG   | Modulation |
 
 ## Related Projects
 
-Other sound chips from the same author (verilog RTL)
+Other sound chips from the same author (Verilog RTL)
 
 Chip                   | Repository
 -----------------------|------------
