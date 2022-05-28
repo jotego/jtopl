@@ -79,8 +79,6 @@ parameter OPL_TYPE=1;
 
 localparam CH=9;
 
-reg  [5:0] rhy_csr;
-reg        rhy_oen;
 wire [2:0] subslot;
 wire       match;
 
@@ -106,9 +104,9 @@ jtopl_slot_cnt u_slot_cnt(
     // Pipeline order
     .zero   ( zero  ),
     .group  ( group ),
-    .op     ( op    ),           // 0 for modulator operators
+    .op     ( op    ),   // 0 for modulator operators
     .subslot(subslot),
-    .slot   ( slot  )         // hot one encoding of active slot
+    .slot   ( slot  )    // hot one encoding of active slot
 );
 
 always @(posedge clk) begin
@@ -126,7 +124,7 @@ end
 localparam OPCFGW = 4*8 + (OPL_TYPE!=1 ? 2 : 0);
 
 wire [OPCFGW-1:0] shift_out;
-wire              en_sus;
+wire              en_sus, rhy_oen;
 
 // Sustained is disabled in rhythm mode for channels in group 2 (i.e. 6,7,8)
 assign            en_sus_I = rhy_oen ? 1'b0 : en_sus;
@@ -168,10 +166,9 @@ localparam KONW   =  1,
            CONW   =  1;
 localparam CHCSRW = KONW+FNUMW+BLOCKW+FBW+CONW;
 
-wire [CHCSRW-1:0] chcfg0_out, chcfg1_out, chcfg2_out;
-reg  [CHCSRW-1:0] chcfg, chcfg0_in, chcfg1_in, chcfg2_in;
+wire [CHCSRW-1:0] chcfg;
 wire [CHCSRW-1:0] chcfg_inmux;
-wire              keyon_csr, con_csr;
+wire              keyon_csr, con_csr, rhyon_csr;
 wire              disable_con;
 
 assign chcfg_inmux = {
@@ -182,72 +179,21 @@ assign chcfg_inmux = {
 
 assign disable_con = rhy_oen && !slot[12] && !slot[13];
 assign con_I       = !rhy_en || !disable_con ? con_csr : 1'b1;
-
-always @(*) begin
-    case( group )
-        default: chcfg = chcfg0_out;
-        2'd1: chcfg = chcfg1_out;
-        2'd2: chcfg = chcfg2_out;
-    endcase
-    chcfg0_in = group==2'b00 ? chcfg_inmux : chcfg0_out;
-    chcfg1_in = group==2'b01 ? chcfg_inmux : chcfg1_out;
-    chcfg2_in = group==2'b10 ? chcfg_inmux : chcfg2_out;
-end
-
-`ifdef SIMULATION
-reg  [CHCSRW-1:0] chsnap0, chsnap1,chsnap2;
-
-always @(posedge clk) if(zero) begin
-    chsnap0 <= chcfg0_out;
-    chsnap1 <= chcfg1_out;
-    chsnap2 <= chcfg2_out;
-end
-`endif
-
 assign { keyon_csr, block_I, fnum_I, fb_I, con_csr } = chcfg;
+assign keyon_I = rhy_oen ? rhyon_csr : keyon_csr;
 
-// Rhythm key-on CSR
-localparam BD=4, SD=3, TOM=2, TC=1, HH=0;
-
-always @(posedge clk, posedge rst) begin
-    if( rst ) begin
-        rhy_csr <= 6'd0;
-        rhy_oen <= 0;
-    end else if(cen) begin
-        if(slot[11]) rhy_oen <= rhy_en;
-        if(slot[17]) begin
-            rhy_csr <= { rhy_kon[BD], rhy_kon[HH], rhy_kon[TOM],
-                         rhy_kon[BD], rhy_kon[SD], rhy_kon[TC] };
-            rhy_oen <= 0;
-        end else
-            rhy_csr <= { rhy_csr[4:0], rhy_csr[5] };
-    end
-end
-
-assign keyon_I = rhy_oen ? rhy_csr[5] : keyon_csr;
-
-jtopl_sh_rst #(.width(CHCSRW),.stages(3)) u_group0(
-    .clk    ( clk        ),
-    .cen    ( cen        ),
-    .rst    ( rst        ),
-    .din    ( chcfg0_in  ),
-    .drop   ( chcfg0_out )
-);
-
-jtopl_sh_rst #(.width(CHCSRW),.stages(3)) u_group1(
-    .clk    ( clk        ),
-    .cen    ( cen        ),
-    .rst    ( rst        ),
-    .din    ( chcfg1_in  ),
-    .drop   ( chcfg1_out )
-);
-
-jtopl_sh_rst #(.width(CHCSRW),.stages(3)) u_group2(
-    .clk    ( clk        ),
-    .cen    ( cen        ),
-    .rst    ( rst        ),
-    .din    ( chcfg2_in  ),
-    .drop   ( chcfg2_out )
+jtopl_reg_ch#(CHCSRW) u_reg_ch(
+    .rst         ( rst          ),
+    .clk         ( clk          ),
+    .cen         ( cen          ),
+    .rhy_en      ( rhy_en       ),
+    .rhy_kon     ( rhy_kon      ),
+    .slot        ( slot         ),
+    .group       ( group        ),
+    .chcfg_inmux ( chcfg_inmux  ),
+    .chcfg       ( chcfg        ),
+    .rhy_oen     ( rhy_oen      ),
+    .rhyon_csr   ( rhyon_csr    )
 );
 
 endmodule

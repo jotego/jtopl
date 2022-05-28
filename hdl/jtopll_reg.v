@@ -59,41 +59,63 @@ module jtopll_reg(
 
 localparam CH=9;
 
-// Each group contains three channels
-// and each subslot contains six operators
-reg  [2:0] subslot;
 
-reg [5:0] rhy_csr;
-reg       rhy_oen;
+reg  [5:0] rhy_csr;
+reg        rhy_oen;
+wire [2:0] subslot;
+wire       match;
 
-`ifdef SIMULATION
-// These signals need to operate during rst
-// initial state is not relevant (or critical) in real life
-// but we need a clear value during simulation
-initial begin
-    group   = 2'd0;
-    subslot = 3'd0;
-    slot    = 18'd1;
-end
-`endif
-
-wire       match      = { group, subslot } == { sel_group, sel_sub};
-wire [2:0] next_sub   = subslot==3'd5 ? 3'd0 : (subslot+3'd1);
-wire [1:0] next_group = subslot==3'd5 ? (group==2'b10 ? 2'b00 : group+2'b1) : group;
-
-reg  [63:0] patch[0:15]; // instrument memory
+reg  [63:0] patch[0:(15+6-1)]; // instrument memory, 15 instruments + 6 drums
 wire [ 3:0] inst_I;
 
-// Fixed for OPLL, but free in OPL
-assign fnum_I[9] = 0;
+assign fnum_I[9]   = 0; // Fixed for OPLL, but free in OPL
+assign wavsel_I[1] = 0;
+assign match = { group, subslot } == { sel_group, sel_sub};
+
+jtopl_slot_cnt u_slot_cnt(
+    .rst    ( rst   ),
+    .clk    ( clk   ),
+    .cen    ( cen   ),
+
+    // Pipeline order
+    .zero   ( zero  ),
+    .group  ( group ),
+    .op     ( op    ),   // 0 for modulator operators
+    .subslot(subslot),
+    .slot   ( slot  )    // hot one encoding of active slot
+);
+
 
 always @(posedge clk) begin
     if( prog_we )
         patch[ prog_addr[6:3] ][ prog_addr[2:0]*2 +:8 ] = prog_data;
 end
 
-assign { amen_I, viben_I, en_sus_I, ks_I, mul_I } = patch[ inst_I ];
-assign { amen_I, viben_I, en_sus_I, ks_I, mul_I } = patch[ inst_I ];
+// Selects the current patch
+assign { amen_I, viben_I, en_sus_I, ks_I, mul_I } = patch[ inst_I ][ (op ? 8:0) +: 8 ];
+assign ksl_I                = patch[ inst_I ][ (op ? 31:23) -: 2 ];
+assign tl_I                 = op ? 6'd0 : patch[ inst_I ][ 16 +: 5 ];
+assign wavsel_I[0]          = patch[ inst_I ][ op ? 28 : 27];
+assign fb_I                 = op ? 3'd0 : patch[ inst_I ][ 24 +: 3 ];
+assign { arate_I, drate_I } = patch[ inst_I ][ (op ? 40 : 32) +: 8 ];
+assign { sl_I, rrate_I    } = patch[ inst_I ][ op ? 56 : 48 +: 8 ];
+
+jtopl_sh_rst #(.width(5),.stages(1)) u_ii(
+    .clk    ( clk        ),
+    .cen    ( cen        ),
+    .rst    ( rst        ),
+    .din    ( { ks_I, mul_I   } ),
+    .drop   ( { ks_II, mul_II } )
+);
+
+jtopl_sh_rst #(.width(2+1+6),.stages(3)) u_iv(
+    .clk    ( clk        ),
+    .cen    ( cen        ),
+    .rst    ( rst        ),
+    .din    ( { ksl_I, amen_I, tl_I    } ),
+    .drop   ( { ksl_IV, amen_IV, tl_IV } )
+);
+
 
 // Memory for CH registers
 localparam KONW   =  1,
