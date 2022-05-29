@@ -33,7 +33,7 @@ module jtopll_mmr(
     output      [17:0]  slot,
     output  reg         rhy_en,
     // Phase Generator
-    output      [ 9:0]  fnum_I,
+    output      [ 8:0]  fnum_I,
     output      [ 2:0]  block_I,
     output      [ 3:0]  mul_II,
     output              viben_I,
@@ -53,7 +53,6 @@ module jtopll_mmr(
     output reg          am_dep,
     output reg          vib_dep,
     output      [ 1:0]  ksl_IV,
-    output        [3:0] vol_I,    // channel volume
     // Operator configuration
     output      [ 2:0]  fb_I,
     output              con_I
@@ -202,8 +201,7 @@ jtopll_reg u_reg(
     .tl_IV      ( tl_IV         ),
     // Timbre - Neiro
     .fb_I       ( fb_I          ),
-    .con_I      ( con_I         ),
-    .vol_I      ( vol_I         )
+    .con_I      ( con_I         )
 );
 
 endmodule

@@ -44,7 +44,7 @@ module jtopll_reg(
     input            up_original,
 
     // PG
-    output     [9:0] fnum_I,
+    output     [8:0] fnum_I,
     output     [2:0] block_I,
     // channel configuration
     output     [2:0] fb_I,
@@ -66,10 +66,9 @@ module jtopll_reg(
     output     [3:0] rrate_I,  // release rate
     output     [3:0] sl_I,     // sustain level
     output reg       ks_II,    // key scale
-    output           con_I,    // 1 for adding the modulator operator at the accumulator
+    output           con_I     // 1 for adding the modulator operator at the accumulator
                                // carrier op. are always added
 
-    output     [3:0] vol_I     // channel volume
 );
 
 localparam CH=9;
@@ -79,6 +78,7 @@ reg  [ 5:0] rhy_csr;
 wire        rhy_oen, rhyon_csr;
 wire [ 2:0] subslot;
 wire        match;
+wire [ 3:0] vol_I;     // channel volume
 
 wire [ 5:0] tl_I;
 wire [ 1:0] ksl_I;
@@ -90,7 +90,6 @@ reg  [63:0] patch[0:(16+6-1)]; // instrument memory, 15 instruments + original +
 wire [ 3:0] inst_I;
 wire [ 4:0] inst_sel;
 
-assign fnum_I[9]   = 0; // Fixed for OPLL, but free in OPL
 assign wavsel_I[1] = 0;
 assign match = { group, subslot } == { sel_group, sel_sub};
 
@@ -140,7 +139,7 @@ end
 assign inst_sel             = rhy_oen ? { 2'b10, subslot } : { 1'b0, inst_I };
 assign { amen_I, viben_I, en_sus_I, ks_I, mul_I } = patch[ inst_sel ][ (op ? 8:0) +: 8 ];
 assign ksl_I                = patch[ inst_sel ][ (op ? 31:23) -: 2 ];
-assign tl_I                 = op ? 6'd0 : patch[ inst_sel ][ 16 +: 6 ];
+assign tl_I                 = op ? { vol_I, 2'd0 } : patch[ inst_sel ][ 16 +: 6 ];
 assign wavsel_I[0]          = patch[ inst_sel ][ op ? 28 : 27];
 assign fb_I                 = op ? 3'd0 : patch[ inst_sel ][ 24 +: 3 ];
 assign { arate_I, drate_I } = patch[ inst_sel ][ (op ? 40 : 32) +: 8 ];

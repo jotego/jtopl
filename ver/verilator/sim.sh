@@ -71,7 +71,7 @@ function set_slow {
             $JTFILES -parse ../../hdl/jtopl2.yaml
             ;;
         -2413 | -opll )
-            EXTRA="-2413"
+            EXTRA="$EXTRA -2413"
             TOP="jt2413"
             $JTFILES -parse ../../hdl/jt2413.yaml
             ;;

@@ -39,9 +39,8 @@ wire  [ 1:0]  group;
 wire  [17:0]  slot;
 wire  [ 3:0]  trem;
 
-wire  [ 3:0]  vol_I;
 // Phase
-wire  [ 9:0]  fnum_I;
+wire  [ 8:0]  fnum_I;
 wire  [ 2:0]  block_I;
 wire  [ 3:0]  mul_II;
 wire  [ 9:0]  phase_IV;
@@ -113,7 +112,6 @@ jtopll_mmr #(.OPL_TYPE(OPL_TYPE)) u_mmr(
     .am_dep     ( am_dep        ),
     .vib_dep    ( vib_dep       ),
     // Timbre
-    .vol_I      ( vol_I         ),
     .fb_I       ( fb_I          ),
     .con_I      ( con_I         )
 );
@@ -134,7 +132,7 @@ jtopl_pg u_pg(
     .slot       ( slot          ),
     .rhy_en     ( rhy_en        ),
     // Channel frequency
-    .fnum_I     ( fnum_I        ),
+    .fnum_I     ( { fnum_I, 1'b0 } ),
     .block_I    ( block_I       ),
     // Operator multiplying
     .mul_II     ( mul_II        ),
@@ -166,7 +164,7 @@ jtopl_eg u_eg(
     // envelope operation
     .keyon_I    ( keyon_I       ),
     // envelope number
-    .fnum_I     ( fnum_I        ),
+    .fnum_I     ( { fnum_I, 1'b0 } ),
     .block_I    ( block_I       ),
     .lfo_mod    ( trem          ),
     .amsen_IV   ( amen_IV       ),

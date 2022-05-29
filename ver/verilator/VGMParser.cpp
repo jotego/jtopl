@@ -285,7 +285,6 @@ int VGMParser::parse() {
         // cerr << "VGM 0x" << hex << (((int)vgm_cmd)&0xff) << '\n';
         char extra[2];
         switch( vgm_cmd ) {
-            case 0x51: // YM2413 aa vv write
             case 0x55: // YM2203 write
             case 0x56:
             case 0x58: // YM2610
@@ -299,6 +298,7 @@ int VGMParser::parse() {
             //case 0xA5: // Write to dual YM2203
             //    file.read(extra,2); // ignore
             //    continue;
+            case 0x51: // YM2413 aa vv write
             case 0x53: // A1=1
             case 0x54: // YM2151 write
                 file.read( extra, 2);
