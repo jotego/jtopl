@@ -29,16 +29,12 @@ module jt2413(
     input                wr_n,
     // combined output
     output signed [15:0] snd,
-    output               sample,
-    input         [ 6:0] prog_addr,
-    input         [ 7:0] prog_data,
-    input                prog_we
+    output               sample
 );
 
 parameter OPL_TYPE=11;
 
-wire          cenop;
-wire          write;
+wire          cenop, write, zero;
 wire  [ 1:0]  group;
 wire  [17:0]  slot;
 wire  [ 3:0]  trem;
@@ -81,10 +77,6 @@ assign        write   = !cs_n && !wr_n;
 assign        eg_stop = 0;
 assign        sample  = zero;
 
-// unused outputs
-assign dout  = 0;
-assign irq_n = 1;
-
 jtopll_mmr #(.OPL_TYPE(OPL_TYPE)) u_mmr(
     .rst        ( rst           ),
     .clk        ( clk           ),
@@ -123,10 +115,7 @@ jtopll_mmr #(.OPL_TYPE(OPL_TYPE)) u_mmr(
     // Timbre
     .vol_I      ( vol_I         ),
     .fb_I       ( fb_I          ),
-    .con_I      ( con_I         ),
-    .prog_addr  ( prog_addr     ),
-    .prog_data  ( prog_data     ),
-    .prog_we    ( prog_we       )
+    .con_I      ( con_I         )
 );
 
 jtopl_lfo u_lfo(

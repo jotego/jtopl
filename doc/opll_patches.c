@@ -26,7 +26,7 @@ opll_patch_t patch_ym2413[opll_patch_max] = {
     { 0x00, 0x00, 0x00, 0x00,{ 0x00, 0x00 },{ 0x00, 0x00 },{ 0x00, 0x00 },{ 0x00, 0x00 },{ 0x00, 0x01 },{ 0x00, 0x00 },{ 0x00, 0x0a },{ 0x00, 0x0a },{ 0x00, 0x05 },{ 0x00, 0x05 } }
 };
 
-void mame_bin() {
+void make_bin(char *data) {
     for( int k=0; k<opll_patch_max; k++ ) {
         opll_patch_t *p = &patch_ym2413[k];
         int d[8];
@@ -48,15 +48,22 @@ void mame_bin() {
         d[6]=(p->sl[0]<<4) | (p->rr[0]);
         d[7]=(p->sl[1]<<4) | (p->rr[1]);
         for( int j=0; j<8; j++ ) {
-            printf("%02X ", d[j]);
+            *data++ = d[j];
         }
-        printf("\n");
     }
 }
 
 int main() {
-    // MAME format for patches
-
+    char data[8*21];
+    make_bin(data);
+    for( int j=0;j<21;j++ ) {
+        printf("    patch[%02d]=64'h",j+1);
+        char *p = data+8*(j+1)-1;
+        for( int k=7; k>=0; k-- ) {
+            printf("%02X",(unsigned)(*p--)&0xff);
+        }
+        printf(";\n");
+    }
     return 0;
 }
 

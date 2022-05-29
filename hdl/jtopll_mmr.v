@@ -56,11 +56,7 @@ module jtopll_mmr(
     output        [3:0] vol_I,    // channel volume
     // Operator configuration
     output      [ 2:0]  fb_I,
-    output              con_I,
-
-    input         [6:0] prog_addr,
-    input         [7:0] prog_data,
-    input               prog_we
+    output              con_I
 );
 
 parameter OPL_TYPE=1;
@@ -127,7 +123,7 @@ always @(posedge clk) begin
                 // Mapping done according to Table 2-3, page 7 of YM3812 App. Manual
                 if( selreg < 8 ) begin
                     up_original <= 1;
-                    sel_sub     <= addr[2:0];
+                    sel_sub     <= selreg[2:0];
                 end                
                 // Channel registers
                 if( selreg[3:0]<=4'd8) begin
@@ -163,12 +159,11 @@ always @(posedge clk) begin
     end
 end
 
-jtopll_reg #(.OPL_TYPE(OPL_TYPE)) u_reg(
+jtopll_reg u_reg(
     .rst        ( rst           ),
     .clk        ( clk           ),
     .cen        ( cenop         ),
     .din        ( din_copy      ),
-    .write      ( write         ),
     // Pipeline order
     .zero       ( zero          ),
     .group      ( group         ),
@@ -208,10 +203,6 @@ jtopll_reg #(.OPL_TYPE(OPL_TYPE)) u_reg(
     // Timbre - Neiro
     .fb_I       ( fb_I          ),
     .con_I      ( con_I         ),
-    // Programming
-    .prog_addr  ( prog_addr     ),
-    .prog_data  ( prog_data     ),
-    .prog_we    ( prog_we       ),
     .vol_I      ( vol_I         )
 );
 

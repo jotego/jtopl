@@ -146,6 +146,7 @@ int main(int argc, char** argv, char** env) {
     RipParser *gym;
     bool forever=true, dump_hex=false, decode_pcm=true;
     char *gym_filename;
+    bool ym2413=false;
     SimTime sim_time(top);
     int SAMPLERATE=0;
     vluint64_t SAMPLING_PERIOD=0, trace_start_time=0;
@@ -162,7 +163,16 @@ int main(int argc, char** argv, char** env) {
             trace=true;
             continue; 
         }
-        if( string(argv[k])=="-2413" )  { cout << "YM2413 not supported\n"; return 1; }
+        if( string(argv[k])=="-2413" )  {
+            cout << "YM2413 selected\n";
+            if ( gym==nullptr ) {
+                cout << "-ym2413 must be specified before -gym\n";
+                return 1;
+            }
+            ym2413=true;
+            sim_time.set_period(250); // 4 MHz
+            continue;
+        }
         if( string(argv[k])=="-slow" )  { slow=true;  continue; }
         if( string(argv[k])=="-hex" )  { dump_hex=true;  continue; }
         if( string(argv[k])=="-gym" ) {

@@ -10,14 +10,14 @@
 
 class RipParser {
 public:
-    enum chip_type { ym2203=1, ym2612=2, ym2610=3, ym2151=4, ym3526=5, unknown=0 };
+    enum chip_type { ym2203=1, ym2612=2, ym2610=3, ym2151=4, ym3526=5, ym2413=6, ym3812=7, unknown=0 };
 protected:
     int clk_period; // synthesizer clock period
     chip_type chip_cfg;
 public:
     char cmd, val, addr;
     uint64_t wait;
-    virtual void open(const char *filename, int limit=0)=0;
+    virtual void open(const char *filename, int limit=0 )=0;
     virtual int parse()=0;
     virtual uint64_t length()=0;
     virtual ~RipParser() {};
@@ -48,7 +48,7 @@ class VGMParser : public RipParser {
 
     // int max_PSG_warning;
 public:
-    void open(const char *filename, int limit=0);
+    void open(const char *filename, int limit=0 );
     int parse();
     uint64_t length();
     int period();

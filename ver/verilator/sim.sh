@@ -159,11 +159,11 @@ if [ $SKIPMAKE = FALSE ]; then
         exit $?
     fi
 
-    if ! make -j -C obj_dir -f V${TOP}.mk V${TOP}; then
+    if ! make -j -C obj_dir -f Vjtopl.mk Vjtopl; then
         exit $?
     fi
     echo Simulation start...
-    echo obj_dir/V${TOP} $DUMPSIGNALS $EXTRA  $GYM_ARG "$UNZIP_GYM" -o "$WAV_FILE"
+    echo obj_dir/Vjtopl $DUMPSIGNALS $EXTRA  $GYM_ARG "$UNZIP_GYM" -o "$WAV_FILE"
 fi
 
 if [[ $DUMPSIGNALS == "-trace" ]]; then
@@ -172,16 +172,16 @@ if [[ $DUMPSIGNALS == "-trace" ]]; then
         echo VCD to FST conversion running in parallel
         # filter out lines starting with INFO: because these come from $display commands in verilog and are
         # routed to standard output but are not part of the VCD file
-        obj_dir/V${TOP} $DUMPSIGNALS $EXTRA $GYM_ARG "$UNZIP_GYM" -o "$WAV_FILE" |  grep -v "^INFO: " | vcd2fst -v - -f test.fst
+        obj_dir/Vjtopl $DUMPSIGNALS $EXTRA $GYM_ARG "$UNZIP_GYM" -o "$WAV_FILE" |  grep -v "^INFO: " | vcd2fst -v - -f test.fst
     else
         if which simvisdbutil; then
-            obj_dir/V${TOP} $DUMPSIGNALS $EXTRA $GYM_ARG "$UNZIP_GYM" -o "$WAV_FILE" | grep -v "^INFO: " > test.vcd
+            obj_dir/Vjtopl $DUMPSIGNALS $EXTRA $GYM_ARG "$UNZIP_GYM" -o "$WAV_FILE" | grep -v "^INFO: " > test.vcd
             echo VCD to SST2 conversion
             simvisdbutil test.vcd -output test -overwrite -shm && rm test.vcd
         else
-            obj_dir/V${TOP} $DUMPSIGNALS $EXTRA $GYM_ARG "$UNZIP_GYM" -o "$WAV_FILE" > test.vcd
+            obj_dir/Vjtopl $DUMPSIGNALS $EXTRA $GYM_ARG "$UNZIP_GYM" -o "$WAV_FILE" > test.vcd
         fi
     fi
 else
-    obj_dir/V${TOP} $DUMPSIGNALS $EXTRA $GYM_ARG "$UNZIP_GYM" -o "$WAV_FILE"
+    obj_dir/Vjtopl $DUMPSIGNALS $EXTRA $GYM_ARG "$UNZIP_GYM" -o "$WAV_FILE"
 fi
