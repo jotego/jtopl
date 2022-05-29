@@ -163,6 +163,7 @@ jtopl_reg_ch#(CHCSRW) u_reg_ch(
     .rst         ( rst          ),
     .clk         ( clk          ),
     .cen         ( cen          ),
+    .zero        ( zero         ),
     .rhy_en      ( rhy_en       ),
     .rhy_kon     ( rhy_kon      ),
     .slot        ( slot         ),

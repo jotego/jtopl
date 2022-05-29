@@ -162,6 +162,7 @@ int main(int argc, char** argv, char** env) {
             trace=true;
             continue; 
         }
+        if( string(argv[k])=="-2413" )  { cout << "YM2413 not supported\n"; return 1; }
         if( string(argv[k])=="-slow" )  { slow=true;  continue; }
         if( string(argv[k])=="-hex" )  { dump_hex=true;  continue; }
         if( string(argv[k])=="-gym" ) {

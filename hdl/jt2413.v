@@ -20,20 +20,22 @@
     */
 
 module jt2413(
-    input                  rst,        // rst should be at least 6 clk&cen cycles long
-    input                  clk,        // CPU clock
-    input                  cen,        // optional clock enable, it not needed leave as 1'b1
-    input           [ 7:0] din,
-    input                  addr,
-    input                  cs_n,
-    input                  wr_n,
+    input                rst,        // rst should be at least 6 clk&cen cycles long
+    input                clk,        // CPU clock
+    input                cen,        // optional clock enable, it not needed leave as 1'b1
+    input         [ 7:0] din,
+    input                addr,
+    input                cs_n,
+    input                wr_n,
     // combined output
-    output  signed  [15:0] snd,
-    output                 sample
+    output signed [15:0] snd,
+    output               sample,
+    input         [ 6:0] prog_addr,
+    input         [ 7:0] prog_data,
+    input                prog_we
 );
 
-
-parameter OPL_TYPE=1;
+parameter OPL_TYPE=11;
 
 wire          cenop;
 wire          write;
@@ -41,6 +43,7 @@ wire  [ 1:0]  group;
 wire  [17:0]  slot;
 wire  [ 3:0]  trem;
 
+wire  [ 3:0]  vol_I;
 // Phase
 wire  [ 9:0]  fnum_I;
 wire  [ 2:0]  block_I;
@@ -74,142 +77,57 @@ wire          op, con_I, op_out, con_out;
 
 wire signed [12:0] op_result;
 
-assign          write   = !cs_n && !wr_n;
-assign          eg_stop = 0;
-assign          sample  = zero;
+assign        write   = !cs_n && !wr_n;
+assign        eg_stop = 0;
+assign        sample  = zero;
 
-generate
-    if( OPL_TYPE == 11 ) begin // YM2413,
-        // unused outputs
-        assign dout  = 0;
-        assign irq_n = 1;
+// unused outputs
+assign dout  = 0;
+assign irq_n = 1;
 
-        jtopll_mmr #(.OPL_TYPE(OPL_TYPE)) u_mmr(
-            .rst        ( rst           ),
-            .clk        ( clk           ),
-            .cen        ( cen           ),  // external clock enable
-            .cenop      ( cenop         ),  // internal clock enable
-            .din        ( din           ),
-            .write      ( write         ),
-            .addr       ( addr          ),
-            // location
-            .zero       ( zero          ),
-            .group      ( group         ),
-            .op         ( op            ),
-            .slot       ( slot          ),
-            .rhy_en     ( rhy_en        ),
-            // Phase Generator
-            .fnum_I     ( fnum_I        ),
-            .block_I    ( block_I       ),
-            .mul_II     ( mul_II        ),
-            // Operator
-            .wavsel_I   ( wavsel_I      ),
-            // Envelope Generator
-            .keyon_I    ( keyon_I       ),
-            .en_sus_I   ( en_sus_I      ),
-            .arate_I    ( arate_I       ),
-            .drate_I    ( drate_I       ),
-            .rrate_I    ( rrate_I       ),
-            .sl_I       ( sl_I          ),
-            .ks_II      ( ksr_II        ),
-            .tl_IV      ( tl_IV         ),
-            .ksl_IV     ( ksl_IV        ),
-            .amen_IV    ( amen_IV       ),
-            .viben_I    ( viben_I       ),
-            // Global Values
-            .am_dep     ( am_dep        ),
-            .vib_dep    ( vib_dep       ),
-            // Timbre
-            .fb_I       ( fb_I          ),
-            .con_I      ( con_I         )
-            .prog_addr  ( prog_addr     )
-            .prog_data  ( prog_data     )
-            .prog_we    ( prog_we       )
-            .vol_I      ( vol_I         )
-        );
-    end else begin
-        // Timers
-        wire          flag_A, flag_B, flagen_A, flagen_B;
-        wire  [ 7:0]  value_A;
-        wire  [ 7:0]  value_B;
-        wire          load_A, load_B;
-        wire          clr_flag_A, clr_flag_B;
-        wire          overflow_A;
-        wire          zero; // Single-clock pulse at the begginig of s1_enters
-
-        assign dout    = { ~irq_n, flag_A, flag_B, 5'd6 };
-
-        jtopl_timers u_timers(
-            .rst        ( rst           ),
-            .clk        ( clk           ),
-            .cenop      ( cenop         ),
-            .zero       ( zero          ),
-            .value_A    ( value_A       ),
-            .value_B    ( value_B       ),
-            .load_A     ( load_A        ),
-            .load_B     ( load_B        ),
-            .flagen_A   ( flagen_A      ),
-            .flagen_B   ( flagen_B      ),
-            .clr_flag_A ( clr_flag_A    ),
-            .clr_flag_B ( clr_flag_B    ),
-            .flag_A     ( flag_A        ),
-            .flag_B     ( flag_B        ),
-            .overflow_A ( overflow_A    ),
-            .irq_n      ( irq_n         )
-        );
-
-        jtopl_mmr #(.OPL_TYPE(OPL_TYPE)) u_mmr(
-            .rst        ( rst           ),
-            .clk        ( clk           ),
-            .cen        ( cen           ),  // external clock enable
-            .cenop      ( cenop         ),  // internal clock enable
-            .din        ( din           ),
-            .write      ( write         ),
-            .addr       ( addr          ),
-            .zero       ( zero          ),
-            .group      ( group         ),
-            .op         ( op            ),
-            .slot       ( slot          ),
-            .rhy_en     ( rhy_en        ),
-            // Timers
-            .value_A    ( value_A       ),
-            .value_B    ( value_B       ),
-            .load_A     ( load_A        ),
-            .load_B     ( load_B        ),
-            .flagen_A   ( flagen_A      ),
-            .flagen_B   ( flagen_B      ),
-            .clr_flag_A ( clr_flag_A    ),
-            .clr_flag_B ( clr_flag_B    ),
-            .flag_A     ( flag_A        ),
-            .overflow_A ( overflow_A    ),
-            // Phase Generator
-            .fnum_I     ( fnum_I        ),
-            .block_I    ( block_I       ),
-            .mul_II     ( mul_II        ),
-            // Operator
-            .wavsel_I   ( wavsel_I      ),
-            // Envelope Generator
-            .keyon_I    ( keyon_I       ),
-            .en_sus_I   ( en_sus_I      ),
-            .arate_I    ( arate_I       ),
-            .drate_I    ( drate_I       ),
-            .rrate_I    ( rrate_I       ),
-            .sl_I       ( sl_I          ),
-            .ks_II      ( ksr_II        ),
-            .tl_IV      ( tl_IV         ),
-            .ksl_IV     ( ksl_IV        ),
-            .amen_IV    ( amen_IV       ),
-            .viben_I    ( viben_I       ),
-            // Global Values
-            .am_dep     ( am_dep        ),
-            .vib_dep    ( vib_dep       ),
-            // Timbre
-            .fb_I       ( fb_I          ),
-            .con_I      ( con_I         )
-        );
-    end
-endgenerate
-
+jtopll_mmr #(.OPL_TYPE(OPL_TYPE)) u_mmr(
+    .rst        ( rst           ),
+    .clk        ( clk           ),
+    .cen        ( cen           ),  // external clock enable
+    .cenop      ( cenop         ),  // internal clock enable
+    .din        ( din           ),
+    .write      ( write         ),
+    .addr       ( addr          ),
+    // location
+    .zero       ( zero          ),
+    .group      ( group         ),
+    .op         ( op            ),
+    .slot       ( slot          ),
+    .rhy_en     ( rhy_en        ),
+    // Phase Generator
+    .fnum_I     ( fnum_I        ),
+    .block_I    ( block_I       ),
+    .mul_II     ( mul_II        ),
+    // Operator
+    .wavsel_I   ( wavsel_I      ),
+    // Envelope Generator
+    .keyon_I    ( keyon_I       ),
+    .en_sus_I   ( en_sus_I      ),
+    .arate_I    ( arate_I       ),
+    .drate_I    ( drate_I       ),
+    .rrate_I    ( rrate_I       ),
+    .sl_I       ( sl_I          ),
+    .ks_II      ( ksr_II        ),
+    .tl_IV      ( tl_IV         ),
+    .ksl_IV     ( ksl_IV        ),
+    .amen_IV    ( amen_IV       ),
+    .viben_I    ( viben_I       ),
+    // Global Values
+    .am_dep     ( am_dep        ),
+    .vib_dep    ( vib_dep       ),
+    // Timbre
+    .vol_I      ( vol_I         ),
+    .fb_I       ( fb_I          ),
+    .con_I      ( con_I         ),
+    .prog_addr  ( prog_addr     ),
+    .prog_data  ( prog_data     ),
+    .prog_we    ( prog_we       )
+);
 
 jtopl_lfo u_lfo(
     .rst        ( rst           ),
