@@ -25,6 +25,7 @@ module jtopl_reg_ch#( parameter
     input                   rst,
     input                   clk,
     input                   cen,
+    input                   zero,
     input                   rhy_en,
     input             [4:0] rhy_kon,
     input            [17:0] slot,

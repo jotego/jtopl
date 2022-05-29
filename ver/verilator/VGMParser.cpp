@@ -303,6 +303,7 @@ int VGMParser::parse() {
                 return cmd_write;                
             case 0x57:
             case 0x5A:   // YM3812 write register
+            case 0x5B:   // YM3526 write register
             case 0x59: { // YM2610
                 addr = 1;
                 file.read( extra, 2);

@@ -53,9 +53,14 @@ module jtopll_mmr(
     output reg          am_dep,
     output reg          vib_dep,
     output      [ 1:0]  ksl_IV,
+    output        [3:0] vol_I,    // channel volume
     // Operator configuration
     output      [ 2:0]  fb_I,
-    output              con_I
+    output              con_I,
+
+    input         [6:0] prog_addr,
+    input         [7:0] prog_data,
+    input               prog_we
 );
 
 parameter OPL_TYPE=1;
@@ -76,8 +81,7 @@ reg         csm, effect;
 reg  [ 1:0] sel_group;     // group to update
 reg  [ 2:0] sel_sub;       // subslot to update
 reg         up_fnumlo, up_fnumhi, up_inst,
-            up_mult, up_ksl_tl, up_ar_dr, up_sl_rr,
-            up_wav;
+            up_original;
 reg         wave_mode,     // 1 if waveform selection is enabled (OPL2)
             csm_en,
             note_sel;      // keyboard split, not implemented
@@ -176,20 +180,11 @@ jtopll_reg #(.OPL_TYPE(OPL_TYPE)) u_reg(
 
     .rhy_en     ( rhy_en        ),
     .rhy_kon    ( rhy_kon       ),
-    
-    //input           csm,
-    //input           flag_A,
-    //input           overflow_A,
 
+    .up_original( up_original   ),
     .up_inst    ( up_inst       ),
     .up_fnumlo  ( up_fnumlo     ),
     .up_fnumhi  ( up_fnumhi     ),
-
-    .up_mult    ( up_mult       ),
-    .up_ksl_tl  ( up_ksl_tl     ),
-    .up_ar_dr   ( up_ar_dr      ),
-    .up_sl_rr   ( up_sl_rr      ),
-    .up_wav     ( up_wav        ),
 
     // PG
     .fnum_I     ( fnum_I        ),
@@ -212,7 +207,12 @@ jtopll_reg #(.OPL_TYPE(OPL_TYPE)) u_reg(
     .tl_IV      ( tl_IV         ),
     // Timbre - Neiro
     .fb_I       ( fb_I          ),
-    .con_I      ( con_I         )
+    .con_I      ( con_I         ),
+    // Programming
+    .prog_addr  ( prog_addr     ),
+    .prog_data  ( prog_data     ),
+    .prog_we    ( prog_we       ),
+    .vol_I      ( vol_I         )
 );
 
 endmodule

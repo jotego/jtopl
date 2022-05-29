@@ -12,6 +12,23 @@ GATHER=gather.f
 SKIPMAKE=FALSE
 MACROS=
 
+# Locate jtfiles.go
+if which jtfiles > /dev/null; then
+    JTFILES=jtfiles
+elif [ -e $JTFRAME/bin/jtfiles.go ]; then
+    JTFILES="go run $JTFRAME/bin/jtfiles.go"
+else
+    cat <<EOF
+Cannot find jtfiles executable or source file. Clone
+the JTFRAME repository (https://github.com/jotego/jtframe)
+and set the environment variable JTFRAME to point to it.
+Or run this script from within a JTOPL submodule in a
+properly set up JTCORE repository
+EOF
+fi
+JTFILES="$JTFILES -f sim -output gather"
+$JTFILES -parse ../../hdl/jt26.yaml
+
 function set_slow {
     FAST=
     EXTRA="$EXTRA -slow"    
