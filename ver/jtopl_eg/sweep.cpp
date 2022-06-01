@@ -67,7 +67,21 @@ int main(int argc, char *argv[]) {
 		clock(18*2);
 		top.rst = 0;
 		top.keyon_I = 1;
-		clock( 80'000 );
+		vluint64_t t0=main_time;
+		clock( 10'000 );
+		int limit=1000;
+		if( top.arate_I!=0) {
+			while( (int)top.eg_V!=0 && --limit ) {
+				clock( 10'000 );
+			}
+		}
+		if( limit==0 ) {
+			cout << "ARATE " << (int)top.arate_I << " timeout " << "(" << (int) top.eg_V << ")\n";
+		}
+		if( (int)top.eg_V==0 ) {
+			vluint64_t delta=main_time-t0;
+			cout << "ARATE " << (int)top.arate_I << " " << delta << endl;
+		}
 	}
 
 
