@@ -65,9 +65,7 @@ always @(*)
         5'h7:    cnt = eg_cnt[ 7: 5];
         5'h8:    cnt = eg_cnt[ 6: 4];
         5'h9:    cnt = eg_cnt[ 5: 3];
-        5'ha:    cnt = eg_cnt[ 4: 2];
-        5'hb:    cnt = eg_cnt[ 3: 1];
-        default: cnt = eg_cnt[ 2: 0];
+        default: cnt = eg_cnt[ 4: 2];
     endcase
 
 ////////////////////////////////

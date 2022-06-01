@@ -17,7 +17,7 @@ module test(
     input       [ 3:0]    keycode,
     input       [14:0]    eg_cnt,
     input                 cnt_in,
-    input                 ks,
+    input                 ksr,
     output                cnt_lsb,
     output                sum_up_out,
     ///////////////////////////////////
@@ -26,10 +26,14 @@ module test(
     output reg  [ 9:0]    pure_eg_out,
     ///////////////////////////////////
     // IV
-    input       [ 6:0]    lfo_mod,
+    input       [ 3:0]    lfo_mod,
+    input       [ 3:0]    fnum,
+    input       [ 2:0]    block,
     input                 amsen,
     input                 ams,
-    input       [ 6:0]    tl,
+    input       [ 5:0]    tl,
+    input       [ 1:0]    ksl,
+    input       [ 3:0]    final_keycode,
     output reg  [ 9:0]    eg_out
 );
 
@@ -53,6 +57,14 @@ jtopl_eg_comb uut(
     .base_rate      ( base_rate     ),
     .state_next     ( state_next    ),
     .pg_rst         ( pg_rst        ),
+
+    // Frequency settings
+    .fnum           ( fnum          ),
+    .block          ( block         ),
+    .ksl            ( ksl           ),
+    .ksr            ( ksr           ),
+    .final_keycode  ( final_keycode ),
+
     ///////////////////////////////////
     // II
     .step_attack    ( attack        ),
@@ -60,7 +72,6 @@ jtopl_eg_comb uut(
     .keycode        ( keycode       ),
     .eg_cnt         ( eg_cnt        ),
     .cnt_in         ( cnt_in        ),
-    .ks             ( ks            ),
     .cnt_lsb        ( cnt_lsb       ),
     .step           ( step          ),
     .step_rate_out  ( step_rate_out ),

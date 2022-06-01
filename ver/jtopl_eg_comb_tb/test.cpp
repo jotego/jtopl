@@ -32,7 +32,7 @@ class Stim {
 public:
 	// inputs
 	int keyon_now, keyoff_now, state_in, eg_in, arate, drate, rate2, rrate, sl,
-		keycode, eg_cnt, cnt_in, ks, en_sus, sum_up_in,
+		keycode, eg_cnt, cnt_in, ksr, en_sus, sum_up_in,
 		lfo_mod, amsen, ams, tl;
 	// outputs
 	int state_next, pg_rst, cnt_lsb, pure_eg_out, eg_out, sum_up_out;
@@ -95,7 +95,7 @@ int main(int argc, char *argv[]) {
 void Stim::reset() {
 	keyon_now=0, keyoff_now=0, state_in=0, eg_in=0x3ff, arate=0, drate=0, 
 	rrate=0, sl=0, en_sus=0,
-	keycode=0, eg_cnt=0, cnt_in=0, ks=0,
+	keycode=0, eg_cnt=0, cnt_in=0, ksr=0,
 	lfo_mod=0, amsen=0, ams=0, tl=0;
 	sum_up_in = 0;
 	wait_count=0;
@@ -116,7 +116,7 @@ void Stim::apply(Vtest* dut) {
 	dut->keycode	= keycode;
 	dut->eg_cnt		= eg_cnt;
 	dut->cnt_in		= cnt_in;
-	dut->ks			= ks;
+	dut->ksr			= ksr;
 	
 	dut->lfo_mod	= lfo_mod;
 	dut->amsen		= amsen;
@@ -187,7 +187,7 @@ void Stim::read_line() {
 			if( strcmp(cmd,"keycode")==0) { keycode = value; break; }
 			if( strcmp(cmd,"eg_cnt")==0	) { eg_cnt = value; break; }
 			if( strcmp(cmd,"cnt_in")==0	) { cnt_in = value; break; }
-			if( strcmp(cmd,"ks")==0		) { ks = value; break; }
+			if( strcmp(cmd,"ksr")==0		) { ksr = value; break; }
 			if( strcmp(cmd,"lfo_mod")==0) { lfo_mod = value; break; }
 			if( strcmp(cmd,"amsen")==0	) { amsen = value; break; }
 			if( strcmp(cmd,"ams")==0	) { ams = value; break; }

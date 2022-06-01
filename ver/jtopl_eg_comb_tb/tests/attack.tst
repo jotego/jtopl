@@ -4,7 +4,7 @@ drate=7
 rrate=A
 sl=6
 keycode=0
-ks=1
+ksr=1
 
 keyon=1
 wait=1
