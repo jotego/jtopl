@@ -246,7 +246,7 @@ static void OPLL_DoModeWrite(opll_t *chip) {
         case 0x01:
             chip->patch.multi[slot] = chip->write_data & 0x0f;
             chip->patch.ksr[slot] = (chip->write_data >> 4) & 0x01;
-            chip->patch.et[slot] = (chip->write_data >> 5) & 0x01;
+            chip->patch.et[slot] = (chip->write_data >> 5) & 0x01; // enable sustain
             chip->patch.vib[slot] = (chip->write_data >> 6) & 0x01;
             chip->patch.am[slot] = (chip->write_data >> 7) & 0x01;
             break;

@@ -140,7 +140,9 @@ end
 assign inst_sel             = rhy_oen ? { 2'b10, subslot } : { 1'b0, inst_I };
 assign { amen_I, viben_I, en_sus_I, ks_I, mul_I } = patch[ inst_sel ][ (op ? 8:0) +: 8 ];
 assign ksl_I                = patch[ inst_sel ][ (op ? 31:23) -: 2 ];
-assign tl_I                 = op ? { vol_I, 2'd0 } : patch[ inst_sel ][ 16 +: 6 ];
+assign tl_I                 =
+    rhy_oen & (slot[13] | slot[14]) ? { inst_I, 2'd0 } : // HH and TT have the volume set this way
+    op ? { vol_I, 2'd0 } : patch[ inst_sel ][ 16 +: 6 ];
 assign wavsel_I[0]          = patch[ inst_sel ][ op ? 28 : 27];
 assign fb_I                 = op ? 3'd0 : patch[ inst_sel ][ 24 +: 3 ];
 assign { arate_I, drate_I } = patch[ inst_sel ][ (op ? 40 : 32) +: 8 ];
