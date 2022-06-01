@@ -60,7 +60,7 @@ int main(int argc, char *argv[]) {
 		top.trace(vcd,99);
 		vcd->open("test.vcd");
 	}
-	for( top.arate_I=0; top.arate_I<16; top.arate_I++ )
+	for( top.arate_I=1; top.arate_I<16; top.arate_I++ )
 	{
 		top.rst = 1;
 		top.keyon_I = 0;
@@ -68,11 +68,10 @@ int main(int argc, char *argv[]) {
 		top.rst = 0;
 		top.keyon_I = 1;
 		vluint64_t t0=main_time;
-		clock( 10'000 );
-		int limit=1000;
+		int limit=50'000'000;
 		if( top.arate_I!=0) {
 			while( (int)top.eg_V!=0 && --limit ) {
-				clock( 10'000 );
+				clock( 10 );
 			}
 		}
 		if( limit==0 ) {
@@ -80,7 +79,8 @@ int main(int argc, char *argv[]) {
 		}
 		if( (int)top.eg_V==0 ) {
 			vluint64_t delta=main_time-t0;
-			cout << "ARATE " << (int)top.arate_I << " " << delta << endl;
+			delta /= 1000;
+			cout << "ARATE " << (int)top.arate_I << " " << delta << " us" << endl;
 		}
 	}
 

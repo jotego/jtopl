@@ -38,7 +38,7 @@ jtopl_div u_div(
 jtopl_slot_cnt u_slot_cnt(
     .rst    ( rst   ),
     .clk    ( clk   ),
-    .cen    ( 1'b1  ),
+    .cen    ( cenop ),
 
     // Pipeline order
     .zero   ( zero  ),
