@@ -19,6 +19,7 @@
 
 #include <cstring>
 #include <iostream>
+#include <iomanip>
 #include <fstream>
 #include "Vsweep.h"
 #include "verilated_vcd_c.h"
@@ -27,7 +28,7 @@ using namespace std;
 
 
 vluint64_t main_time = 0;	   // Current simulation time
-const vluint64_t HALFPERIOD=133; // 3.57MHz
+const vluint64_t HALFPERIOD=133; // 3.57MHz (133ns * 2)
 Vsweep top;
 VerilatedVcdC* vcd;
 
@@ -54,6 +55,10 @@ int main(int argc, char *argv[]) {
 	int err_code=0;
 	vcd = new VerilatedVcdC;
 	bool trace=true;
+	// YM2413
+	 float atime[] = { 0.1, 1738,863,432,216,108,54,27,13.52,6.76,3.38,1.69,0.84,0.5,0.28,0.1 };
+	// YM3812
+	//float atime[] = { 0.1, 2826, 1413, 706, 353, 176, 88, 44, 22, 11, 5.52, 2.76, 1.40, 0.7, 0.38,0.1 };
 
 	if( trace ) {
 		Verilated::traceEverOn(true);
@@ -68,7 +73,7 @@ int main(int argc, char *argv[]) {
 		top.rst = 0;
 		top.keyon_I = 1;
 		vluint64_t t0=main_time;
-		int limit=50'000'000;
+		int limit=1'000'000;
 		if( top.arate_I!=0) {
 			while( (int)top.eg_V!=0 && --limit ) {
 				clock( 10 );
@@ -78,9 +83,11 @@ int main(int argc, char *argv[]) {
 			cout << "ARATE " << (int)top.arate_I << " timeout " << "(" << (int) top.eg_V << ")\n";
 		}
 		if( (int)top.eg_V==0 ) {
-			vluint64_t delta=main_time-t0;
-			delta /= 1000;
-			cout << "ARATE " << (int)top.arate_I << " " << delta << " us" << endl;
+			float delta=(float)main_time-t0;
+			delta /= 1e6;
+			float err = (delta-atime[top.arate_I])/atime[top.arate_I]*100.0;
+			cout << "ARATE " << (int)top.arate_I << " " << delta << " ms (" <<
+				setprecision(3) << err << "%) " << endl;
 		}
 	}
 

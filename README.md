@@ -49,13 +49,13 @@ YMF262  |  jt262.v       | jt262.yaml  | OPL3        |         | Not yet      |
 
 ### Chip differences
 
-Chip     |  Type        | Features
----------|--------------|----------------------------------------
-YM3526   | OPL          | Basic OPL
-YM2413   | OPLL         | Removes depth options for vibrato/tremolo
-Y8950    | OPL+ADPCM    | Adds ADPCM
-YM3812   | OPL2         | Adds waveform select. Four waveforms
-YMF262   | OPL3         | No CSM. More operator modes, more channels
+Chip     |  Type        | EG bits | Features
+---------|--------------|---------|-------------------------------
+YM3526   | OPL          |    9?   | Basic OPL
+YM2413   | OPLL         |    7    | Removes depth options for vibrato/tremolo
+Y8950    | OPL+ADPCM    |    9?   | Adds ADPCM
+YM3812   | OPL2         |    9?   | Adds waveform select. Four waveforms
+YMF262   | OPL3         |    9    | No CSM. More operator modes, more channels
 
 ## Simulation
 

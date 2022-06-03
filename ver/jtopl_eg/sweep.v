@@ -25,13 +25,18 @@ module test(
     output  reg         pg_rst_II
 );
 
-wire cenop, zero, op;
-wire kon = keyon_I;// & zero;
+wire        cenop, zero, op;
+wire        kon = keyon_I;// & zero;
+wire [17:0] slot;
+
+reg cen=0;
+
+always @(posedge clk) cen <= ~cen;
 
 jtopl_div u_div(
     .rst    ( rst   ),
     .clk    ( clk   ),
-    .cen    ( 1'b1  ),
+    .cen    ( cen   ),
     .cenop  ( cenop )   // clock enable at operator rate
 );
 
@@ -45,12 +50,13 @@ jtopl_slot_cnt u_slot_cnt(
     .group  (       ),
     .op     ( op    ),   // 0 for modulator operators
     .subslot(       ),
-    .slot   (       )    // hot one encoding of active slot
+    .slot   ( slot  )    // hot one encoding of active slot
 );
 
 jtopl_eg uut(
     .rst        ( rst           ),
     .clk        ( clk           ),
+    .cen        ( cen           ),
     .cenop      ( cenop         ),
     .zero       ( zero          ),
     .eg_stop    ( eg_stop       ),

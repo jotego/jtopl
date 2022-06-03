@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if ! verilator -f sweep.f sweep.cpp --cc --exe --trace > s; then
+if ! verilator -f sweep.f sweep.cpp --cc --exe --trace --timescale 1ns/1ns > s; then
 	cat s; rm s
 	exit $?
 fi
