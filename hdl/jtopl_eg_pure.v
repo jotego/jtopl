@@ -53,15 +53,18 @@ reg [ 9:0] ar_sum;
 always @(*) begin : ar_calculation
     casez( rate[5:2] )
         default: ar_sum0 = {2'd0, eg_in[9:4]};
-        //4'b1011: ar_sum0 = {1'd0, eg_in[9:3]}; // 'hb
-        4'b1101: ar_sum0 = {1'd0, eg_in[9:3]}; // 'hd
-        4'b111?: ar_sum0 = eg_in[9:2];         // 'he/f
+        4'b1011, 4'b1100: ar_sum0 = {1'd0, eg_in[9:3]}; // 'hb
+        // 4'b1101: ar_sum0 = {1'd0, eg_in[9:3]}; // 'hd
+        // 4'b111?: ar_sum0 = eg_in[9:2];         // 'he/f
+        4'b1101, 4'b111?: ar_sum0 = eg_in[9:2];         // 'he/f
     endcase
     ar_sum1 = ar_sum0+9'd1;
-    if( rate[5:2] > 4'hb )
+    if( rate[5:2] == 4'he )
+        ar_sum = { ar_sum1, 1'b0 };
+    else if( rate[5:2] > 4'hb )
         ar_sum = step ? { ar_sum1, 1'b0 } : { 1'b0, ar_sum1 }; // adds ar_sum1*3/2 max
-    else if( rate[5:2] == 4'hb )
-        ar_sum = step ? { ar_sum1, 1'b0 } : 10'd0; // adds ar_sum1 max
+    // else if( rate[5:2] == 4'hb )
+    //     ar_sum = step ? { ar_sum1, 1'b0 } : 10'd0; // adds ar_sum1 max
     else
         ar_sum = step ? { 1'b0, ar_sum1 } : 10'd0; // adds ar_sum1/2 max
     ar_result = eg_in-ar_sum;

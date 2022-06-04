@@ -65,7 +65,7 @@ int main(int argc, char *argv[]) {
 		top.trace(vcd,99);
 		vcd->open("test.vcd");
 	}
-	for( top.arate_I=3; top.arate_I<16; top.arate_I++ )
+	for( top.arate_I=3; top.arate_I<15; top.arate_I++ )
 	{
 		top.rst = 1;
 		top.keyon_I = 0;
@@ -87,8 +87,7 @@ int main(int argc, char *argv[]) {
 			float delta=(float)main_time-t0;
 			delta /= 1e6;
 			float err = (delta-atime[top.arate_I])/atime[top.arate_I]*100.0;
-			cout << "ARATE " << hex << (int)top.arate_I << dec << " " << delta << " ms (" <<
-				setprecision(3) << err << "%) " << endl;
+			printf("ARATE %X %6.2f ms (%4.1f %%)\n", top.arate_I, delta, err );
 		}
 	}
 
