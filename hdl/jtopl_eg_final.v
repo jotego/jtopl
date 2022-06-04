@@ -27,7 +27,6 @@ module jtopl_eg_final(
     input            ams,
     input      [5:0] tl,
     input      [1:0] ksl,   // level damped by pitch
-    input      [3:0] keycode,
     input      [9:0] eg_pure_in,
     output reg [9:0] eg_limited
 );

@@ -4,7 +4,6 @@ module test(
     input               eg_stop,
     // envelope configuration
     input               en_sus_I, // enable sustain
-    input       [3:0]   keycode_II,
     input       [3:0]   arate_I, // attack  rate
     input       [3:0]   drate_I, // decay   rate
     input       [3:0]   rrate_I, // release rate
@@ -28,6 +27,7 @@ module test(
 wire        cenop, zero, op;
 wire        kon = keyon_I;// & zero;
 wire [17:0] slot;
+wire [ 3:0] keycode_II = { block_I, fnum_I[9] };
 
 reg cen=0;
 

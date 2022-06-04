@@ -51,26 +51,24 @@ double sc_time_stamp () {	   // Called by $time in Verilog
    return main_time;
 }
 
-int main(int argc, char *argv[]) {	
-	int err_code=0;
-	vcd = new VerilatedVcdC;
-	bool trace=true;
+void reset() {
+	top.rst = 1;
+	top.keyon_I = 0;
+	clock(18*2);
+	top.rst = 0;
+}
+
+void attack_sweep() {
 	// YM2413
 	// float atime[] = { 0.1, 1738,863,432,216,108,54,27,13.52,6.76,3.38,1.69,0.84,0.5,0.28,0.1 };
 	// YM3812
 	float atime[] = { 0.1, 2826, 1413, 706, 353, 176, 88, 44, 22, 11, 5.52, 2.76, 1.40, 0.7, 0.38,0.1 };
 
-	if( trace ) {
-		Verilated::traceEverOn(true);
-		top.trace(vcd,99);
-		vcd->open("test.vcd");
-	}
+	top.ksr_II=1;
 	for( top.arate_I=3; top.arate_I<15; top.arate_I++ )
+	for( top.block_I=0; top.block_I<4; top.block_I++ )
 	{
-		top.rst = 1;
-		top.keyon_I = 0;
-		clock(18*2);
-		top.rst = 0;
+		reset();
 		top.keyon_I = 1;
 		vluint64_t t0=main_time;
 		int limit=1'000'000;
@@ -87,10 +85,31 @@ int main(int argc, char *argv[]) {
 			float delta=(float)main_time-t0;
 			delta /= 1e6;
 			float err = (delta-atime[top.arate_I])/atime[top.arate_I]*100.0;
-			printf("ARATE %X %6.2f ms (%4.1f %%)\n", top.arate_I, delta, err );
+			printf("ARATE %X (block %d) %6.2f ms (%4.1f %%)\n",
+				top.arate_I, top.block_I, delta, err );
 		}
 	}
+}
 
+int main(int argc, char *argv[]) {
+	int err_code=0;
+	vcd = new VerilatedVcdC;
+	bool trace=true;
+
+	if( trace ) {
+		Verilated::traceEverOn(true);
+		top.trace(vcd,99);
+		vcd->open("test.vcd");
+	}
+
+	top.arate_I=15;
+	top.sl_I=0;
+	for( top.drate_I=1; top.drate_I<16; top.drate_I++ ) {
+		reset();
+		top.keyon_I = 1;
+		vluint64_t t0=main_time;
+		clock(10000);
+	}
 
 	quit:
 	if(trace) vcd->close();

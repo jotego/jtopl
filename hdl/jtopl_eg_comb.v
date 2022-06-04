@@ -123,7 +123,6 @@ jtopl_eg_final u_final(
     .ams        ( ams           ),
     .tl         ( tl            ),
     .ksl        ( ksl           ),
-    .keycode    ( final_keycode ),
     .eg_pure_in ( final_eg_in   ),
     .eg_limited ( final_eg_out  )
 );
