@@ -34,10 +34,10 @@ reg [10:0]  dr_result;
 
 always @(*) begin : dr_calculation
     case( rate[5:2] )
-        4'b1100: dr_sum = { 2'b0, step, ~step }; // 12
-        4'b1101: dr_sum = { 1'b0, step, ~step, 1'b0 }; // 13
-        4'b1110: dr_sum = { step, ~step, 2'b0 }; // 14
-        4'b1111: dr_sum = 4'd8;// 15
+        4'b1100: dr_sum = 4'h2; // 12
+        4'b1101: dr_sum = 4'h4; // 13
+        4'b1110: dr_sum = 4'h8; // 14
+        4'b1111: dr_sum = 4'hf;// 15
         default: dr_sum = { 2'b0, step, 1'b0 };
     endcase
     // Decay rate attenuation is multiplied by 4 for SSG operation

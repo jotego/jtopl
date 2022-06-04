@@ -31,16 +31,17 @@ vluint64_t main_time = 0;	   // Current simulation time
 const vluint64_t HALFPERIOD=133; // 3.57MHz (133ns * 2)
 Vsweep top;
 VerilatedVcdC* vcd;
+bool keep = true;
 
 void clock(int n) {
 	while( n-->0 ) {
 		top.eval();
-		vcd->dump(main_time);
+		if(keep) vcd->dump(main_time);
 
 		main_time += HALFPERIOD;
 		top.clk=1;
 		top.eval();
-		vcd->dump(main_time);
+		if(keep) vcd->dump(main_time);
 
 		main_time += HALFPERIOD;
 		top.clk=0;
@@ -91,6 +92,39 @@ void attack_sweep() {
 	}
 }
 
+void decay_sweep() {
+	// YM3812
+	float atime[] = { 0.1, 39280,19640,9820,4910,2455,1227,613.7,306.8,153.44,76.72,38.36,19.20,9.60,4.80,2.40 };
+
+	top.arate_I=15;
+	top.sl_I=15;
+	for( top.drate_I= keep ? 5 : 1; top.drate_I<16; top.drate_I++ ) {
+		reset();
+		top.keyon_I = 1;
+		clock( 100 );
+		vluint64_t t0=main_time;
+		int limit=1'000'000;
+		if( top.drate_I!=0) {
+			while( (int)top.eg_V<0x3e0 && --limit ) {
+				clock( 10 );
+			}
+		}
+		if( limit==0 ) {
+			cout << "DRATE " << hex << (int)top.drate_I << dec << " timeout " << "(" << (int) top.eg_V << ")\n";
+			if( top.drate_I>5 ) break; // do not continue
+		}
+		if( (int)top.eg_V>=0x3e0 ) {
+			float delta=(float)main_time-t0;
+			delta /= 1e6;
+			float err = (delta-atime[top.drate_I])/atime[top.drate_I]*100.0;
+			printf("DRATE %X (block %d) %6.2f ms (%4.1f %%)\n",
+				top.drate_I, top.block_I, delta, err );
+		} else {
+			printf("End not reached\n");
+		}
+	}
+}
+
 int main(int argc, char *argv[]) {
 	int err_code=0;
 	vcd = new VerilatedVcdC;
@@ -102,16 +136,9 @@ int main(int argc, char *argv[]) {
 		vcd->open("test.vcd");
 	}
 
-	top.arate_I=15;
-	top.sl_I=0;
-	for( top.drate_I=1; top.drate_I<16; top.drate_I++ ) {
-		reset();
-		top.keyon_I = 1;
-		vluint64_t t0=main_time;
-		clock(10000);
-	}
+	//attack_sweep();
+	decay_sweep();
 
-	quit:
 	if(trace) vcd->close();
 	// VerilatedCov::write("logs/coverage.dat");
 	delete vcd;
