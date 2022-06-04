@@ -56,7 +56,7 @@ jtopl_slot_cnt u_slot_cnt(
 jtopl_eg uut(
     .rst        ( rst           ),
     .clk        ( clk           ),
-    .cen        ( cen           ),
+    // .cen        ( cen           ),Mas
     .cenop      ( cenop         ),
     .zero       ( zero          ),
     .eg_stop    ( eg_stop       ),

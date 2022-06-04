@@ -56,16 +56,16 @@ int main(int argc, char *argv[]) {
 	vcd = new VerilatedVcdC;
 	bool trace=true;
 	// YM2413
-	 float atime[] = { 0.1, 1738,863,432,216,108,54,27,13.52,6.76,3.38,1.69,0.84,0.5,0.28,0.1 };
+	// float atime[] = { 0.1, 1738,863,432,216,108,54,27,13.52,6.76,3.38,1.69,0.84,0.5,0.28,0.1 };
 	// YM3812
-	//float atime[] = { 0.1, 2826, 1413, 706, 353, 176, 88, 44, 22, 11, 5.52, 2.76, 1.40, 0.7, 0.38,0.1 };
+	float atime[] = { 0.1, 2826, 1413, 706, 353, 176, 88, 44, 22, 11, 5.52, 2.76, 1.40, 0.7, 0.38,0.1 };
 
 	if( trace ) {
 		Verilated::traceEverOn(true);
 		top.trace(vcd,99);
 		vcd->open("test.vcd");
 	}
-	for( top.arate_I=1; top.arate_I<16; top.arate_I++ )
+	for( top.arate_I=3; top.arate_I<16; top.arate_I++ )
 	{
 		top.rst = 1;
 		top.keyon_I = 0;
@@ -81,6 +81,7 @@ int main(int argc, char *argv[]) {
 		}
 		if( limit==0 ) {
 			cout << "ARATE " << (int)top.arate_I << " timeout " << "(" << (int) top.eg_V << ")\n";
+			if( top.arate_I>5 ) break; // do not continue
 		}
 		if( (int)top.eg_V==0 ) {
 			float delta=(float)main_time-t0;
