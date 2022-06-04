@@ -80,14 +80,14 @@ int main(int argc, char *argv[]) {
 			}
 		}
 		if( limit==0 ) {
-			cout << "ARATE " << (int)top.arate_I << " timeout " << "(" << (int) top.eg_V << ")\n";
+			cout << "ARATE " << hex << (int)top.arate_I << dec << " timeout " << "(" << (int) top.eg_V << ")\n";
 			if( top.arate_I>5 ) break; // do not continue
 		}
 		if( (int)top.eg_V==0 ) {
 			float delta=(float)main_time-t0;
 			delta /= 1e6;
 			float err = (delta-atime[top.arate_I])/atime[top.arate_I]*100.0;
-			cout << "ARATE " << (int)top.arate_I << " " << delta << " ms (" <<
+			cout << "ARATE " << hex << (int)top.arate_I << dec << " " << delta << " ms (" <<
 				setprecision(3) << err << "%) " << endl;
 		}
 	}
