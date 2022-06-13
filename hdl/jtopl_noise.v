@@ -19,6 +19,11 @@
 
     */
 
+// Following research by Andete in
+// https://github.com/andete/ym2413
+// This has been research for the YM2413 (OPLL)
+// I assume other OPL chips use the same one
+
 module jtopl_noise(
     input  rst,        // rst should be at least 6 clk&cen cycles long
     input  clk,        // CPU clock
@@ -26,21 +31,16 @@ module jtopl_noise(
     output noise
 );
 
-reg [22:0] no;
+reg [22:0] poly;
 reg        nbit;
 
-assign     noise = no[0];
-
-always @(*) begin
-    nbit = no[0] ^ no[14];
-    nbit = nbit | (no==23'd0);
-end
+assign     noise = poly[22] ^ poly[9] ^ poly[8] ^ poly[0];
 
 always @(posedge clk, posedge rst) begin
     if( rst )
-        no <= 23'd1<<22;
+        poly <= 1;
     else if(cen) begin
-        no <= { nbit, no[22:1] };
+        poly <= poly==0 ? 23'd1 : { poly[21:0], noise };
     end
 end
 

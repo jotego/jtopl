@@ -19,6 +19,12 @@ The implementation tries to be as close to original hardware as possible. Low us
 * Accurate at sample level, and at internal cycle clock where reasonable
 * Original architecture kept as much as possible
 
+Some reference works used:
+
+* [NukeYT's Nuked-OPLL](https://github.com/nukeykt/Nuked-OPLL)
+* [Research by Andete](https://github.com/andete/ym2413)
+* [Mitsutaka Okazaki's emu2413](https://github.com/digital-sound-antiques/emu2413)
+
 *Modern Design for FPGA*
 
 * Fully synchronous
