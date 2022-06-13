@@ -24,8 +24,9 @@
 // restart the sum when input "zero" is high
 
 module jtopl_single_acc #(parameter 
-        INW=13, // input data width 
-        OUTW=16 // output data width
+        OPL_TYPE=  1,
+        INW     = 13, // input data width
+        OUTW    = 16 // output data width
 )(
     input                 clk,
     input                 cenop,
@@ -36,7 +37,6 @@ module jtopl_single_acc #(parameter
     output reg [OUTW-1:0] snd
 );
 
-parameter OPL_TYPE=1;
 
 // for full resolution use INW=14, OUTW=16
 // for cut down resolution use INW=9, OUTW=12
