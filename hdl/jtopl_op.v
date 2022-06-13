@@ -43,7 +43,7 @@ module jtopl_op(
     
     output reg signed [12:0] op_result,
     output                   op_out,
-    output                   con_out
+    output                   con_IV
 );
 
 parameter OPL_TYPE=1;
@@ -78,7 +78,7 @@ jtopl_sh #( .width(2), .stages(3)) u_condly(
     .clk    ( clk                ),
     .cen    ( cenop              ),
     .din    ( {op_d, con_I_d}    ),
-    .drop   ( {op_out, con_out}  )
+    .drop   ( {op_out, con_IV}   )
 );
 
 always @(*) begin

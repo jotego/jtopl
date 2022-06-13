@@ -55,6 +55,7 @@ module jtopl_reg(
     output     [2:0] block_I,
     // channel configuration
     output     [2:0] fb_I,
+    output           rhy_IV,
     
     output     [3:0] mul_II,  // frequency multiplier
     output     [1:0] ksl_IV,  // key shift level
@@ -180,6 +181,14 @@ assign disable_con = rhy_oen && !slot[12] && !slot[13];
 assign con_I       = !rhy_en || !disable_con ? con_csr : 1'b1;
 assign { keyon_csr, block_I, fnum_I, fb_I, con_csr } = chcfg;
 assign keyon_I = rhy_oen ? rhyon_csr : keyon_csr;
+
+jtopl_sh_rst #(.width(1),.stages(3)) u_iv(
+    .clk    ( clk        ),
+    .cen    ( cen        ),
+    .rst    ( rst        ),
+    .din    ( rhy_oen    ),
+    .drop   ( rhy_IV     )
+);
 
 jtopl_reg_ch#(CHCSRW) u_reg_ch(
     .rst         ( rst          ),

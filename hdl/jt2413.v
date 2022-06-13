@@ -68,7 +68,7 @@ wire          am_dep, vib_dep, rhy_en;
 // Operator
 wire  [ 2:0]  fb_I;
 wire  [ 1:0]  wavsel_I;
-wire          op, con_I, op_out, con_out;
+wire          op, con_I, op_out, con_IV, rhy_IV;
 
 wire signed [12:0] op_result;
 
@@ -193,17 +193,18 @@ jtopl_op #(.OPL_TYPE(OPL_TYPE)) u_op(
     .con_I      ( con_I         ),
     .op_result  ( op_result     ),
     .op_out     ( op_out        ),
-    .con_out    ( con_out       )
+    .con_IV     ( con_IV        )
 );
 
-jtopl_acc u_acc(
+jtopl_acc #(.OPL_TYPE(OPL_TYPE)) u_acc(
     .rst        ( rst           ),
     .clk        ( clk           ),
     .cenop      ( cenop         ),
     .zero       ( zero          ),
     .op_result  ( op_result     ),
     .op         ( op_out        ),
-    .con        ( con_out       ),
+    .con        ( con_IV        ),
+    .rhy_IV     ( rhy_IV        ),
     .snd        ( snd           )
 );
 

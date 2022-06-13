@@ -28,20 +28,24 @@ module jtopl_acc(
     input                zero,
     input                op,  // 0 for modulator operators
     input                con, // 0 for modulated connection
+    input                rhy_IV, // 1 for rhythm channels
     output signed [15:0] snd
 );
+
+parameter OPL_TYPE=1;
 
 wire sum_en;
 
 assign sum_en = op | con;
 
 // Continuous output
-jtopl_single_acc  u_acc(
+jtopl_single_acc #(.OPL_TYPE(OPL_TYPE))  u_acc(
     .clk        ( clk       ),
     .cenop      ( cenop     ),
     .op_result  ( op_result ),
     .sum_en     ( sum_en    ),
     .zero       ( zero      ),
+    .rhy_IV     ( rhy_IV    ),
     .snd        ( snd       )
 );
 

@@ -32,8 +32,11 @@ module jtopl_single_acc #(parameter
     input [INW-1:0]       op_result,
     input                 sum_en,
     input                 zero,
+    input                 rhy_IV, // 1 for rhythm channels
     output reg [OUTW-1:0] snd
 );
+
+parameter OPL_TYPE=1;
 
 // for full resolution use INW=14, OUTW=16
 // for cut down resolution use INW=9, OUTW=12
@@ -47,6 +50,9 @@ wire [OUTW-1:0] minus_inf = { 1'b1, {(OUTW-1){1'b0}} }; // minimum negative valu
 
 always @(*) begin
     current = sum_en ? { {(OUTW-INW){op_result[INW-1]}}, op_result } : {OUTW{1'b0}};
+    if( rhy_IV && OPL_TYPE==11 ) begin
+        current = current << 1; // double the gain for rhythm instruments in OPLL
+    end
     next = zero ? current : current + acc;
     overflow = !zero && 
         (current[OUTW-1] == acc[OUTW-1]) && 

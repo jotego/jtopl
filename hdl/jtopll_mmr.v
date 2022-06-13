@@ -49,6 +49,8 @@ module jtopll_mmr(
     output              ks_II,    // key scale
     output      [ 5:0]  tl_IV,
     output              amen_IV,
+    // Accumulator
+    output              rhy_IV,
     // global values
     output reg          am_dep,
     output reg          vib_dep,
@@ -199,6 +201,8 @@ jtopll_reg u_reg(
     .ksl_IV     ( ksl_IV        ),
     .amen_IV    ( amen_IV       ),
     .tl_IV      ( tl_IV         ),
+    // accumulator
+    .rhy_IV     ( rhy_IV        ),
     // Timbre - Neiro
     .fb_I       ( fb_I          ),
     .con_I      ( con_I         )

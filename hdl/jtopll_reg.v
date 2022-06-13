@@ -48,7 +48,7 @@ module jtopll_reg(
     output     [2:0] block_I,
     // channel configuration
     output     [2:0] fb_I,
-
+    output           rhy_IV,
 
     output reg [3:0] mul_II,  // frequency multiplier
     output     [1:0] ksl_IV,  // key shift level
@@ -160,8 +160,8 @@ jtopl_sh_rst #(.width(2+1+6),.stages(3)) u_iv(
     .clk    ( clk        ),
     .cen    ( cen        ),
     .rst    ( rst        ),
-    .din    ( { ksl_I, amen_I, tl_I    } ),
-    .drop   ( { ksl_IV, amen_IV, tl_IV } )
+    .din    ( { rhy_oen, ksl_I,  amen_I,  tl_I  } ),
+    .drop   ( { rhy_IV,  ksl_IV, amen_IV, tl_IV } )
 );
 
 // Memory for CH registers
