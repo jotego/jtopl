@@ -50,21 +50,22 @@ module jtopl_eg (
 
 parameter SLOTS=18;
 
-wire [14:0] eg_cnt;
+wire [15:0] eg_cnt, eg_carry;
 
 jtopl_eg_cnt u_egcnt(
-    .rst    ( rst   ),
-    .clk    ( clk   ),
-    .cen    ( cenop & ~eg_stop ),
-    .zero   ( zero  ),
-    .eg_cnt ( eg_cnt)
+    .rst     ( rst      ),
+    .clk     ( clk      ),
+    .cen     ( cenop & ~eg_stop ),
+    .zero    ( zero     ),
+    .eg_cnt  ( eg_cnt   ),
+    .eg_carry( eg_carry )
 );
 
 wire keyon_last_I;
 wire keyon_now_I  = !keyon_last_I && keyon_I;
 wire keyoff_now_I = keyon_last_I && !keyon_I;
 
-wire cnt_in_II, cnt_lsb_II, step_II, pg_rst_I;
+wire step_II, pg_rst_I;
 
 wire [2:0] state_in_I, state_next_I;
 
@@ -107,9 +108,8 @@ jtopl_eg_comb u_comb(
     .step_rate_in   ( base_rate_II  ),
     .keycode        ( keycode_II    ),
     .eg_cnt         ( eg_cnt        ),
-    .cnt_in         ( cnt_in_II     ),
+    .eg_carry       ( eg_carry      ),
     .ksr            ( ksr_II        ),
-    .cnt_lsb        ( cnt_lsb_II    ),
     .step           ( step_II       ),
     .step_rate_out  ( rate_out_II   ),
     .sum_up_out     ( sum_out_II    ),
@@ -153,13 +153,6 @@ always @(posedge clk) if(cenop) begin
     keycode_III <= keycode_II;
     keycode_IV  <= keycode_III;
 end
-
-jtopl_sh #( .width(1), .stages(SLOTS) ) u_cntsh(
-    .clk    ( clk       ),
-    .cen    ( cenop     ),
-    .din    ( cnt_lsb_II),
-    .drop   ( cnt_in_II )
-);
 
 jtopl_sh #( .width(4), .stages(3) ) u_fnumsh(
     .clk    ( clk         ),

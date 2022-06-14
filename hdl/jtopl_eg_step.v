@@ -23,10 +23,9 @@ module jtopl_eg_step(
     input             attack,
     input      [ 4:0] base_rate,
     input      [ 3:0] keycode,
-    input      [14:0] eg_cnt,
-    input             cnt_in,
+    input      [15:0] eg_cnt,
+    input      [15:0] eg_carry,
     input             ksr,
-    output            cnt_lsb,
     output reg        step,
     output reg [ 5:0] rate,
     output reg        sum_up
@@ -45,28 +44,34 @@ end
 always @(*)
     rate = pre_rate>=7'b1111_00 ? 6'b1111_11 : pre_rate[5:0];
 
-reg [2:0] cnt;
+reg [ 4:0] mux_sel;
+reg [ 2:0] cnt;
 
-reg [4:0] mux_sel;
 always @(*) begin
     mux_sel = attack ? (rate[5:2]+4'd1): {1'b0,rate[5:2]};
 end
 
-always @(*) 
-    case( mux_sel )
-        5'h0:    cnt = eg_cnt[13:11];
-        5'h1:    cnt = eg_cnt[12:10];
-        5'h2:    cnt = eg_cnt[11: 9];
-        5'h3:    cnt = eg_cnt[10: 8];
-        5'h4:    cnt = eg_cnt[ 9: 7];
-        5'h5:    cnt = eg_cnt[ 8: 6];
-        5'h6:    cnt = eg_cnt[ 7: 5];
-        5'h7:    cnt = eg_cnt[ 6: 4];
-        5'h8:    cnt = eg_cnt[ 5: 3];
-        5'h9:    cnt = eg_cnt[ 4: 2];
-        5'ha:    cnt = eg_cnt[ 3: 1];
-        default: cnt = eg_cnt[ 2: 0];
+always @* begin
+    // a rate of zero keeps the level still because sum_up is zero
+    case( rate[5:2] )
+        0:  { cnt, sum_up } = { 3'd0, 1'd0 };
+        1:  { cnt, sum_up } = { eg_cnt[11: 9], eg_carry[ 8] };
+        2:  { cnt, sum_up } = { eg_cnt[10: 8], eg_carry[ 7] };
+        3:  { cnt, sum_up } = { eg_cnt[ 9: 7], eg_carry[ 6] };
+        4:  { cnt, sum_up } = { eg_cnt[ 8: 6], eg_carry[ 5] };
+        5:  { cnt, sum_up } = { eg_cnt[ 7: 5], eg_carry[ 4] };
+        6:  { cnt, sum_up } = { eg_cnt[ 6: 4], eg_carry[ 3] };
+        7:  { cnt, sum_up } = { eg_cnt[ 5: 3], eg_carry[ 2] };
+        8:  { cnt, sum_up } = { eg_cnt[ 4: 2], eg_carry[ 1] };
+        9:  { cnt, sum_up } = { eg_cnt[ 3: 1], eg_carry[ 0] };
+        10: { cnt, sum_up } = { eg_cnt[ 2: 0], 1'b1 };
+        11: { cnt, sum_up } = { eg_cnt[ 2: 0], 1'b1 };
+        12: { cnt, sum_up } = { eg_cnt[ 2: 0], 1'b1 };
+        13: { cnt, sum_up } = { eg_cnt[ 2: 0], 1'b1 };
+        14: { cnt, sum_up } = { eg_cnt[ 2: 0], 1'd1 };
+        15: { cnt, sum_up } = { 3'd7, 1'd1 };
     endcase
+end
 
 ////////////////////////////////
 reg [7:0] step_idx;
@@ -94,13 +99,7 @@ always @(*) begin : rate_step
             2'd3: step_idx = 8'b11111110; // 7
         endcase
     end
-    // a rate of zero keeps the level still
-    step = rate[5:1]==5'd0 ? 1'b0 : step_idx[ cnt ];
-end
-
-assign cnt_lsb = cnt[0];
-always @(*) begin
-    sum_up = cnt[0] != cnt_in;
+    step = /*rate[5:1]==5'd0 ? 1'b0 :*/ step_idx[ cnt ];
 end
 
 endmodule // eg_step

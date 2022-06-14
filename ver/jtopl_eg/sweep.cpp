@@ -66,13 +66,13 @@ void attack_sweep() {
 	float atime[] = { 0.1, 2826, 1413, 706, 353, 176, 88, 44, 22, 11, 5.52, 2.76, 1.40, 0.7, 0.38,0.1 };
 
 	top.ksr_II=1;
-	for( top.arate_I=3; top.arate_I<15; top.arate_I++ )
+	for( top.arate_I=1; top.arate_I<15; top.arate_I++ )
 	for( top.block_I=0; top.block_I<4; top.block_I++ )
 	{
 		reset();
 		top.keyon_I = 1;
 		vluint64_t t0=main_time;
-		int limit=1'000'000;
+		int limit=10'000'000;
 		if( top.arate_I!=0) {
 			while( (int)top.eg_V!=0 && --limit ) {
 				clock( 10 );
@@ -86,8 +86,8 @@ void attack_sweep() {
 			float delta=(float)main_time-t0;
 			delta /= 1e6;
 			float err = (delta-atime[top.arate_I])/atime[top.arate_I]*100.0;
-			printf("ARATE %X (block %d) %6.2f ms (%4.1f %%)\n",
-				top.arate_I, top.block_I, delta, err );
+			printf("ARATE %X (block %d) %6.2f ms - %6.2f(%4.1f %%)\n",
+				top.arate_I, top.block_I, delta, atime[top.arate_I], err );
 		}
 	}
 }
@@ -136,8 +136,8 @@ int main(int argc, char *argv[]) {
 		vcd->open("test.vcd");
 	}
 
-	//attack_sweep();
-	decay_sweep();
+	attack_sweep();
+	//decay_sweep();
 
 	if(trace) vcd->close();
 	// VerilatedCov::write("logs/coverage.dat");
