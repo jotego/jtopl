@@ -349,7 +349,7 @@ static void OPLL_DoRegWrite(opll_t *chip) {
             case 0x10:
                 if (chip->chip_type == opll_type_ym2420)
                 {
-                    chip->fnum[channel] = (chip->fnum[channel] & 0x0f) | ((chip->data & 0x1f) << 4);
+                    chip->fnum[channel] = (chip->fnum[channel] & 0x0f) | ((chip->data & 0x1f) << 4); // fnum is 9 bits
                     chip->block[channel] = (chip->data >> 5) & 0x07;
                 }
                 else
@@ -423,7 +423,7 @@ static void OPLL_PreparePatch1(opll_t *chip) {
     chip->c_et = patch->et[mcsel];
     chip->c_ksr = patch->ksr[mcsel];
     chip->c_ksl = patch->ksl[mcsel];
-    chip->c_ksr_freq = (chip->block[ch] << 1) | (chip->fnum[ch] >> 8);
+    chip->c_ksr_freq = (chip->block[ch] << 1) | (chip->fnum[ch] >> 8); // 3+1 = 4 bits, keycode
     chip->c_ksl_freq = (chip->fnum[ch]>>5);
     chip->c_ksl_block = (chip->block[ch]);
 }

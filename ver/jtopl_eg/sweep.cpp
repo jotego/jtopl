@@ -98,12 +98,14 @@ void decay_sweep() {
 
 	top.arate_I=15;
 	top.sl_I=15;
-	for( top.drate_I= keep ? 5 : 1; top.drate_I<16; top.drate_I++ ) {
+	for( top.drate_I= keep ? 6 : 1; top.drate_I<16; top.drate_I++ )
+	for( top.block_I=0; top.block_I<4; top.block_I++ )
+	{
 		reset();
 		top.keyon_I = 1;
 		clock( 100 );
 		vluint64_t t0=main_time;
-		int limit=1'000'000;
+		int limit=40'000'000;
 		if( top.drate_I!=0) {
 			while( (int)top.eg_V<0x3e0 && --limit ) {
 				clock( 10 );
@@ -136,8 +138,8 @@ int main(int argc, char *argv[]) {
 		vcd->open("test.vcd");
 	}
 
-	attack_sweep();
-	//decay_sweep();
+	// attack_sweep();
+	decay_sweep();
 
 	if(trace) vcd->close();
 	// VerilatedCov::write("logs/coverage.dat");

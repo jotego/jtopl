@@ -21,7 +21,7 @@
 
 module jtopl_eg_step(
     input             attack,
-    input      [ 4:0] base_rate,
+    input      [ 4:0] base_rate, // base_rate has already been doubled in the eg_ctrl module
     input      [ 3:0] keycode,
     input      [15:0] eg_cnt,
     input      [15:0] eg_carry,
@@ -38,11 +38,13 @@ always @(*) begin : pre_rate_calc
         pre_rate = 7'd0;
     else
         pre_rate = { 1'b0, base_rate, 1'b0 } +  // base_rate LSB is always zero except for RR
-            ({ 3'b0, keycode } >> (ksr ? 1 : 3));
-end
+            ({ 3'b0, keycode } >> (ksr ? 0 : 2));
 
-always @(*)
-    rate = pre_rate>=7'b1111_00 ? 6'b1111_11 : pre_rate[5:0];
+    if( pre_rate[6] )
+        pre_rate = { 5'b11111, keycode[1:0] };
+
+    rate = pre_rate[5:0];
+end
 
 reg [ 4:0] mux_sel;
 reg [ 2:0] cnt;
@@ -55,16 +57,16 @@ always @* begin
     // a rate of zero keeps the level still because sum_up is zero
     case( rate[5:2] )
         0:  { cnt, sum_up } = { 3'd0, 1'd0 };
-        1:  { cnt, sum_up } = { eg_cnt[11: 9], eg_carry[ 8] };
-        2:  { cnt, sum_up } = { eg_cnt[10: 8], eg_carry[ 7] };
-        3:  { cnt, sum_up } = { eg_cnt[ 9: 7], eg_carry[ 6] };
-        4:  { cnt, sum_up } = { eg_cnt[ 8: 6], eg_carry[ 5] };
-        5:  { cnt, sum_up } = { eg_cnt[ 7: 5], eg_carry[ 4] };
-        6:  { cnt, sum_up } = { eg_cnt[ 6: 4], eg_carry[ 3] };
-        7:  { cnt, sum_up } = { eg_cnt[ 5: 3], eg_carry[ 2] };
-        8:  { cnt, sum_up } = { eg_cnt[ 4: 2], eg_carry[ 1] };
-        9:  { cnt, sum_up } = { eg_cnt[ 3: 1], eg_carry[ 0] };
-        10: { cnt, sum_up } = { eg_cnt[ 2: 0], 1'b1 };
+        1:  { cnt, sum_up } = { eg_cnt[12:10], eg_carry[ 9] };
+        2:  { cnt, sum_up } = { eg_cnt[11: 9], eg_carry[ 8] };
+        3:  { cnt, sum_up } = { eg_cnt[10: 8], eg_carry[ 7] };
+        4:  { cnt, sum_up } = { eg_cnt[ 9: 7], eg_carry[ 6] };
+        5:  { cnt, sum_up } = { eg_cnt[ 8: 6], eg_carry[ 5] };
+        6:  { cnt, sum_up } = { eg_cnt[ 7: 5], eg_carry[ 4] };
+        7:  { cnt, sum_up } = { eg_cnt[ 6: 4], eg_carry[ 3] };
+        8:  { cnt, sum_up } = { eg_cnt[ 5: 3], eg_carry[ 2] };
+        9:  { cnt, sum_up } = { eg_cnt[ 4: 2], eg_carry[ 1] };
+        10: { cnt, sum_up } = { eg_cnt[ 3: 1], eg_carry[ 0] };
         11: { cnt, sum_up } = { eg_cnt[ 2: 0], 1'b1 };
         12: { cnt, sum_up } = { eg_cnt[ 2: 0], 1'b1 };
         13: { cnt, sum_up } = { eg_cnt[ 2: 0], 1'b1 };
@@ -79,7 +81,7 @@ reg [7:0] step_idx;
 always @(*) begin : rate_step
     if( rate[5:4]==2'b11 ) begin // 0 means 1x, 1 means 2x
         if( rate[5:2]==4'hf && attack)
-            step_idx = 8'b11111111; // Maximum attack speed, rates 60&61
+            step_idx = 8'b11111111; // Maximum attack speed, rates 60, 61
         else
         case( rate[1:0] )
             2'd0: step_idx = 8'b00000000;
