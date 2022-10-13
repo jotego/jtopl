@@ -129,7 +129,7 @@ wire              en_sus, rhy_oen;
 // Sustained is disabled in rhythm mode for channels in group 2 (i.e. 6,7,8)
 assign            en_sus_I = rhy_oen ? 1'b0 : en_sus;
 
-jtopl_csr #(.LEN(CH*2),.W(OPCFGW)) u_csr(
+jtopl_csr #(.LEN(CH*2),.W(OPCFGW), .OPL_TYPE(OPL_TYPE)) u_csr(
     .rst            ( rst           ),
     .clk            ( clk           ),
     .cen            ( cen           ),

@@ -21,7 +21,7 @@
 */
 
 module jtopl_csr #(
-    parameter LEN=18, W=34
+    parameter LEN=18, W=34, OPL_TYPE=1
 ) ( // Circular Shift Register + input mux
     input           rst,
     input           clk,
@@ -70,8 +70,9 @@ assign regop_in[31:0] = { // 4 bytes:
         up_sl_rr_op ? din         : shift_out[ 7: 0]
     };
 
-`ifdef JTOPL2
-    assign regop_in[33:32] = up_wav_I ? din[1:0] : shift_out[33:32];
-`endif
+generate if (OPL_TYPE == 2) begin
+assign regop_in[33:32] = up_wav_I ? din[1:0] : shift_out[33:32];
+end
+endgenerate
 
 endmodule // jtopl_reg
