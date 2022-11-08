@@ -3,3 +3,4 @@
 *.wav
 *.vgm
 obj_dir
+.DS_Store

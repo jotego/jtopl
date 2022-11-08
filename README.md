@@ -7,6 +7,22 @@ You can show your appreciation through
 
 JTOPL is an FM sound source written in Verilog, fully compatible with YM3526. This project will most likely grow to include other Yamaha chips of the OPL family.
 
+## Using JTOPL in a git project
+
+If you are using JTOPL in a git project, the best way to add it to your project is:
+
+1. Optionally fork JTOPL's repository to your own GitHub account
+2. Add it as a submodule to your git project: `git submodule add https://github.com/jotego/jtopl.git`
+3. Now you can refer to the RTL files in **jtopl/hdl**
+
+The advantages of a using a git submodule are:
+
+1. Your project contains a reference to a commit of the JTOPL repository
+2. As long as you do not manually update the JTOPL submodule, it will keep pointing to the same commit
+3. Each time you make a commit in your project, it will include a pointer to the JTOPL commit used. So you will always know the JTOPL that worked for you
+4. If JTOPL is updated and you want to get the changes, simply update the submodule using git. The new JTOPL commit used will be annotated in your project's next commit. So the history of your project will reflect that change too.
+5. JTOPL files will be intact and you will use the files without altering them.
+
 ## Features
 
 The implementation tries to be as close to original hardware as possible. Low usage of FPGA resources has also been a design goal. 
