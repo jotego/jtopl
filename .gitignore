@@ -2,5 +2,8 @@
 *.f
 *.wav
 *.vgm
+*.jtt
+*.fst
+*.bin
 obj_dir
 .DS_Store
