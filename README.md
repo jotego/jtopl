@@ -1,7 +1,6 @@
-# JTOPL FPGA Clone of Yamaha OPL hardware by Jose Tejada (@topapate)
+# JTOPL FPGA Clone of Yamaha OPL hardware
 
-You can show your appreciation through by supporting [Patreon](https://patreon.com/jotego) releases. 
-
+(c) Jose Tejada. You can show your appreciation by supporting [Patreon](https://patreon.com/jotego) releases. 
 
 JTOPL is an FM sound source written in Verilog, fully compatible with YM3526. This project will most likely grow to include other Yamaha chips of the OPL family.
 
