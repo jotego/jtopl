@@ -90,7 +90,7 @@ reg  [ 7:0] din_copy;
 reg         csm, effect;
 reg  [ 1:0] sel_group;     // group to update
 reg  [ 2:0] sel_sub;       // subslot to update
-reg         up_fnumlo, up_fnumhi, up_fbcon, 
+reg         up_fnumlo, up_fnumhi, up_fbcon,
             up_mult, up_ksl_tl, up_ar_dr, up_sl_rr,
             up_wav;
 reg         wave_mode,     // 1 if waveform selection is enabled (OPL2)
@@ -142,7 +142,7 @@ always @(posedge clk) begin
         // WRITE IN REGISTERS
         if( write ) begin
             if( !addr ) begin
-                selreg <= din;  
+                selreg <= din;
             end else begin
                 // Global registers
                 din_copy  <= din;
@@ -160,8 +160,8 @@ always @(posedge clk) begin
                     REG_CLKA: value_A <= din;
                     REG_CLKB: value_B <= din;
                     REG_TIMER: begin
-                        clr_flag_A <= din[7];
-                        clr_flag_B <= din[7];
+                        clr_flag_A <= din[7] | din[6];
+                        clr_flag_B <= din[7] | din[5];
                         if (~din[7]) begin
                             flagen_A   <= ~din[6];
                             flagen_B   <= ~din[5];
@@ -186,7 +186,7 @@ always @(posedge clk) begin
                         3'b111: up_wav    <= OPL_TYPE!=1;
                         default:;
                     endcase
-                end                
+                end
                 // Channel registers
                 if( selreg[3:0]<=4'd8) begin
                     case( selreg[7:4] )
@@ -235,13 +235,13 @@ jtopl_reg #(.OPL_TYPE(OPL_TYPE)) u_reg(
     .group      ( group         ),
     .op         ( op            ),
     .slot       ( slot          ),
-    
+
     .sel_group  ( sel_group     ),     // group to update
     .sel_sub    ( sel_sub       ),     // subslot to update
 
     .rhy_en     ( rhy_en        ),
     .rhy_kon    ( rhy_kon       ),
-    
+
     //input           csm,
     //input           flag_A,
     //input           overflow_A,
