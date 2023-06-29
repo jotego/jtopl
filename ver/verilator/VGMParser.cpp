@@ -305,7 +305,7 @@ int VGMParser::parse() {
                 cmd = extra[0];
                 val = extra[1];
                 translate_cmd();
-                return cmd_write;                
+                return cmd_write;
             case 0x57:
             case 0x5A:   // YM3812 write register
             case 0x5B:   // YM3526 write register
@@ -457,6 +457,17 @@ int VGMParser::parse() {
                 {
                     char ss;
                     file.read( &ss, 1 );
+                }
+            case 0xb8: // OKIM6295, write value dd to register aa
+                {
+                    static bool warned=false;
+                    if( !warned ) {
+                        cerr << "OKIM6295 commands will be ignored\n";
+                        warned=true;
+                    }
+                    char ss[2];
+                    file.read( ss, 2 );
+                    continue;   // not implemented
                 }
             case 0xe0:
                 file.read( (char*)&data_offset, 4);
