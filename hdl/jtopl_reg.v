@@ -81,7 +81,6 @@ parameter OPL_TYPE=1;
 localparam CH=9;
 
 wire [2:0] subslot;
-wire [1:0] next_group;
                
 wire       update_op_I  = !write && sel_group == group && sel_sub == subslot;
 reg        update_op_II, update_op_III, update_op_IV;
@@ -94,7 +93,6 @@ jtopl_slot_cnt u_slot_cnt(
     // Pipeline order
     .zero       ( zero      ),
     .group      ( group     ),
-    .next_group (next_group ),
     .op         ( op        ),   // 0 for modulator operators
     .subslot    ( subslot   ),
     .slot       ( slot      )    // hot one encoding of active slot

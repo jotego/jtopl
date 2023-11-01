@@ -27,7 +27,6 @@ module jtopl_slot_cnt(
     // Pipeline order
     output            zero,
     output reg [ 1:0] group,
-    output     [ 1:0] next_group,
     output reg        op,           // 0 for modulator operators    
     output reg [ 2:0] subslot,
     output reg [17:0] slot         // hot one encoding of active slot
@@ -36,7 +35,7 @@ module jtopl_slot_cnt(
 // Each group contains three channels
 // and each subslot contains six operators
 wire [2:0] next_sub   = subslot==3'd5 ? 3'd0 : (subslot+3'd1);
-assign next_group = subslot==3'd5 ? (group==2'b10 ? 2'b00 : group+2'b1) : group;
+wire [1:0] next_group = subslot==3'd5 ? (group==2'b10 ? 2'b00 : group+2'b1) : group;
 
 `ifdef SIMULATION
 // These signals need to operate during rst
