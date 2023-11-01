@@ -19,7 +19,7 @@
 
 */
 
-module jtopl_reg_ch(
+module jtopll_reg_ch(
     input             rst,
     input             clk,
     input             cen,
@@ -31,16 +31,17 @@ module jtopl_reg_ch(
     input       [3:0] up_ch,
     input             up_fnumhi,
     input             up_fnumlo,
-    input             up_fbcon,
+    input             up_inst,
     input       [7:0] din,
 
     input       [1:0] group,
     input       [2:0] sub,
     output reg        keyon,
     output reg  [2:0] block,
-    output reg  [9:0] fnum,
-    output reg  [2:0] fb,
-    output reg        con,
+    output reg  [8:0] fnum,
+    output reg  [3:0] inst,
+    output reg  [3:0] vol,
+    output reg        sus,
     output reg        rhy_oen,    // high for rhythm operators if rhy_en is set
     output            rhyon_csr
 );
@@ -50,10 +51,11 @@ localparam BD=4, SD=3, TOM=2, TC=1, HH=0;
 
 reg  [5:0] rhy_csr;
 
-reg  [8:0] reg_keyon, reg_con;
+reg  [8:0] reg_keyon, reg_sus;
 reg  [2:0] reg_block[8:0];
-reg  [2:0] reg_fb   [8:0];
-reg  [9:0] reg_fnum [8:0];
+reg  [3:0] reg_vol  [8:0];
+reg  [3:0] reg_inst [8:0];
+reg  [8:0] reg_fnum [8:0];
 reg  [3:0] cur, i;
 
 assign rhyon_csr = rhy_csr[5];
@@ -85,30 +87,34 @@ always @(posedge clk, posedge rst) begin
         keyon <= 0;
         block <= 0;
         fnum  <= 0;
-        fb    <= 0;
-        con   <= 0;
+        vol   <= 0;
+        inst  <= 0;
+        sus   <= 0;
     end else if(cen) begin
         keyon <= reg_keyon[cur];
         block <= reg_block[cur];
         fnum  <= reg_fnum [cur];
-        fb    <= reg_fb   [cur];
-        con   <= reg_con  [cur];
+        vol   <= reg_vol  [cur];
+        inst  <= reg_inst [cur];
+        sus   <= reg_sus  [cur];
     end
 end
 
 always @(posedge clk, posedge rst) begin
     if( rst ) begin
         reg_keyon <= 0;
-        reg_con   <= 0;
+        reg_sus   <= 0;
         for( i=0; i<9; i=i+1 ) begin
             reg_block[i] <= 0;
             reg_fnum [i] <= 0;
+            reg_inst [i] <= 0;
+            reg_vol  [i] <= 0;
         end
     end else if(cen) begin
         i <= 0;
         if( up_fnumlo ) reg_fnum[up_ch][7:0] <= din;
-        if( up_fnumhi ) { reg_keyon[up_ch], reg_block[up_ch], reg_fnum[up_ch][9:8] } <= din[5:0];
-        if( up_fbcon  ) { reg_fb[up_ch], reg_con[up_ch] } <= din[3:0];
+        if( up_fnumhi ) { reg_sus[up_ch], reg_keyon[up_ch], reg_block[up_ch], reg_fnum[up_ch][8] } <= din[5:0];
+        if( up_inst   ) { reg_inst[up_ch], reg_vol[up_ch] } <= din;
     end
 end
 

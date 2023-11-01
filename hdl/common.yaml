@@ -19,7 +19,6 @@ here:
   - jtopl_pg_sum.v
   - jtopl_pg_rhy.v
   - jtopl_pg.v
-  - jtopl_reg_ch.v
   - jtopl_sh_rst.v
   - jtopl_sh.v
   - jtopl_slot_cnt.v

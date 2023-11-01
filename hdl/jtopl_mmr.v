@@ -88,6 +88,7 @@ localparam [7:0] REG_TESTYM  = 8'h01,
 reg  [ 7:0] selreg;       // selected register
 reg  [ 7:0] din_copy;
 reg         csm, effect;
+reg  [ 3:0] sel_ch;
 reg  [ 1:0] sel_group;     // group to update
 reg  [ 2:0] sel_sub;       // subslot to update
 reg         up_fnumlo, up_fnumhi, up_fbcon,
@@ -125,6 +126,7 @@ always @(posedge clk) begin
     if( rst ) begin
         selreg    <= 8'h0;
         sel_group <= 2'd0;
+        sel_ch    <= 0;
         sel_sub   <= 3'd0;
         // Updaters
         up_fbcon  <= 0;
@@ -216,6 +218,7 @@ always @(posedge clk) begin
                     // Channels 3-5 -> group 1
                     // Channels 6-8 -> group 2
                     // other        -> group 3 - ignored
+                    sel_ch    <= selreg[3:0];
                     sel_group <= selreg[3:0] < 4'd3 ? 2'd0 :
                                  selreg[3:0] < 4'd6 ? 2'd1 :
                                  selreg[3:0] < 4'd9 ? 2'd2 : 2'd3;
@@ -249,6 +252,7 @@ jtopl_reg #(.OPL_TYPE(OPL_TYPE)) u_reg(
     .op         ( op            ),
     .slot       ( slot          ),
 
+    .sel_ch     ( sel_ch        ),
     .sel_group  ( sel_group     ),     // group to update
     .sel_sub    ( sel_sub       ),     // subslot to update
 
