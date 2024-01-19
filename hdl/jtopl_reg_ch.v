@@ -105,7 +105,7 @@ always @(posedge clk, posedge rst) begin
             reg_fnum [i] <= 0;
         end
     end else if(cen) begin
-        i <= 0;
+        i = 0;
         if( up_fnumlo ) reg_fnum[up_ch][7:0] <= din;
         if( up_fnumhi ) { reg_keyon[up_ch], reg_block[up_ch], reg_fnum[up_ch][9:8] } <= din[5:0];
         if( up_fbcon  ) { reg_fb[up_ch], reg_con[up_ch] } <= din[3:0];
