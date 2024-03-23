@@ -241,6 +241,8 @@ jtopl_op #(.OPL_TYPE(OPL_TYPE)) u_op(
 jtopl_acc u_acc(
     .rst        ( rst           ),
     .clk        ( clk           ),
+    .slot       ( slot          ),
+    .rhy_en     ( rhy_en        ),
     .cenop      ( cenop         ),
     .zero       ( zero          ),
     .op_result  ( op_result     ),
