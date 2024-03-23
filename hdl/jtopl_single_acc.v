@@ -24,8 +24,9 @@
 // restart the sum when input "zero" is high
 
 module jtopl_single_acc #(parameter 
-        INW=13, // input data width 
-        OUTW=16 // output data width
+        INW=13,  // input data width
+        OUTW=13, // output data width
+        ACCW=17
 )(
     input                 clk,
     input                 cenop,
@@ -35,27 +36,18 @@ module jtopl_single_acc #(parameter
     output reg [OUTW-1:0] snd
 );
 
-// for full resolution use INW=14, OUTW=16
-// for cut down resolution use INW=9, OUTW=12
-// OUTW-INW should be > 0
-
-reg signed [OUTW-1:0] next, acc, current;
+reg signed [ACCW-1:0] next, acc, current;
 reg overflow;
 
-wire [OUTW-1:0] plus_inf  = { 1'b0, {(OUTW-1){1'b1}} }; // maximum positive value
-wire [OUTW-1:0] minus_inf = { 1'b1, {(OUTW-1){1'b0}} }; // minimum negative value
-
 always @(*) begin
-    current = sum_en ? { {(OUTW-INW){op_result[INW-1]}}, op_result } : {OUTW{1'b0}};
-    next = zero ? current : current + acc;
-    overflow = !zero && 
-        (current[OUTW-1] == acc[OUTW-1]) && 
-        (acc[OUTW-1]!=next[OUTW-1]);
+    current  = sum_en ? {{(ACCW-INW){op_result[INW-1]}}, op_result} : {ACCW{1'b0}};
+    overflow = acc[ACCW-1:INW]!={ACCW-INW{acc[INW-1]}};
 end
 
 always @(posedge clk) if( cenop ) begin
-    acc <= overflow ? (acc[OUTW-1] ? minus_inf : plus_inf) : next;
-    if(zero) snd <= acc;
+    acc <= zero ? current : current + acc;
+    if(zero)
+        snd <= overflow ? {acc[ACCW-1],{OUTW-1{~acc[ACCW-1]}}} : acc[0+:OUTW];
 end
 
 endmodule

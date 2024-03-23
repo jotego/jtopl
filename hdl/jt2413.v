@@ -28,7 +28,7 @@ module jt2413(
     input                cs_n,
     input                wr_n,
     // combined output
-    output signed [15:0] snd,
+    output signed [12:0] snd,
     output               sample
 );
 
@@ -201,12 +201,13 @@ jtopl_acc u_acc(
     .clk        ( clk           ),
     .cenop      ( cenop         ),
     .zero       ( zero          ),
+    .slot       ( slot          ),
+    .rhy_en     ( rhy_en        ),
     .op_result  ( op_result     ),
     .op         ( op_out        ),
     .con        ( con_out       ),
     .snd        ( snd           )
 );
-
 
 endmodule
     
