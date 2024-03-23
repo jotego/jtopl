@@ -30,7 +30,7 @@ module jtopl2(
     output          [ 7:0] dout,
     output                 irq_n,
     // combined output
-    output  signed  [12:0] snd,
+    output  signed  [15:0] snd,
     output                 sample
 );
 

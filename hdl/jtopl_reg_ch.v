@@ -100,7 +100,7 @@ always @(posedge clk, posedge rst) begin
     if( rst ) begin
         reg_keyon <= 0;
         reg_con   <= 0;
-        for( i=4'd0; i<4'd9; i=i+4'd1 ) begin
+        for( i=0; i<9; i=i+1 ) begin
             reg_block[i] <= 0;
             reg_fnum [i] <= 0;
         end
