@@ -34,7 +34,7 @@ module jtopl_acc(
 );
 
 wire               sum_en;
-wire signed [12:0] op2x;
+wire signed [13:0] op2x;
 wire               rhy2x;
 
 // all rhythm channels are amplified by two
@@ -42,10 +42,10 @@ wire               rhy2x;
 // slots 13~18 (counting from 1 to 18) will enter when bits slot[7:2] are set
 assign rhy2x  = rhy_en && |slot[7:2];
 assign sum_en = op | con;
-assign op2x   = rhy2x ? op_result<<1 : op_result;
+assign op2x   = rhy2x ? {op_result, 1'b0} : {op_result[12],op_result};
 
 // Continuous output
-jtopl_single_acc  u_acc(
+jtopl_single_acc #(.INW(14),.OUTW(16))  u_acc(
     .clk        ( clk       ),
     .cenop      ( cenop     ),
     .op_result  ( op2x      ),
