@@ -31,23 +31,12 @@ module jtopl_sh_rst #(parameter width=5, stages=18, rstval=1'b0 )
 reg [stages-1:0] bits[width-1:0];
 
 genvar i;
-integer k;
-generate
-initial
-	for (k=0; k < width; k=k+1) begin
-		bits[k] = { stages{rstval}};
-	end
-endgenerate
-
 generate
 	for (i=0; i < width; i=i+1) begin: bit_shifter
-		always @(posedge clk, posedge rst) 
-			if( rst ) begin
-				bits[i] <= {stages{rstval}};
-			end else if(cen) begin
-				bits[i] <= {bits[i][stages-2:0], din[i]};
-			end
-		assign drop[i] = bits[i][stages-1];
+		always @(posedge clk) if(cen) begin
+			bits[i] <= {bits[i][stages-2:0], din[i]};
+		end
+		assign drop[i] = rst ? {stages{rstval[0]}} : bits[i][stages-1];
 	end
 endgenerate
 
