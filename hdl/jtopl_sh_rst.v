@@ -29,14 +29,15 @@ module jtopl_sh_rst #(parameter width=5, stages=18, rstval=1'b0 )
 );
 
 reg [stages-1:0] bits[width-1:0];
+wire [width-1:0] din_mx = rst ? {width{rstval[0]}} : din;
 
 genvar i;
 generate
 	for (i=0; i < width; i=i+1) begin: bit_shifter
 		always @(posedge clk) if(cen) begin
-			bits[i] <= {bits[i][stages-2:0], din[i]};
+			bits[i] <= {bits[i][stages-2:0], din_mx[i]};
 		end
-		assign drop[i] = rst ? rstval[0] : bits[i][stages-1];
+		assign drop[i] = bits[i][stages-1];
 	end
 endgenerate
 
