@@ -1,0 +1,4 @@
+jtopl:
+  - get:
+    - jtopl2.v
+    - jt26.yaml
