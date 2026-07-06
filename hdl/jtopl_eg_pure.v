@@ -38,7 +38,7 @@ always @(*) begin : dr_calculation
         4'b1101: dr_sum = 4'h4; // 13
         4'b1110: dr_sum = 4'h8; // 14
         4'b1111: dr_sum = 4'hf;// 15
-        default: dr_sum = { 2'b0, step, 1'b0 };
+        default: dr_sum = { 3'b0, step };       // OPL ref increments by 1 (was 2)
     endcase
     // Decay rate attenuation is multiplied by 4 for SSG operation
     dr_adj    = {6'd0, dr_sum};

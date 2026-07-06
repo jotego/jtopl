@@ -64,8 +64,8 @@ always @(posedge clk, posedge rst) begin
         hh <= 10'd0;
         tc <= 10'd0;
     end else begin
-        if( slot[13] ) hh <= phase_drop[18:9];
-        if( slot[17] ) tc <= phase_drop[18:9];
+        if( slot[14] ) hh <= phase_drop[18:9]; // +1 pipeline offset: op13 lands at slot14
+        if( slot[ 0] ) tc <= phase_drop[18:9]; // +1 pipeline offset: op17 lands at slot0
         rm_xor <= (hh[2]^hh[7]) | (hh[3]^tc[5]) | (tc[3]^tc[5]);
     end
 end
