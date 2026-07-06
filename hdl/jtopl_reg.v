@@ -150,7 +150,7 @@ endgenerate
 wire              pre_keyon, pre_con, rhyon_csr;
 wire              disable_con;
 
-assign disable_con = rhy_oen && !slot[12] && !slot[13];
+assign disable_con = rhy_oen && !slot[12] && !slot[15]; // exclude BOTH bd ops (12=mod,15=car keeps FM); force HH(13) to sum
 assign con_I       = !rhy_en || !disable_con ? pre_con : 1'b1;
 assign keyon_I = rhy_oen ? rhyon_csr : pre_keyon;
 

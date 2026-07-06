@@ -130,7 +130,7 @@ always @(*) begin
     // OPL3  shifts by 9-FB
     // OPLL seems to use lower resolution for OPW so it makes
     // sense that it shifts by one fewer
-    fbmod_I  = modmux_I>>>(4'd9-{1'b0,fb_I_d});
+    fbmod_I  = modmux_I>>>(4'd10-{1'b0,fb_I_d}); // BD buzz: -1 bit feedback
 end
 
 reg signed [9:0] phasemod_I;
