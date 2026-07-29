@@ -46,4 +46,4 @@ always @(*) begin
         phase_op = phase_pre;
 end
 
-endmodule // jtopl_pg_sum
+endmodule

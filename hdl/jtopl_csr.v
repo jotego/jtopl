@@ -75,4 +75,4 @@ assign regop_in[33:32] = up_wav_I ? din[1:0] : shift_out[33:32];
 end
 endgenerate
 
-endmodule // jtopl_reg
+endmodule
