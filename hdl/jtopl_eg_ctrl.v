@@ -78,7 +78,7 @@ always @(*)
             state_next  = HOLD;
         end
         default: begin // RELEASE, note that keyoff_now==1 will enter this state too
-            base_rate   = {rrate,1'b1};
+            base_rate   = {rrate,1'b0};
             state_next  = RELEASE;  // release
         end
     endcase

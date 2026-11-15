@@ -8,3 +8,5 @@
 *.raw
 obj_dir
 .DS_Store
+
+!ver/eg_rate/gather.f
