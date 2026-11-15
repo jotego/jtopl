@@ -35,13 +35,13 @@ module jtopl_eg_step(
 reg  [6:0]   pre_rate;
 wire [1:0]   shby;
 
-assign shby = ksr ? 2'd1 : 2'd3;
+assign shby = ksr ? 2'd0 : 2'd2;
 
 always @(*) begin : pre_rate_calc
     if( base_rate == 5'd0 )
         pre_rate = 7'd0;
     else
-        pre_rate = { 1'b0, base_rate, 1'b0 } +  // base_rate LSB is always zero except for RR
+        pre_rate = { 1'b0, base_rate, 1'b0 } +
             ({ 3'b0, keycode } >> shby);
 end
 

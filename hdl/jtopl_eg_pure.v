@@ -34,13 +34,13 @@ reg [10:0]  dr_result;
 
 always @(*) begin : dr_calculation
     case( rate[5:2] )
-        4'b1100: dr_sum = 4'h2; // 12
-        4'b1101: dr_sum = 4'h4; // 13
-        4'b1110: dr_sum = 4'h8; // 14
-        4'b1111: dr_sum = 4'hf;// 15
-        default: dr_sum = { 3'b0, step };       // OPL ref increments by 1 (was 2)
+        4'b1100: dr_sum = step ? 4'd2 : 4'd1;
+        4'b1101: dr_sum = step ? 4'd4 : 4'd2;
+        4'b1110: dr_sum = step ? 4'd8 : 4'd4;
+        4'b1111: dr_sum = 4'd8;
+        default: dr_sum = { 3'b0, step };
     endcase
-    // Decay rate attenuation is multiplied by 4 for SSG operation
+    // One internal unit is half an OPL attenuation step.
     dr_adj    = {6'd0, dr_sum};
     dr_result = dr_adj + eg_in;
 end
