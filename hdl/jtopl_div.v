@@ -36,12 +36,19 @@ reg  [W-1:0] cnt;
 initial cnt={W{1'b0}};
 `endif
 
-always @(posedge clk) if(cen) begin
-    cnt <= cnt+1'd1;
+// The counter keeps running during reset, but it restarts when the reset is
+// released, so the chip always has the same phase after the reset. Otherwise,
+// it would depend on how long the reset lasted and the game would not repeat
+reg rst_l=0;
+
+always @(posedge clk) begin
+    rst_l <= rst;
+    if( rst_l && !rst ) cnt <= 0;
+    else if(cen) cnt <= cnt+1'd1;
 end
 
 always @(posedge clk) begin
-    cenop <= cen && (&cnt);
+    cenop <= cen && (&cnt) && !(rst_l && !rst);
 end
 
 endmodule
