@@ -50,9 +50,6 @@ end
 
 assign     zero = slot[0];
 
-// The counter keeps running during reset, but it restarts when the reset is
-// released, so the chip always has the same phase after the reset. Otherwise,
-// it would depend on how long the reset lasted and the game would not repeat
 reg rst_l=0;
 
 always @(posedge clk) begin : up_counter
