@@ -50,8 +50,16 @@ end
 
 assign     zero = slot[0];
 
+reg rst_l=0;
+
 always @(posedge clk) begin : up_counter
-    if( cen ) begin
+    rst_l <= rst;
+    if( rst_l && !rst ) begin
+        group   <= 0;
+        subslot <= 0;
+        slot    <= 18'd1;
+        op      <= 0;
+    end else if( cen ) begin
         { group, subslot }  <= { next_group, next_sub };
         if( { next_group, next_sub }==5'd0 ) begin
             slot <= 18'd1;
